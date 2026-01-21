@@ -1,34 +1,131 @@
-.App-logo {
-    height: 40vmin;
-    pointer-events: none;
+/* App-specific styles */
+
+/* Button styles from design guidelines */
+.btn-primary {
+    @apply bg-[#0F4C5C] text-white hover:bg-[#093642] rounded-full px-8 py-3 font-medium shadow-lg;
+    transition: background-color 0.3s, box-shadow 0.3s, transform 0.2s;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-    .App-logo {
-        animation: App-logo-spin infinite 20s linear;
-    }
+.btn-primary:hover {
+    @apply shadow-xl;
+    transform: translateY(-1px);
 }
 
-.App-header {
-    background-color: #0f0f10;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    font-size: calc(10px + 2vmin);
-    color: white;
+.btn-secondary {
+    @apply border-2 border-[#C5A059] text-[#800020] hover:bg-[#C5A059] hover:text-white rounded-full px-8 py-3 font-medium;
+    transition: background-color 0.3s, color 0.3s;
 }
 
-.App-link {
-    color: #61dafb;
+.btn-ghost {
+    @apply text-[#800020] hover:bg-[#800020]/10 rounded-lg px-4 py-2;
+    transition: background-color 0.3s;
 }
 
-@keyframes App-logo-spin {
-    from {
-        transform: rotate(0deg);
-    }
-    to {
-        transform: rotate(360deg);
-    }
+/* Card styles */
+.card-vendor {
+    @apply bg-white border border-[#E5E5E5] hover:border-[#C5A059] rounded-xl shadow-sm overflow-hidden;
+    transition: border-color 0.3s, box-shadow 0.3s, transform 0.3s;
+}
+
+.card-vendor:hover {
+    @apply shadow-md;
+    transform: translateY(-4px);
+}
+
+.card-feature {
+    @apply bg-[#F9F8F4] p-8 rounded-2xl border border-transparent;
+    transition: border-color 0.3s;
+}
+
+.card-feature:hover {
+    @apply border-[#C5A059]/30;
+}
+
+/* Input styles */
+.input-styled {
+    @apply bg-white border border-[#E5E5E5] focus:border-[#0F4C5C] focus:ring-1 focus:ring-[#0F4C5C] rounded-lg px-4 py-3 outline-none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+/* AI Chat styles */
+.chat-container {
+    @apply fixed bottom-6 right-6 w-96 h-[600px] bg-white/95 backdrop-blur-xl border border-[#C5A059]/50 rounded-2xl shadow-2xl z-50 flex flex-col overflow-hidden;
+}
+
+.chat-header {
+    @apply bg-[#800020] text-white p-4 flex justify-between items-center;
+}
+
+.chat-message-user {
+    @apply bg-[#0F4C5C] text-white rounded-2xl rounded-tr-sm p-3 max-w-[80%] self-end mb-2;
+}
+
+.chat-message-ai {
+    @apply bg-[#F9F8F4] border border-[#E5E5E5] text-[#1A1A1A] rounded-2xl rounded-tl-sm p-3 max-w-[80%] self-start mb-2;
+}
+
+/* Grid layouts */
+.tetris-grid {
+    @apply grid grid-cols-1 md:grid-cols-12 gap-8;
+}
+
+.bento-grid {
+    @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6;
+}
+
+/* Shadows */
+.shadow-soft {
+    box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05);
+}
+
+.shadow-gold-glow {
+    box-shadow: 0 0 15px rgba(197, 160, 89, 0.3);
+}
+
+/* Price badge colors */
+.price-1 { @apply bg-green-100 text-green-800; }
+.price-2 { @apply bg-blue-100 text-blue-800; }
+.price-3 { @apply bg-purple-100 text-purple-800; }
+.price-4 { @apply bg-amber-100 text-amber-800; }
+
+/* Status badge colors */
+.status-pending { @apply bg-yellow-100 text-yellow-800; }
+.status-accepted { @apply bg-green-100 text-green-800; }
+.status-declined { @apply bg-red-100 text-red-800; }
+
+/* Category icon hover */
+.category-icon {
+    transition: transform 0.3s, background-color 0.3s;
+}
+
+.category-icon:hover {
+    transform: scale(1.05);
+}
+
+/* Vendor image zoom on hover */
+.vendor-image-container {
+    overflow: hidden;
+}
+
+.vendor-image {
+    transition: transform 0.5s ease;
+}
+
+.card-vendor:hover .vendor-image {
+    transform: scale(1.05);
+}
+
+/* Loading spinner */
+.spinner {
+    @apply w-6 h-6 border-2 border-[#C5A059] border-t-transparent rounded-full;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Hero section */
+.hero-gradient {
+    background: linear-gradient(180deg, #F9F8F4 0%, #FFFFFF 100%);
 }
