@@ -1,0 +1,189 @@
+{
+  "identity": {
+    "name": "E1: The Anti-AI Designer",
+    "mission": "Create a culturally rich, emotionally resonant platform for Arangetram planning that blends tradition with modern SaaS efficiency.",
+    "principles": [
+      "Fusion over Imitation: Blend 'Royal Heritage' aesthetics with 'Modern SaaS' functionality.",
+      "Emotion First: Every interaction should feel like a celebration or a reassuring helping hand.",
+      "Content is King: The dancer and the art form are the heroes; the UI is the stage.",
+      "Zoom In: Focus on the intricate details (jewelry, food textures, fabric folds).",
+      "Negative Space: Use generous 'parchment' space to let the content breathe."
+    ]
+  },
+  "typography": {
+    "headings": {
+      "font_family": "Playfair Display, serif",
+      "weights": ["600", "700"],
+      "usage": "Main page titles, section headers, hero text.",
+      "letter_spacing": "-0.02em"
+    },
+    "body": {
+      "font_family": "Manrope, sans-serif",
+      "weights": ["400", "500", "600"],
+      "usage": "Paragraphs, UI labels, form inputs.",
+      "letter_spacing": "0em"
+    },
+    "accents": {
+      "font_family": "Cormorant Garamond, serif",
+      "weights": ["400", "500"],
+      "style": "italic",
+      "usage": "Quotes, testimonials, 'The Arangetram Journey' subtitles."
+    }
+  },
+  "colors": {
+    "palette": {
+      "primary": {
+        "name": "Deep Crimson (Alta)",
+        "hex": "#800020",
+        "usage": "Primary brand color, key highlights, active states."
+      },
+      "secondary": {
+        "name": "Antique Gold",
+        "hex": "#C5A059",
+        "usage": "Borders, icons, secondary buttons, hover effects."
+      },
+      "accent": {
+        "name": "Peacock Teal",
+        "hex": "#0F4C5C",
+        "usage": "Primary Call-to-Action (Buttons), links, high-contrast elements."
+      },
+      "background": {
+        "name": "Warm Parchment",
+        "hex": "#F9F8F4",
+        "usage": "Main page background, card backgrounds (light mode)."
+      },
+      "surface": {
+        "name": "Pure White",
+        "hex": "#FFFFFF",
+        "usage": "Card surfaces, input fields, modal backgrounds."
+      },
+      "text": {
+        "primary": "#1A1A1A",
+        "secondary": "#4A4A4A",
+        "muted": "#888888"
+      },
+      "status": {
+        "success": "#2E7D32",
+        "error": "#D32F2F",
+        "warning": "#ED6C02"
+      }
+    },
+    "gradients": {
+      "gold_shimmer": "linear-gradient(135deg, #C5A059 0%, #E5C585 50%, #C5A059 100%)",
+      "royal_fade": "linear-gradient(180deg, #F9F8F4 0%, #FFFFFF 100%)"
+    }
+  },
+  "layout": {
+    "spacing_system": {
+      "base": "0.25rem",
+      "scale": ["p-1", "p-2", "p-4", "p-6", "p-8", "p-12", "p-16", "p-24", "p-32"],
+      "philosophy": "Generous. Use p-8 or p-12 for section padding to create a 'luxury magazine' feel."
+    },
+    "grids": {
+      "marketing": {
+        "name": "The Tetris Grid",
+        "classes": "grid grid-cols-1 md:grid-cols-12 gap-8",
+        "rules": "Asymmetric spans. Hero images span 8 cols, text spans 4. Overlap elements using negative margins."
+      },
+      "dashboard": {
+        "name": "The Bento Grid",
+        "classes": "grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6",
+        "rules": "Dense, functional. Cards must stretch to fill height (h-full)."
+      }
+    }
+  },
+  "components": {
+    "buttons": {
+      "primary": "bg-[#0F4C5C] text-white hover:bg-[#093642] rounded-full px-8 py-3 font-medium transition-all shadow-lg hover:shadow-xl",
+      "secondary": "border-2 border-[#C5A059] text-[#800020] hover:bg-[#C5A059] hover:text-white rounded-full px-8 py-3 font-medium transition-all",
+      "ghost": "text-[#800020] hover:bg-[#800020]/10 rounded-lg px-4 py-2"
+    },
+    "cards": {
+      "vendor": "bg-white border border-[#E5E5E5] hover:border-[#C5A059] rounded-xl shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden group",
+      "feature": "bg-[#F9F8F4] p-8 rounded-2xl border border-transparent hover:border-[#C5A059]/30 transition-all"
+    },
+    "inputs": {
+      "style": "bg-white border border-[#E5E5E5] focus:border-[#0F4C5C] focus:ring-1 focus:ring-[#0F4C5C] rounded-lg px-4 py-3 outline-none transition-all"
+    },
+    "ai_chat": {
+      "container": "fixed bottom-6 right-6 w-96 h-[600px] bg-white/90 backdrop-blur-xl border border-[#C5A059]/50 rounded-2xl shadow-2xl z-50 flex flex-col overflow-hidden",
+      "header": "bg-[#800020] text-white p-4 flex justify-between items-center",
+      "message_user": "bg-[#0F4C5C] text-white rounded-2xl rounded-tr-sm p-3 max-w-[80%] self-end mb-2",
+      "message_ai": "bg-[#F9F8F4] border border-[#E5E5E5] text-[#1A1A1A] rounded-2xl rounded-tl-sm p-3 max-w-[80%] self-start mb-2"
+    }
+  },
+  "visual_enhancers": {
+    "textures": {
+      "noise": "Use a subtle noise overlay (opacity 0.02) on the background to simulate paper texture.",
+      "mandala": "Use large, low-opacity (3%) mandala SVG patterns in the background of 'How it Works' or 'Hero' sections."
+    },
+    "shadows": {
+      "soft": "0 4px 20px -2px rgba(0, 0, 0, 0.05)",
+      "gold_glow": "0 0 15px rgba(197, 160, 89, 0.3)"
+    },
+    "borders": {
+      "elegant": "1px solid #E5E5E5",
+      "active": "1px solid #C5A059"
+    }
+  },
+  "image_urls": {
+    "hero": {
+      "url": "https://images.pexels.com/photos/34717625/pexels-photo-34717625.jpeg",
+      "alt": "Classical Bharatanatyam dancer in a pose",
+      "category": "landing_hero"
+    },
+    "music": {
+      "url": "https://images.pexels.com/photos/33753145/pexels-photo-33753145.jpeg",
+      "alt": "Traditional Indian musical instruments",
+      "category": "vendor_category_music"
+    },
+    "venue": {
+      "url": "https://images.pexels.com/photos/16985130/pexels-photo-16985130.jpeg",
+      "alt": "Luxury banquet hall interior",
+      "category": "vendor_category_venue"
+    },
+    "catering": {
+      "url": "https://images.pexels.com/photos/9198596/pexels-photo-9198596.jpeg",
+      "alt": "Luxury Indian buffet spread",
+      "category": "vendor_category_catering"
+    }
+  },
+  "accessibility": {
+    "contrast": "Ensure all text meets WCAG AA standards. Use #0F4C5C (Teal) for text on light backgrounds instead of pure gold.",
+    "focus_states": "Visible focus rings using the secondary gold color (#C5A059).",
+    "reduced_motion": "Respect prefers-reduced-motion for parallax and scroll animations."
+  },
+  "instructions_to_main_agent": {
+    "general": "You are building a platform that feels like a 'Digital Concierge' for a high-stakes cultural event. It must feel expensive but accessible.",
+    "do_not": [
+      "DO NOT use default Shadcn 'slate' colors. Override them with the Warm Parchment and Deep Crimson palette.",
+      "DO NOT use generic 'Inter' font for headings. Load 'Playfair Display' from Google Fonts.",
+      "DO NOT make the AI chat look like a generic chatbot. Give it a personality (e.g., 'Event Assistant') and a distinct visual container."
+    ],
+    "do": [
+      "DO use the 'Tetris Grid' for the landing page to showcase the imagery.",
+      "DO use the 'Bento Grid' for the vendor selection dashboard.",
+      "DO implement the 'Gold Shimmer' effect on primary buttons on hover."
+    ]
+  },
+  "UNIVERSAL_GUIDELINES_FOR_MAIN_AGENT": [
+    "Dark colors look good when used independently without gradients. DO NOT use dark colors as gradients.",
+    "Don't make generic centered layouts, simplistic gradients, and uniform styling.",
+    "Create depth through layered design elements with z-index hierarchy.",
+    "Use glass-morphism effects with backdrop filters (12-24px blur).",
+    "You MUST NOT apply universal transition. Eg: transition: all. This results in breaking transforms. Always add transitions for specific interactive elements like button, input excluding transforms.",
+    "You MUST NOT center align the app container, ie do not add .App { text-align: center; } in the css file. This disrupts the human natural reading flow of text.",
+    "Always use modern button styles like pill-shaped, or sharp button with interaction animations & color relevant to the app style.",
+    "NEVER: use AI assistant Emoji characters like 🤖🧠💭💡🔮🎯📚🎭🎬🎪🎉🎊🎁🎀🎂🍰🎈🎨🎰💰💵💳🏦💎🪙💸🤑📊📈📉💹🔢🏆🥇 etc for icons.",
+    "Every interaction needs micro-animations - hover states, transitions, parallax effects, and entrance animations. Static = dead.",
+    "Use 2-3x more spacing than feels comfortable. Cramped designs look cheap.",
+    "Subtle grain textures, noise overlays, custom cursors, selection states, and loading animations: separates good from extraordinary.",
+    "Main agent relies on these image URLs. Missing categories (especially sponsor logos) = main agent will use placeholder text which is FORBIDDEN.",
+    "Prioritize using pre-existing components from src/components/ui when applicable.",
+    "Create new components that match the style and conventions of existing components when needed.",
+    "Examine existing components to understand the project's component patterns before creating new ones.",
+    "Components MUST use named exports (export const ComponentName = ...).",
+    "Pages MUST use default exports (export default function PageName() {...}).",
+    "Use sonner for toasts. Sonner component are located in /app/src/components/ui/sonner.tsx."
+  ]
+}
