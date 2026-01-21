@@ -57,9 +57,12 @@ export const AIChat = ({ eventContext = null, onClose, isOpen }) => {
       <button
         onClick={onClose}
         data-testid="ai-chat-toggle"
-        className="fixed bottom-6 right-6 w-14 h-14 bg-[#800020] text-white rounded-full shadow-lg hover:shadow-xl flex items-center justify-center z-50 transition-transform hover:scale-105"
+        className="fixed bottom-6 right-6 w-16 h-16 bg-[#800020] text-white rounded-full shadow-lg hover:shadow-xl flex items-center justify-center z-50 hover:scale-110 group"
+        style={{ transition: 'transform 0.2s, box-shadow 0.2s' }}
+        aria-label="Open AI Chat Assistant"
       >
-        <MessageCircle className="w-6 h-6" />
+        <MessageCircle className="w-7 h-7" />
+        <span className="absolute -top-1 -right-1 w-4 h-4 bg-[#C5A059] rounded-full animate-pulse"></span>
       </button>
     );
   }
