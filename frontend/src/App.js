@@ -17,6 +17,7 @@ import VendorDetailPage from "./pages/VendorDetailPage";
 import PlanEventPage from "./pages/PlanEventPage";
 import UserDashboard from "./pages/UserDashboard";
 import VendorDashboard from "./pages/VendorDashboard";
+import ProfileWizardPage from "./pages/vendor/ProfileWizardPage";
 
 function App() {
   return (
@@ -48,6 +49,14 @@ function App() {
               element={
                 <ProtectedRoute requiredRole="vendor">
                   <VendorDashboard />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/vendor/profile/create"
+              element={
+                <ProtectedRoute requiredRole="vendor">
+                  <ProfileWizardPage />
                 </ProtectedRoute>
               }
             />
