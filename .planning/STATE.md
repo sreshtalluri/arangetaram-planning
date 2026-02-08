@@ -10,28 +10,28 @@ See: .planning/PROJECT.md (updated 2026-02-07)
 ## Current Position
 
 Phase: 1 of 5 (Foundation & Authentication)
-Plan: 4 of 6 in current phase
-Status: In progress
-Last activity: 2026-02-08 — Completed 01-04-PLAN.md (React Auth Context)
+Plan: 6 of 6 in current phase
+Status: In progress (01-05 running in parallel)
+Last activity: 2026-02-08 — Completed 01-06-PLAN.md (Guest Experience & Auth Cleanup)
 
-Progress: [████░░░░░░] ~13% (4/30+ plans estimated)
+Progress: [█████░░░░░] ~17% (5/30+ plans estimated)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 4
-- Average duration: 2.25 min
-- Total execution time: 0.15 hours
+- Total plans completed: 5
+- Average duration: 2.4 min
+- Total execution time: 0.2 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| 01-foundation-authentication | 4 | 9 min | 2.25 min |
+| 01-foundation-authentication | 5 | 12 min | 2.4 min |
 
 **Recent Trend:**
-- Last 5 plans: 01-01 (3 min), 01-02 (2 min), 01-03 (2 min), 01-04 (2 min)
-- Trend: Stable ~2 min/plan
+- Last 5 plans: 01-02 (2 min), 01-03 (2 min), 01-04 (2 min), 01-06 (3 min)
+- Trend: Stable ~2-3 min/plan
 
 *Updated after each plan completion*
 
@@ -55,6 +55,9 @@ Recent decisions affecting current work:
 | 01-04 | AuthProvider inside QueryClientProvider | useProfile hook works within AuthContext |
 | 01-04 | Role from profile with metadata fallback | Database is source of truth for role |
 | 01-04 | Legacy auth.js backed up | Supports gradual migration of existing components |
+| 01-06 | Display profile.full_name with email fallback | Graceful handling when profile not loaded |
+| 01-06 | GuestPrompt inline/card variants | Flexible contextual prompts for guests |
+| 01-06 | Deprecated auth.js throws error | Fails loudly with migration guidance |
 
 ### Pending Todos
 
@@ -70,6 +73,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-02-08T01:33:44Z
-Stopped at: Completed 01-04-PLAN.md (React Auth Context)
-Resume file: .planning/phases/01-foundation-authentication/01-05-PLAN.md
+Last session: 2026-02-08T01:40:02Z
+Stopped at: Completed 01-06-PLAN.md (Guest Experience & Auth Cleanup)
+Resume file: .planning/phases/01-foundation-authentication/01-05-PLAN.md (if not yet complete)
