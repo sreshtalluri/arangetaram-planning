@@ -61,6 +61,7 @@
     "start": "craco start",
     "build": "craco build",
     "test": "craco test",
+    "type-check": "tsc --noEmit",
     "gen:types": "npx supabase gen types typescript --project-id bqdnqcpupccdoykjtemn > src/lib/database.types.ts"
   },
   "browserslist": {
