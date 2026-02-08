@@ -23,7 +23,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 ### Phase 1: Foundation & Authentication
 **Goal**: Supabase infrastructure is operational with secure multi-tenant database and working authentication for users and vendors
 **Depends on**: Nothing (first phase)
-**Requirements**: INFRA-01, INFRA-02, INFRA-03, INFRA-04, INFRA-05, AUTH-01, AUTH-02, AUTH-03, AUTH-04, AUTH-05, AUTH-06
+**Requirements**: INFRA-01, INFRA-02, INFRA-04, INFRA-05, AUTH-01, AUTH-02, AUTH-03, AUTH-04, AUTH-05, AUTH-06
 **Success Criteria** (what must be TRUE):
   1. User can create account with email/password and role is set correctly
   2. User can log in and session persists across browser refresh
@@ -45,7 +45,7 @@ Plans:
 ### Phase 2: Vendor Supply Platform
 **Goal**: Vendors can create complete profiles with portfolios, manage availability, and access their dashboard
 **Depends on**: Phase 1 (requires auth and database)
-**Requirements**: CAT-01, CAT-02, CAT-03, CAT-04, CAT-05, CAT-06, CAT-07, CAT-08, CAT-09, CAT-10, CAT-11, VEND-01, VEND-02, VEND-03, VEND-04, VEND-05, VEND-06, VEND-07, AVAIL-01, AVAIL-02, AVAIL-03, AVAIL-04, VDASH-01, VDASH-02, VDASH-03, VDASH-04
+**Requirements**: INFRA-03, CAT-01, CAT-02, CAT-03, CAT-04, CAT-05, CAT-06, CAT-07, CAT-08, CAT-09, CAT-10, CAT-11, VEND-01, VEND-02, VEND-03, VEND-04, VEND-05, VEND-06, VEND-07, AVAIL-01, AVAIL-02, AVAIL-03, AVAIL-04, VDASH-01, VDASH-02, VDASH-03, VDASH-04
 **Success Criteria** (what must be TRUE):
   1. Platform supports all 11 vendor categories with cultural context descriptions
   2. Vendor can create profile with business name, description, category, service areas, and pricing
