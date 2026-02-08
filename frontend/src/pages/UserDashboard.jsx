@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { useAuth } from "../lib/auth";
+import { useAuth } from "../hooks/useAuth";
 import { eventAPI, bookingAPI, vendorAPI } from "../lib/api";
 import Navbar from "../components/Navbar";
 import { Button } from "../components/ui/button";
@@ -29,18 +29,17 @@ const statusIcons = {
 
 export default function UserDashboard() {
   const navigate = useNavigate();
-  const { user, isAuthenticated } = useAuth();
+  const { user, profile, loading: authLoading } = useAuth();
   const [events, setEvents] = useState([]);
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!isAuthenticated()) {
-      navigate("/login");
-      return;
+    // ProtectedRoute handles auth check, just load data when authenticated
+    if (!authLoading && user) {
+      loadData();
     }
-    loadData();
-  }, [isAuthenticated, navigate]);
+  }, [authLoading, user]);
 
   const loadData = async () => {
     setLoading(true);
@@ -78,7 +77,7 @@ export default function UserDashboard() {
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
           <div>
             <h1 className="text-3xl font-bold text-[#1A1A1A]" style={{ fontFamily: 'Playfair Display, serif' }}>
-              Welcome, {user?.name}
+              Welcome, {profile?.full_name || user?.email}
             </h1>
             <p className="text-[#4A4A4A]">Manage your events and bookings</p>
           </div>

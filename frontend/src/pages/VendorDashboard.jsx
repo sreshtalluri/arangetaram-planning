@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../lib/auth";
+import { useAuth } from "../hooks/useAuth";
 import { vendorAPI, bookingAPI } from "../lib/api";
 import Navbar from "../components/Navbar";
 import { Button } from "../components/ui/button";
@@ -54,7 +54,7 @@ const priceRanges = [
 
 export default function VendorDashboard() {
   const navigate = useNavigate();
-  const { user, isAuthenticated, isVendor } = useAuth();
+  const { user, profile, loading: authLoading } = useAuth();
   const [vendorProfile, setVendorProfile] = useState(null);
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -75,16 +75,11 @@ export default function VendorDashboard() {
   });
 
   useEffect(() => {
-    if (!isAuthenticated()) {
-      navigate("/login");
-      return;
+    // ProtectedRoute handles auth and role check, just load data when authenticated
+    if (!authLoading && user) {
+      loadData();
     }
-    if (!isVendor()) {
-      navigate("/dashboard");
-      return;
-    }
-    loadData();
-  }, [isAuthenticated, isVendor, navigate]);
+  }, [authLoading, user]);
 
   const loadData = async () => {
     setLoading(true);
