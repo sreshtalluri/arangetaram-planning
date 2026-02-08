@@ -9,20 +9,20 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Infrastructure
 
-- [ ] **INFRA-01**: Migrate database from MongoDB to Supabase PostgreSQL
-- [ ] **INFRA-02**: Replace JWT auth with Supabase Auth (email/password)
+- [x] **INFRA-01**: Migrate database from MongoDB to Supabase PostgreSQL
+- [x] **INFRA-02**: Replace JWT auth with Supabase Auth (email/password)
 - [ ] **INFRA-03**: Implement Supabase Storage for vendor media
-- [ ] **INFRA-04**: Configure Row Level Security policies on all tables
-- [ ] **INFRA-05**: Set up TypeScript with generated database types
+- [x] **INFRA-04**: Configure Row Level Security policies on all tables
+- [x] **INFRA-05**: Set up TypeScript with generated database types
 
 ### Authentication
 
-- [ ] **AUTH-01**: User can create account with email and password
-- [ ] **AUTH-02**: User can log in with email and password
-- [ ] **AUTH-03**: User session persists across browser refresh
-- [ ] **AUTH-04**: User can log out from any page
-- [ ] **AUTH-05**: User can browse vendors without creating account (guest)
-- [ ] **AUTH-06**: Vendor can create account with vendor role
+- [x] **AUTH-01**: User can create account with email and password
+- [x] **AUTH-02**: User can log in with email and password
+- [x] **AUTH-03**: User session persists across browser refresh
+- [x] **AUTH-04**: User can log out from any page
+- [x] **AUTH-05**: User can browse vendors without creating account (guest)
+- [x] **AUTH-06**: Vendor can create account with vendor role
 
 ### Vendor Categories
 
@@ -163,17 +163,17 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| INFRA-01 | Phase 1 | Pending |
-| INFRA-02 | Phase 1 | Pending |
+| INFRA-01 | Phase 1 | Complete |
+| INFRA-02 | Phase 1 | Complete |
 | INFRA-03 | Phase 2 | Pending |
-| INFRA-04 | Phase 1 | Pending |
-| INFRA-05 | Phase 1 | Pending |
-| AUTH-01 | Phase 1 | Pending |
-| AUTH-02 | Phase 1 | Pending |
-| AUTH-03 | Phase 1 | Pending |
-| AUTH-04 | Phase 1 | Pending |
-| AUTH-05 | Phase 1 | Pending |
-| AUTH-06 | Phase 1 | Pending |
+| INFRA-04 | Phase 1 | Complete |
+| INFRA-05 | Phase 1 | Complete |
+| AUTH-01 | Phase 1 | Complete |
+| AUTH-02 | Phase 1 | Complete |
+| AUTH-03 | Phase 1 | Complete |
+| AUTH-04 | Phase 1 | Complete |
+| AUTH-05 | Phase 1 | Complete |
+| AUTH-06 | Phase 1 | Complete |
 | CAT-01 | Phase 2 | Pending |
 | CAT-02 | Phase 2 | Pending |
 | CAT-03 | Phase 2 | Pending |
@@ -242,4 +242,4 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ---
 *Requirements defined: 2026-02-07*
-*Last updated: 2026-02-07 after roadmap creation*
+*Last updated: 2026-02-08 after Phase 1 completion*

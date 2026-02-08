@@ -5,7 +5,7 @@
 See: .planning/PROJECT.md (updated 2026-02-07)
 
 **Core value:** Users discover the right vendors for their needs, budget, and location
-**Current focus:** Phase 1 - Foundation & Authentication
+**Current focus:** Phase 2 - Vendor Supply Platform (ready to plan)
 
 ## Current Position
 
