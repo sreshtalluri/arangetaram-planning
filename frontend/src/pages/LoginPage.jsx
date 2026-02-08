@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { useAuth } from "../lib/auth";
+import { useAuth } from "../hooks/useAuth";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
@@ -9,7 +9,7 @@ import { Loader2, ArrowLeft } from "lucide-react";
 
 export default function LoginPage() {
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const { signIn } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -23,15 +23,17 @@ export default function LoginPage() {
 
     setLoading(true);
     try {
-      const user = await login(email, password);
-      toast.success(`Welcome back, ${user.name}!`);
-      if (user.user_type === "vendor") {
+      const { user } = await signIn(email, password);
+      const role = user?.user_metadata?.role;
+      toast.success(`Welcome back!`);
+      if (role === "vendor") {
         navigate("/vendor-dashboard");
       } else {
         navigate("/dashboard");
       }
     } catch (error) {
-      toast.error(error.response?.data?.detail || "Invalid credentials");
+      const message = error instanceof Error ? error.message : "Invalid credentials";
+      toast.error(message);
     } finally {
       setLoading(false);
     }
@@ -120,10 +122,16 @@ export default function LoginPage() {
             </Button>
           </form>
 
+          <div className="mt-4 text-center">
+            <Link to="/forgot-password" className="text-[#888888] hover:text-[#800020] text-sm">
+              Forgot password?
+            </Link>
+          </div>
+
           <div className="mt-6 text-center">
             <p className="text-[#4A4A4A]">
               Don't have an account?{" "}
-              <Link to="/register" className="text-[#800020] hover:underline font-medium">
+              <Link to="/signup" className="text-[#800020] hover:underline font-medium">
                 Register here
               </Link>
             </p>
