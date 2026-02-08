@@ -174,22 +174,72 @@ Which phases cover which requirements. Updated during roadmap creation.
 | AUTH-04 | Phase 1 | Pending |
 | AUTH-05 | Phase 1 | Pending |
 | AUTH-06 | Phase 1 | Pending |
-| CAT-01 to CAT-11 | Phase 2 | Pending |
-| VEND-01 to VEND-07 | Phase 2 | Pending |
-| AVAIL-01 to AVAIL-04 | Phase 2 | Pending |
-| EVENT-01 to EVENT-07 | Phase 3 | Pending |
-| DISC-01 to DISC-08 | Phase 3 | Pending |
-| AI-01 to AI-05 | Phase 4 | Pending |
-| CHAT-01 to CHAT-04 | Phase 4 | Pending |
-| INQ-01 to INQ-07 | Phase 5 | Pending |
-| DASH-01 to DASH-03 | Phase 5 | Pending |
-| VDASH-01 to VDASH-04 | Phase 5 | Pending |
+| CAT-01 | Phase 2 | Pending |
+| CAT-02 | Phase 2 | Pending |
+| CAT-03 | Phase 2 | Pending |
+| CAT-04 | Phase 2 | Pending |
+| CAT-05 | Phase 2 | Pending |
+| CAT-06 | Phase 2 | Pending |
+| CAT-07 | Phase 2 | Pending |
+| CAT-08 | Phase 2 | Pending |
+| CAT-09 | Phase 2 | Pending |
+| CAT-10 | Phase 2 | Pending |
+| CAT-11 | Phase 2 | Pending |
+| VEND-01 | Phase 2 | Pending |
+| VEND-02 | Phase 2 | Pending |
+| VEND-03 | Phase 2 | Pending |
+| VEND-04 | Phase 2 | Pending |
+| VEND-05 | Phase 2 | Pending |
+| VEND-06 | Phase 2 | Pending |
+| VEND-07 | Phase 2 | Pending |
+| AVAIL-01 | Phase 2 | Pending |
+| AVAIL-02 | Phase 2 | Pending |
+| AVAIL-03 | Phase 2 | Pending |
+| AVAIL-04 | Phase 2 | Pending |
+| VDASH-01 | Phase 2 | Pending |
+| VDASH-02 | Phase 2 | Pending |
+| VDASH-03 | Phase 2 | Pending |
+| VDASH-04 | Phase 2 | Pending |
+| EVENT-01 | Phase 3 | Pending |
+| EVENT-02 | Phase 3 | Pending |
+| EVENT-03 | Phase 3 | Pending |
+| EVENT-04 | Phase 3 | Pending |
+| EVENT-05 | Phase 3 | Pending |
+| EVENT-06 | Phase 3 | Pending |
+| EVENT-07 | Phase 3 | Pending |
+| DISC-01 | Phase 3 | Pending |
+| DISC-02 | Phase 3 | Pending |
+| DISC-03 | Phase 3 | Pending |
+| DISC-04 | Phase 3 | Pending |
+| DISC-05 | Phase 3 | Pending |
+| DISC-06 | Phase 3 | Pending |
+| DISC-07 | Phase 3 | Pending |
+| DISC-08 | Phase 3 | Pending |
+| DASH-01 | Phase 3 | Pending |
+| DASH-02 | Phase 3 | Pending |
+| DASH-03 | Phase 3 | Pending |
+| AI-01 | Phase 4 | Pending |
+| AI-02 | Phase 4 | Pending |
+| AI-03 | Phase 4 | Pending |
+| AI-04 | Phase 4 | Pending |
+| AI-05 | Phase 4 | Pending |
+| CHAT-01 | Phase 4 | Pending |
+| CHAT-02 | Phase 4 | Pending |
+| CHAT-03 | Phase 4 | Pending |
+| CHAT-04 | Phase 4 | Pending |
+| INQ-01 | Phase 5 | Pending |
+| INQ-02 | Phase 5 | Pending |
+| INQ-03 | Phase 5 | Pending |
+| INQ-04 | Phase 5 | Pending |
+| INQ-05 | Phase 5 | Pending |
+| INQ-06 | Phase 5 | Pending |
+| INQ-07 | Phase 5 | Pending |
 
 **Coverage:**
-- v1 requirements: 56 total
-- Mapped to phases: 56
+- v1 requirements: 71 total
+- Mapped to phases: 71
 - Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-02-07*
-*Last updated: 2026-02-07 after initial definition*
+*Last updated: 2026-02-07 after roadmap creation*
