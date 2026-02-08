@@ -32,10 +32,15 @@ Decimal phases appear between their surrounding integers in numeric order.
   5. Vendor can create account with vendor role
   6. All database tables have Row Level Security policies enabled (no public data leaks)
   7. TypeScript types are generated from database schema
-**Plans**: TBD
+**Plans**: 6 plans
 
 Plans:
-- [ ] TBD during plan-phase
+- [ ] 01-01-PLAN.md — Supabase infrastructure setup, database schema with RLS, TypeScript types
+- [ ] 01-02-PLAN.md — Supabase client singleton and auth library functions
+- [ ] 01-03-PLAN.md — React Query setup with QueryClient and useProfile hook
+- [ ] 01-04-PLAN.md — AuthContext with Supabase integration and ProtectedRoute
+- [ ] 01-05-PLAN.md — Auth UI pages (signup, login, password reset, email callback)
+- [ ] 01-06-PLAN.md — Guest experience, logout, protected dashboards, cleanup old auth
 
 ### Phase 2: Vendor Supply Platform
 **Goal**: Vendors can create complete profiles with portfolios, manage availability, and access their dashboard
@@ -116,7 +121,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation & Authentication | 0/TBD | Not started | - |
+| 1. Foundation & Authentication | 0/6 | Ready to execute | - |
 | 2. Vendor Supply Platform | 0/TBD | Not started | - |
 | 3. Event Planning & Discovery | 0/TBD | Not started | - |
 | 4. AI Enhancement | 0/TBD | Not started | - |
