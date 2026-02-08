@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "react-router-dom";
-import { useAuth } from "../lib/auth";
+import { useAuth } from "../hooks/useAuth";
 import { Button } from "./ui/button";
 import {
   DropdownMenu,
@@ -11,11 +11,11 @@ import {
 import { User, LogOut, LayoutDashboard, Store } from "lucide-react";
 
 export const Navbar = () => {
-  const { user, logout, isVendor, isAuthenticated } = useAuth();
+  const { user, profile, isVendor, isAuthenticated, signOut, loading } = useAuth();
   const navigate = useNavigate();
 
-  const handleLogout = () => {
-    logout();
+  const handleLogout = async () => {
+    await signOut();
     navigate("/");
   };
 
@@ -51,23 +51,23 @@ export const Navbar = () => {
 
           {/* Auth Section */}
           <div className="flex items-center gap-4">
-            {isAuthenticated() ? (
+            {isAuthenticated ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" className="flex items-center gap-2 hover:bg-[#F9F8F4]">
                     <div className="w-8 h-8 rounded-full bg-[#0F4C5C] flex items-center justify-center">
                       <User className="w-4 h-4 text-white" />
                     </div>
-                    <span className="hidden sm:inline text-[#1A1A1A]">{user?.name}</span>
+                    <span className="hidden sm:inline text-[#1A1A1A]">{profile?.full_name || user?.email}</span>
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-56">
                   <div className="px-2 py-1.5">
-                    <p className="text-sm font-medium">{user?.name}</p>
+                    <p className="text-sm font-medium">{profile?.full_name || 'User'}</p>
                     <p className="text-xs text-muted-foreground">{user?.email}</p>
                   </div>
                   <DropdownMenuSeparator />
-                  {isVendor() ? (
+                  {isVendor ? (
                     <DropdownMenuItem onClick={() => navigate("/vendor-dashboard")}>
                       <Store className="w-4 h-4 mr-2" />
                       Vendor Dashboard
