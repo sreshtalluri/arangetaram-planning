@@ -1,170 +1,40 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
-import { vendorAPI, bookingAPI } from "../lib/api";
+import { useVendorProfile } from "../hooks/useVendorProfile";
+import { usePortfolio } from "../hooks/usePortfolio";
+import { useBlockedDates } from "../hooks/useAvailability";
+import { PortfolioUploader } from "../components/vendor/PortfolioUploader";
+import { PortfolioGallery } from "../components/vendor/PortfolioGallery";
+import { AvailabilityCalendar } from "../components/vendor/AvailabilityCalendar";
+import { getCategoryByValue } from "../lib/vendor-categories";
+import { cn } from "../lib/utils";
 import Navbar from "../components/Navbar";
 import { Button } from "../components/ui/button";
 import { Badge } from "../components/ui/badge";
-import { Input } from "../components/ui/input";
-import { Label } from "../components/ui/label";
-import { Textarea } from "../components/ui/textarea";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "../components/ui/dialog";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "../components/ui/select";
-import { toast } from "sonner";
-import {
-  Store, Calendar, MapPin, DollarSign, Plus, Edit2,
-  Loader2, Clock, CheckCircle2, XCircle, User, Star
+  Store, Calendar, MapPin, DollarSign, Edit2,
+  Loader2, Star, LayoutDashboard, Image, ExternalLink,
+  CheckCircle2, AlertCircle, ImageIcon, CalendarDays
 } from "lucide-react";
-
-const statusColors = {
-  pending: "bg-yellow-100 text-yellow-800",
-  accepted: "bg-green-100 text-green-800",
-  declined: "bg-red-100 text-red-800",
-};
-
-const categories = [
-  { value: "venue", label: "Venue" },
-  { value: "catering", label: "Catering" },
-  { value: "photographer", label: "Photographer" },
-  { value: "videographer", label: "Videographer" },
-  { value: "decorations", label: "Decorations" },
-  { value: "musicians", label: "Musicians" },
-];
-
-const priceRanges = [
-  { value: "$", label: "$ - Budget" },
-  { value: "$$", label: "$$ - Moderate" },
-  { value: "$$$", label: "$$$ - Premium" },
-  { value: "$$$$", label: "$$$$ - Luxury" },
-];
 
 export default function VendorDashboard() {
   const navigate = useNavigate();
-  const { user, profile, loading: authLoading } = useAuth();
-  const [vendorProfile, setVendorProfile] = useState(null);
-  const [bookings, setBookings] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [profileDialogOpen, setProfileDialogOpen] = useState(false);
-  const [savingProfile, setSavingProfile] = useState(false);
-  const [updatingBooking, setUpdatingBooking] = useState(null);
+  const { user, loading: authLoading } = useAuth();
+  const { data: vendorProfile, isLoading: profileLoading } = useVendorProfile(user?.id);
+  const { data: portfolioImages = [] } = usePortfolio(user?.id);
+  const { blockedDates = [], availability = [] } = useBlockedDates(user?.id);
 
-  const [formData, setFormData] = useState({
-    business_name: "",
-    category: "",
-    description: "",
-    location: "",
-    price_range: "$$",
-    price_estimate: "",
-    services: "",
-    contact_phone: "",
-    contact_email: "",
-  });
+  const [activeSection, setActiveSection] = useState('overview');
 
-  useEffect(() => {
-    // ProtectedRoute handles auth and role check, just load data when authenticated
-    if (!authLoading && user) {
-      loadData();
-    }
-  }, [authLoading, user]);
+  const sections = [
+    { id: 'overview', label: 'Overview', icon: LayoutDashboard },
+    { id: 'profile', label: 'Profile', icon: Store },
+    { id: 'portfolio', label: 'Portfolio', icon: Image },
+    { id: 'availability', label: 'Availability', icon: Calendar },
+  ];
 
-  const loadData = async () => {
-    setLoading(true);
-    try {
-      const bookingsRes = await bookingAPI.getVendorBookings();
-      setBookings(bookingsRes.data);
-
-      try {
-        const profileRes = await vendorAPI.getMyProfile();
-        setVendorProfile(profileRes.data);
-        setFormData({
-          business_name: profileRes.data.business_name || "",
-          category: profileRes.data.category || "",
-          description: profileRes.data.description || "",
-          location: profileRes.data.location || "",
-          price_range: profileRes.data.price_range || "$$",
-          price_estimate: profileRes.data.price_estimate || "",
-          services: profileRes.data.services?.join(", ") || "",
-          contact_phone: profileRes.data.contact_phone || "",
-          contact_email: profileRes.data.contact_email || "",
-        });
-      } catch (e) {
-        // No profile yet
-        setProfileDialogOpen(true);
-      }
-    } catch (error) {
-      console.error("Failed to load data:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleFormChange = (field, value) => {
-    setFormData({ ...formData, [field]: value });
-  };
-
-  const handleSaveProfile = async () => {
-    if (!formData.business_name || !formData.category || !formData.description) {
-      toast.error("Please fill in all required fields");
-      return;
-    }
-
-    setSavingProfile(true);
-    try {
-      const profileData = {
-        business_name: formData.business_name,
-        category: formData.category,
-        description: formData.description,
-        location: formData.location,
-        price_range: formData.price_range,
-        price_estimate: formData.price_estimate,
-        services: formData.services.split(",").map(s => s.trim()).filter(s => s),
-        contact_phone: formData.contact_phone,
-        contact_email: formData.contact_email,
-      };
-
-      if (vendorProfile) {
-        await vendorAPI.update(vendorProfile.id, profileData);
-        toast.success("Profile updated successfully");
-      } else {
-        const res = await vendorAPI.create(profileData);
-        setVendorProfile(res.data);
-        toast.success("Profile created successfully");
-      }
-      setProfileDialogOpen(false);
-      loadData();
-    } catch (error) {
-      toast.error(error.response?.data?.detail || "Failed to save profile");
-    } finally {
-      setSavingProfile(false);
-    }
-  };
-
-  const handleBookingUpdate = async (bookingId, status) => {
-    setUpdatingBooking(bookingId);
-    try {
-      await bookingAPI.update(bookingId, { status });
-      toast.success(`Booking ${status}`);
-      loadData();
-    } catch (error) {
-      toast.error("Failed to update booking");
-    } finally {
-      setUpdatingBooking(null);
-    }
-  };
+  const loading = authLoading || profileLoading;
 
   if (loading) {
     return (
@@ -177,378 +47,433 @@ export default function VendorDashboard() {
     );
   }
 
+  // No profile state - prompt to create
+  if (!vendorProfile) {
+    return (
+      <div className="min-h-screen bg-[#F9F8F4]">
+        <Navbar />
+        <div className="max-w-xl mx-auto px-4 py-16 text-center">
+          <Store className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+          <h2 className="text-xl font-semibold mb-2">Create Your Profile</h2>
+          <p className="text-gray-500 mb-6">
+            Set up your vendor profile to start receiving inquiries from families planning Arangetrams.
+          </p>
+          <Button
+            onClick={() => navigate('/vendor/profile/create')}
+            className="btn-primary"
+          >
+            Create Profile
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  // Calculate profile completion status
+  const hasDescription = !!vendorProfile.description;
+  const hasServiceAreas = vendorProfile.service_areas?.length > 0;
+  const hasPricing = vendorProfile.price_min !== null || vendorProfile.price_max !== null;
+  const hasPortfolio = portfolioImages.length > 0;
+  const isProfileComplete = hasDescription && hasServiceAreas && hasPricing && hasPortfolio;
+
+  // Get category info
+  const categoryInfo = getCategoryByValue(vendorProfile.category);
+
+  // Render section content
+  const renderSection = () => {
+    switch (activeSection) {
+      case 'overview':
+        return (
+          <OverviewSection
+            vendorProfile={vendorProfile}
+            portfolioCount={portfolioImages.length}
+            blockedDatesCount={availability.length}
+            isProfileComplete={isProfileComplete}
+            hasDescription={hasDescription}
+            hasServiceAreas={hasServiceAreas}
+            hasPricing={hasPricing}
+            hasPortfolio={hasPortfolio}
+            navigate={navigate}
+            setActiveSection={setActiveSection}
+          />
+        );
+      case 'profile':
+        return (
+          <ProfileSection
+            vendorProfile={vendorProfile}
+            categoryInfo={categoryInfo}
+            navigate={navigate}
+          />
+        );
+      case 'portfolio':
+        return (
+          <PortfolioSection
+            vendorId={user?.id}
+            portfolioCount={portfolioImages.length}
+          />
+        );
+      case 'availability':
+        return (
+          <AvailabilitySection
+            vendorId={user?.id}
+            upcomingBlockedCount={availability.length}
+          />
+        );
+      default:
+        return null;
+    }
+  };
+
   return (
     <div className="min-h-screen bg-[#F9F8F4]">
       <Navbar />
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
-          <div>
-            <h1 className="text-3xl font-bold text-[#1A1A1A]" style={{ fontFamily: 'Playfair Display, serif' }}>
-              Vendor Dashboard
-            </h1>
-            <p className="text-[#4A4A4A]">Manage your profile and booking requests</p>
+      <div className="flex">
+        {/* Sidebar */}
+        <aside className="w-64 bg-white border-r min-h-[calc(100vh-64px)] p-4 hidden md:block">
+          <div className="mb-6 px-4">
+            <h2 className="font-semibold text-[#1A1A1A] truncate">
+              {vendorProfile.business_name}
+            </h2>
+            <p className="text-sm text-gray-500">
+              {categoryInfo?.label || vendorProfile.category}
+            </p>
           </div>
-          <Button onClick={() => setProfileDialogOpen(true)} className="btn-secondary">
-            <Edit2 className="w-4 h-4 mr-2" />
-            {vendorProfile ? "Edit Profile" : "Create Profile"}
-          </Button>
+          <nav className="space-y-1">
+            {sections.map((section) => (
+              <button
+                key={section.id}
+                onClick={() => setActiveSection(section.id)}
+                className={cn(
+                  "w-full flex items-center gap-3 px-4 py-2 rounded-lg text-left transition-colors",
+                  activeSection === section.id
+                    ? "bg-[#0F4C5C] text-white"
+                    : "text-gray-600 hover:bg-gray-100"
+                )}
+              >
+                <section.icon className="w-5 h-5" />
+                {section.label}
+              </button>
+            ))}
+          </nav>
+        </aside>
+
+        {/* Mobile section tabs */}
+        <div className="md:hidden w-full border-b bg-white px-4 py-2 overflow-x-auto">
+          <div className="flex gap-2">
+            {sections.map((section) => (
+              <button
+                key={section.id}
+                onClick={() => setActiveSection(section.id)}
+                className={cn(
+                  "flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm whitespace-nowrap transition-colors",
+                  activeSection === section.id
+                    ? "bg-[#0F4C5C] text-white"
+                    : "text-gray-600 bg-gray-100"
+                )}
+              >
+                <section.icon className="w-4 h-4" />
+                {section.label}
+              </button>
+            ))}
+          </div>
         </div>
 
-        <Tabs defaultValue="profile" className="space-y-6">
-          <TabsList className="bg-white border border-[#E5E5E5] p-1">
-            <TabsTrigger
-              value="profile"
-              className="data-[state=active]:bg-[#0F4C5C] data-[state=active]:text-white rounded-lg px-6"
-              data-testid="profile-tab"
-            >
-              My Profile
-            </TabsTrigger>
-            <TabsTrigger
-              value="bookings"
-              className="data-[state=active]:bg-[#0F4C5C] data-[state=active]:text-white rounded-lg px-6"
-              data-testid="vendor-bookings-tab"
-            >
-              Booking Requests ({bookings.length})
-            </TabsTrigger>
-          </TabsList>
+        {/* Main content */}
+        <main className="flex-1 p-6">
+          <div className="max-w-5xl mx-auto">
+            {renderSection()}
+          </div>
+        </main>
+      </div>
+    </div>
+  );
+}
 
-          {/* Profile Tab */}
-          <TabsContent value="profile">
-            {vendorProfile ? (
-              <div className="bg-white rounded-xl p-6 shadow-sm">
-                <div className="grid md:grid-cols-3 gap-8">
-                  {/* Profile Image */}
-                  <div className="md:col-span-1">
-                    <div className="aspect-square rounded-xl bg-[#F9F8F4] flex items-center justify-center overflow-hidden">
-                      {vendorProfile.portfolio_images?.[0] ? (
-                        <img
-                          src={vendorProfile.portfolio_images[0]}
-                          alt={vendorProfile.business_name}
-                          className="w-full h-full object-cover"
-                        />
-                      ) : (
-                        <Store className="w-16 h-16 text-[#888888]" />
-                      )}
-                    </div>
-                    <div className="mt-4 text-center">
-                      <div className="flex items-center justify-center gap-1 mb-1">
-                        <Star className="w-5 h-5 text-[#C5A059] fill-[#C5A059]" />
-                        <span className="font-semibold">{vendorProfile.rating?.toFixed(1) || "0.0"}</span>
-                      </div>
-                      <p className="text-sm text-[#888888]">{vendorProfile.review_count || 0} reviews</p>
-                    </div>
-                  </div>
-
-                  {/* Profile Details */}
-                  <div className="md:col-span-2 space-y-6">
-                    <div>
-                      <h2 className="text-2xl font-bold text-[#1A1A1A]">{vendorProfile.business_name}</h2>
-                      <Badge className="mt-2 bg-[#0F4C5C]/10 text-[#0F4C5C] border-0">
-                        {vendorProfile.category}
-                      </Badge>
-                    </div>
-
-                    <p className="text-[#4A4A4A]">{vendorProfile.description}</p>
-
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="flex items-center gap-2">
-                        <MapPin className="w-4 h-4 text-[#888888]" />
-                        <span className="text-[#4A4A4A]">{vendorProfile.location}</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <DollarSign className="w-4 h-4 text-[#888888]" />
-                        <span className="text-[#4A4A4A]">{vendorProfile.price_estimate}</span>
-                      </div>
-                    </div>
-
-                    {vendorProfile.services?.length > 0 && (
-                      <div>
-                        <h3 className="font-semibold text-[#1A1A1A] mb-2">Services</h3>
-                        <div className="flex flex-wrap gap-2">
-                          {vendorProfile.services.map((service, idx) => (
-                            <Badge key={idx} variant="outline" className="border-[#E5E5E5]">
-                              {service}
-                            </Badge>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-            ) : (
-              <div className="bg-white rounded-xl p-12 shadow-sm text-center">
-                <div className="w-16 h-16 rounded-full bg-[#F9F8F4] flex items-center justify-center mx-auto mb-4">
-                  <Store className="w-8 h-8 text-[#888888]" />
-                </div>
-                <h3 className="text-xl font-semibold text-[#1A1A1A] mb-2">No profile yet</h3>
-                <p className="text-[#4A4A4A] mb-6">
-                  Create your vendor profile to start receiving booking requests
-                </p>
-                <Button onClick={() => setProfileDialogOpen(true)} className="btn-primary">
-                  <Plus className="w-4 h-4 mr-2" />
-                  Create Profile
-                </Button>
-              </div>
-            )}
-          </TabsContent>
-
-          {/* Bookings Tab */}
-          <TabsContent value="bookings" className="space-y-4">
-            {bookings.length > 0 ? (
-              <div className="grid gap-4">
-                {bookings.map((booking) => (
-                  <div
-                    key={booking.id}
-                    className="bg-white rounded-xl p-6 shadow-sm"
-                    data-testid={`vendor-booking-card-${booking.id}`}
-                  >
-                    <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
-                      <div className="flex items-start gap-4">
-                        <div className="w-12 h-12 rounded-full bg-[#0F4C5C] flex items-center justify-center shrink-0">
-                          <User className="w-6 h-6 text-white" />
-                        </div>
-                        <div>
-                          <h3 className="font-semibold text-[#1A1A1A]">
-                            {booking.user?.name || "Guest User"}
-                          </h3>
-                          <p className="text-sm text-[#4A4A4A]">
-                            {booking.user?.email}
-                          </p>
-                          <div className="flex items-center gap-4 mt-2 text-sm text-[#888888]">
-                            <div className="flex items-center gap-1">
-                              <Calendar className="w-4 h-4" />
-                              <span>{booking.event_date}</span>
-                            </div>
-                          </div>
-                          <p className="text-sm text-[#4A4A4A] mt-2">
-                            Event: {booking.event?.event_name}
-                          </p>
-                        </div>
-                      </div>
-
-                      <div className="flex flex-col items-end gap-3">
-                        <Badge className={`${statusColors[booking.status]} border-0`}>
-                          {booking.status}
-                        </Badge>
-
-                        {booking.status === "pending" && (
-                          <div className="flex gap-2">
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              onClick={() => handleBookingUpdate(booking.id, "declined")}
-                              disabled={updatingBooking === booking.id}
-                              className="border-red-200 text-red-600 hover:bg-red-50"
-                            >
-                              {updatingBooking === booking.id ? (
-                                <Loader2 className="w-4 h-4 animate-spin" />
-                              ) : (
-                                <>
-                                  <XCircle className="w-4 h-4 mr-1" />
-                                  Decline
-                                </>
-                              )}
-                            </Button>
-                            <Button
-                              size="sm"
-                              onClick={() => handleBookingUpdate(booking.id, "accepted")}
-                              disabled={updatingBooking === booking.id}
-                              className="bg-green-600 hover:bg-green-700"
-                            >
-                              {updatingBooking === booking.id ? (
-                                <Loader2 className="w-4 h-4 animate-spin" />
-                              ) : (
-                                <>
-                                  <CheckCircle2 className="w-4 h-4 mr-1" />
-                                  Accept
-                                </>
-                              )}
-                            </Button>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-
-                    {booking.message && (
-                      <div className="mt-4 pt-4 border-t border-[#E5E5E5]">
-                        <p className="text-sm text-[#4A4A4A]">
-                          <span className="font-medium">Message:</span> {booking.message}
-                        </p>
-                      </div>
-                    )}
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="bg-white rounded-xl p-12 shadow-sm text-center">
-                <div className="w-16 h-16 rounded-full bg-[#F9F8F4] flex items-center justify-center mx-auto mb-4">
-                  <Calendar className="w-8 h-8 text-[#888888]" />
-                </div>
-                <h3 className="text-xl font-semibold text-[#1A1A1A] mb-2">No booking requests</h3>
-                <p className="text-[#4A4A4A]">
-                  Booking requests from families will appear here
-                </p>
-              </div>
-            )}
-          </TabsContent>
-        </Tabs>
+// Overview Section Component
+function OverviewSection({
+  vendorProfile,
+  portfolioCount,
+  blockedDatesCount,
+  isProfileComplete,
+  hasDescription,
+  hasServiceAreas,
+  hasPricing,
+  hasPortfolio,
+  navigate,
+  setActiveSection,
+}) {
+  return (
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-2xl font-bold text-[#1A1A1A]" style={{ fontFamily: 'Playfair Display, serif' }}>
+          Welcome back!
+        </h1>
+        <p className="text-gray-500">Here's an overview of your vendor account.</p>
       </div>
 
-      {/* Profile Dialog */}
-      <Dialog open={profileDialogOpen} onOpenChange={setProfileDialogOpen}>
-        <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>{vendorProfile ? "Edit" : "Create"} Vendor Profile</DialogTitle>
-            <DialogDescription>
-              Fill in your business details to start receiving booking requests
-            </DialogDescription>
-          </DialogHeader>
-
-          <div className="space-y-4 py-4">
-            <div className="space-y-2">
-              <Label htmlFor="business_name">Business Name *</Label>
-              <Input
-                id="business_name"
-                value={formData.business_name}
-                onChange={(e) => handleFormChange("business_name", e.target.value)}
-                placeholder="Your business name"
-                className="input-styled"
-                data-testid="vendor-business-name"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label>Category *</Label>
-              <Select value={formData.category} onValueChange={(v) => handleFormChange("category", v)}>
-                <SelectTrigger className="input-styled" data-testid="vendor-category">
-                  <SelectValue placeholder="Select category" />
-                </SelectTrigger>
-                <SelectContent>
-                  {categories.map((cat) => (
-                    <SelectItem key={cat.value} value={cat.value}>
-                      {cat.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="description">Description *</Label>
-              <Textarea
-                id="description"
-                value={formData.description}
-                onChange={(e) => handleFormChange("description", e.target.value)}
-                placeholder="Describe your services..."
-                className="input-styled resize-none"
-                rows={3}
-                data-testid="vendor-description"
-              />
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="location">Location</Label>
-                <Input
-                  id="location"
-                  value={formData.location}
-                  onChange={(e) => handleFormChange("location", e.target.value)}
-                  placeholder="e.g., Fremont, CA"
-                  className="input-styled"
-                  data-testid="vendor-location"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label>Price Range</Label>
-                <Select value={formData.price_range} onValueChange={(v) => handleFormChange("price_range", v)}>
-                  <SelectTrigger className="input-styled">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {priceRanges.map((pr) => (
-                      <SelectItem key={pr.value} value={pr.value}>
-                        {pr.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="price_estimate">Price Estimate</Label>
-              <Input
-                id="price_estimate"
-                value={formData.price_estimate}
-                onChange={(e) => handleFormChange("price_estimate", e.target.value)}
-                placeholder="e.g., $2,000 - $3,500"
-                className="input-styled"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="services">Services (comma-separated)</Label>
-              <Input
-                id="services"
-                value={formData.services}
-                onChange={(e) => handleFormChange("services", e.target.value)}
-                placeholder="e.g., Full coverage, Edited photos, Online gallery"
-                className="input-styled"
-              />
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="contact_phone">Phone</Label>
-                <Input
-                  id="contact_phone"
-                  value={formData.contact_phone}
-                  onChange={(e) => handleFormChange("contact_phone", e.target.value)}
-                  placeholder="(408) 555-0101"
-                  className="input-styled"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="contact_email">Email</Label>
-                <Input
-                  id="contact_email"
-                  type="email"
-                  value={formData.contact_email}
-                  onChange={(e) => handleFormChange("contact_email", e.target.value)}
-                  placeholder="you@business.com"
-                  className="input-styled"
-                />
+      {/* Profile completion prompt */}
+      {!isProfileComplete && (
+        <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
+          <div className="flex items-start gap-3">
+            <AlertCircle className="w-5 h-5 text-amber-600 mt-0.5" />
+            <div className="flex-1">
+              <h3 className="font-medium text-amber-800">Complete Your Profile</h3>
+              <p className="text-sm text-amber-700 mt-1">
+                A complete profile helps families find and trust you. Add the missing items:
+              </p>
+              <ul className="mt-2 space-y-1 text-sm text-amber-700">
+                {!hasDescription && <li>- Add a description of your services</li>}
+                {!hasServiceAreas && <li>- Specify your service areas</li>}
+                {!hasPricing && <li>- Add your pricing information</li>}
+                {!hasPortfolio && <li>- Upload portfolio images</li>}
+              </ul>
+              <div className="mt-3 flex gap-2">
+                {(!hasDescription || !hasServiceAreas || !hasPricing) && (
+                  <Button size="sm" onClick={() => navigate('/vendor/profile/create')}>
+                    Edit Profile
+                  </Button>
+                )}
+                {!hasPortfolio && (
+                  <Button size="sm" variant="outline" onClick={() => setActiveSection('portfolio')}>
+                    Add Photos
+                  </Button>
+                )}
               </div>
             </div>
           </div>
+        </div>
+      )}
 
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setProfileDialogOpen(false)}>
-              Cancel
-            </Button>
+      {isProfileComplete && (
+        <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+          <div className="flex items-center gap-3">
+            <CheckCircle2 className="w-5 h-5 text-green-600" />
+            <div>
+              <h3 className="font-medium text-green-800">Profile Complete</h3>
+              <p className="text-sm text-green-700">
+                Your profile is ready for families to discover.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Quick Stats */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div className="bg-white rounded-lg p-4 border shadow-sm">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-lg bg-[#0F4C5C]/10 flex items-center justify-center">
+              <ImageIcon className="w-5 h-5 text-[#0F4C5C]" />
+            </div>
+            <div>
+              <p className="text-2xl font-bold text-[#1A1A1A]">{portfolioCount}</p>
+              <p className="text-sm text-gray-500">Portfolio Images</p>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white rounded-lg p-4 border shadow-sm">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-lg bg-red-100 flex items-center justify-center">
+              <CalendarDays className="w-5 h-5 text-red-600" />
+            </div>
+            <div>
+              <p className="text-2xl font-bold text-[#1A1A1A]">{blockedDatesCount}</p>
+              <p className="text-sm text-gray-500">Blocked Dates</p>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white rounded-lg p-4 border shadow-sm">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-lg bg-[#C5A059]/20 flex items-center justify-center">
+              <Star className="w-5 h-5 text-[#C5A059]" />
+            </div>
+            <div>
+              <p className="text-2xl font-bold text-[#1A1A1A]">
+                {vendorProfile.is_published ? 'Published' : 'Draft'}
+              </p>
+              <p className="text-sm text-gray-500">Profile Status</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* View as User button */}
+      {vendorProfile.is_published && (
+        <div className="bg-white rounded-lg p-4 border shadow-sm">
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="font-medium text-[#1A1A1A]">Public Profile</h3>
+              <p className="text-sm text-gray-500">
+                See how your profile appears to families searching for vendors.
+              </p>
+            </div>
             <Button
-              onClick={handleSaveProfile}
-              disabled={savingProfile}
-              className="btn-primary"
-              data-testid="save-vendor-profile"
+              variant="outline"
+              onClick={() => navigate(`/vendors/${vendorProfile.id}`)}
             >
-              {savingProfile ? (
-                <>
-                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  Saving...
-                </>
-              ) : (
-                "Save Profile"
-              )}
+              <ExternalLink className="w-4 h-4 mr-2" />
+              View as User
             </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// Profile Section Component
+function ProfileSection({ vendorProfile, categoryInfo, navigate }) {
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-[#1A1A1A]" style={{ fontFamily: 'Playfair Display, serif' }}>
+            Profile
+          </h1>
+          <p className="text-gray-500">View and edit your vendor profile.</p>
+        </div>
+        <Button onClick={() => navigate('/vendor/profile/create')} className="btn-secondary">
+          <Edit2 className="w-4 h-4 mr-2" />
+          Edit Profile
+        </Button>
+      </div>
+
+      <div className="bg-white rounded-xl p-6 shadow-sm border">
+        <div className="grid md:grid-cols-3 gap-8">
+          {/* Profile Image */}
+          <div className="md:col-span-1">
+            <div className="aspect-square rounded-xl bg-[#F9F8F4] flex items-center justify-center overflow-hidden">
+              {vendorProfile.profile_photo_url ? (
+                <img
+                  src={vendorProfile.profile_photo_url}
+                  alt={vendorProfile.business_name}
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <Store className="w-16 h-16 text-[#888888]" />
+              )}
+            </div>
+            <div className="mt-4">
+              <Badge className={cn(
+                "w-full justify-center",
+                vendorProfile.is_published
+                  ? "bg-green-100 text-green-800 border-green-200"
+                  : "bg-gray-100 text-gray-600 border-gray-200"
+              )}>
+                {vendorProfile.is_published ? 'Published' : 'Draft'}
+              </Badge>
+            </div>
+          </div>
+
+          {/* Profile Details */}
+          <div className="md:col-span-2 space-y-6">
+            <div>
+              <h2 className="text-2xl font-bold text-[#1A1A1A]">{vendorProfile.business_name}</h2>
+              <Badge className="mt-2 bg-[#0F4C5C]/10 text-[#0F4C5C] border-0">
+                {categoryInfo?.label || vendorProfile.category}
+              </Badge>
+            </div>
+
+            {vendorProfile.description ? (
+              <p className="text-[#4A4A4A]">{vendorProfile.description}</p>
+            ) : (
+              <p className="text-gray-400 italic">No description added yet.</p>
+            )}
+
+            <div className="grid grid-cols-2 gap-4">
+              {vendorProfile.service_areas?.length > 0 && (
+                <div className="flex items-start gap-2">
+                  <MapPin className="w-4 h-4 text-[#888888] mt-1" />
+                  <div>
+                    <p className="text-sm font-medium text-gray-600">Service Areas</p>
+                    <p className="text-[#4A4A4A]">{vendorProfile.service_areas.join(', ')}</p>
+                  </div>
+                </div>
+              )}
+              {(vendorProfile.price_min || vendorProfile.price_max) && (
+                <div className="flex items-start gap-2">
+                  <DollarSign className="w-4 h-4 text-[#888888] mt-1" />
+                  <div>
+                    <p className="text-sm font-medium text-gray-600">Pricing</p>
+                    <p className="text-[#4A4A4A]">
+                      {vendorProfile.price_min && vendorProfile.price_max
+                        ? `$${vendorProfile.price_min.toLocaleString()} - $${vendorProfile.price_max.toLocaleString()}`
+                        : vendorProfile.price_min
+                        ? `From $${vendorProfile.price_min.toLocaleString()}`
+                        : `Up to $${vendorProfile.price_max.toLocaleString()}`}
+                    </p>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Portfolio Section Component
+function PortfolioSection({ vendorId, portfolioCount }) {
+  return (
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-2xl font-bold text-[#1A1A1A]" style={{ fontFamily: 'Playfair Display, serif' }}>
+          Portfolio
+        </h1>
+        <p className="text-gray-500">
+          Showcase your work with up to 10 images. Drag to reorder.
+        </p>
+      </div>
+
+      <div className="bg-white rounded-xl p-6 shadow-sm border">
+        <div className="mb-6">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="font-medium text-[#1A1A1A]">Upload New Image</h3>
+            <span className="text-sm text-gray-500">{portfolioCount}/10 images</span>
+          </div>
+          <PortfolioUploader
+            vendorId={vendorId}
+            currentCount={portfolioCount}
+          />
+        </div>
+
+        <div className="border-t pt-6">
+          <h3 className="font-medium text-[#1A1A1A] mb-4">Your Portfolio</h3>
+          <PortfolioGallery vendorId={vendorId} />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Availability Section Component
+function AvailabilitySection({ vendorId, upcomingBlockedCount }) {
+  return (
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-2xl font-bold text-[#1A1A1A]" style={{ fontFamily: 'Playfair Display, serif' }}>
+          Availability
+        </h1>
+        <p className="text-gray-500">
+          Manage your calendar to show families when you're available.
+        </p>
+      </div>
+
+      <div className="bg-white rounded-xl p-6 shadow-sm border">
+        <div className="flex items-center justify-between mb-6">
+          <h3 className="font-medium text-[#1A1A1A]">Availability Calendar</h3>
+          {upcomingBlockedCount > 0 && (
+            <span className="text-sm text-gray-500">
+              {upcomingBlockedCount} date{upcomingBlockedCount !== 1 ? 's' : ''} blocked
+            </span>
+          )}
+        </div>
+        <AvailabilityCalendar vendorId={vendorId} />
+      </div>
     </div>
   );
 }
