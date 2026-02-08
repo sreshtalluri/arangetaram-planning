@@ -10,28 +10,28 @@ See: .planning/PROJECT.md (updated 2026-02-07)
 ## Current Position
 
 Phase: 2 of 5 (Vendor Supply Platform)
-Plan: 4 of 6 in current phase
+Plan: 5 of 6 in current phase
 Status: In progress
-Last activity: 2026-02-07 - Completed 02-04-PLAN.md (Profile Wizard)
+Last activity: 2026-02-08 - Completed 02-05-PLAN.md (Portfolio & Availability Components)
 
-Progress: [███████░░░] ~33% (10/30+ plans estimated)
+Progress: [████████░░] ~37% (11/30+ plans estimated)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 10
+- Total plans completed: 11
 - Average duration: 2.5 min
-- Total execution time: 0.42 hours
+- Total execution time: 0.46 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 01-foundation-authentication | 6 | 16 min | 2.7 min |
-| 02-vendor-supply-platform | 4 | 10 min | 2.5 min |
+| 02-vendor-supply-platform | 5 | 13 min | 2.6 min |
 
 **Recent Trend:**
-- Last 5 plans: 01-06 (3 min), 02-01 (3 min), 02-02 (2 min), 02-03 (3 min), 02-04 (2 min)
+- Last 5 plans: 02-01 (3 min), 02-02 (2 min), 02-03 (3 min), 02-04 (2 min), 02-05 (3 min)
 - Trend: Stable ~2-3 min/plan
 
 *Updated after each plan completion*
@@ -71,6 +71,9 @@ Recent decisions affecting current work:
 | 02-04 | FormProvider wraps wizard steps | Shared form state via useFormContext() |
 | 02-04 | Auto-save on watch() | Every field change saves to localStorage |
 | 02-04 | Existing profile fallback | Form loads existing data if no draft |
+| 02-05 | Preview via URL.createObjectURL | Immediate visual feedback without server round-trip |
+| 02-05 | Storage delete before database delete | Ensures orphaned files don't accumulate |
+| 02-05 | Blocked dates red with Booked label | Clear visual distinction for unavailable dates |
 
 ### Pending Todos
 
@@ -89,6 +92,6 @@ Recent decisions affecting current work:
 
 ## Session Continuity
 
-Last session: 2026-02-08T02:58:00Z
-Stopped at: Completed 02-04-PLAN.md (Profile Wizard)
-Resume file: None - ready for 02-05
+Last session: 2026-02-08T03:02:00Z
+Stopped at: Completed 02-05-PLAN.md (Portfolio & Availability Components)
+Resume file: None - ready for 02-06
