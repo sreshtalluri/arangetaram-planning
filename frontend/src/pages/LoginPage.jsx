@@ -32,7 +32,11 @@ export default function LoginPage() {
         navigate("/dashboard");
       }
     } catch (error) {
-      const message = error instanceof Error ? error.message : "Invalid credentials";
+      console.error('Login error:', error);
+      let message = "Invalid credentials";
+      if (error && typeof error === 'object' && 'message' in error) {
+        message = String(error.message);
+      }
       toast.error(message);
     } finally {
       setLoading(false);

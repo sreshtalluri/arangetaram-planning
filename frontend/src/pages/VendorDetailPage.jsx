@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { vendorAPI, bookingAPI, eventAPI } from "../lib/api";
-import { useAuth } from "../lib/auth";
+import { useAuth } from "../hooks/useAuth";
 import Navbar from "../components/Navbar";
 import { Button } from "../components/ui/button";
 import { Badge } from "../components/ui/badge";

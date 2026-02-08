@@ -1,10 +1,8 @@
-import { useEffect } from "react";
 import "@/App.css";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./contexts/AuthContext";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { Toaster } from "./components/ui/sonner";
-import { seedAPI } from "./lib/api";
 
 // Pages
 import LandingPage from "./pages/LandingPage";
@@ -21,18 +19,6 @@ import UserDashboard from "./pages/UserDashboard";
 import VendorDashboard from "./pages/VendorDashboard";
 
 function App() {
-  useEffect(() => {
-    // Seed database on first load
-    const initializeApp = async () => {
-      try {
-        await seedAPI.seed();
-      } catch (e) {
-        console.log("Database may already be seeded");
-      }
-    };
-    initializeApp();
-  }, []);
-
   return (
     <AuthProvider>
       <div className="min-h-screen bg-[#F9F8F4]">

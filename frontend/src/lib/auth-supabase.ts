@@ -25,23 +25,32 @@ export async function signUp(
 }
 
 export async function signIn(email: string, password: string) {
-  const { data, error } = await supabase.auth.signInWithPassword({
-    email,
-    password,
-  })
+  try {
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    })
 
-  if (error) {
-    // Provide specific error messages per CONTEXT.md
-    if (error.message.includes('Invalid login credentials')) {
-      throw new Error('Email or password is incorrect')
+    if (error) {
+      // Provide specific error messages per CONTEXT.md
+      const msg = String(error.message || '')
+      if (msg.includes('Invalid login credentials')) {
+        throw new Error('Email or password is incorrect')
+      }
+      if (msg.includes('Email not confirmed')) {
+        throw new Error('Please verify your email before logging in')
+      }
+      throw new Error(msg || 'Login failed')
     }
-    if (error.message.includes('Email not confirmed')) {
-      throw new Error('Please verify your email before logging in')
+
+    return data
+  } catch (err) {
+    // Ensure we always throw a clean Error object
+    if (err instanceof Error) {
+      throw err
     }
-    throw error
+    throw new Error('Login failed')
   }
-
-  return data
 }
 
 export async function signOut() {

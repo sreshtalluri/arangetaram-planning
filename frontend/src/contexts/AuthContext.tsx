@@ -8,7 +8,7 @@ interface AuthContextType {
   user: User | null
   loading: boolean
   signUp: (email: string, password: string, role: UserRole, fullName?: string) => Promise<void>
-  signIn: (email: string, password: string) => Promise<void>
+  signIn: (email: string, password: string) => Promise<{ session: Session | null; user: User | null }>
   signOut: () => Promise<void>
 }
 
@@ -44,10 +44,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   const signIn = async (email: string, password: string) => {
-    const { session } = await authSignIn(email, password)
+    const data = await authSignIn(email, password)
     // onAuthStateChange will handle state update, but we can set immediately for faster UI
-    setSession(session)
-    setUser(session?.user ?? null)
+    setSession(data.session)
+    setUser(data.user)
+    return { session: data.session, user: data.user }
   }
 
   const signOut = async () => {

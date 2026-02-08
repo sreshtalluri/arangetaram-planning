@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../lib/auth";
+import { useAuth } from "../hooks/useAuth";
 import { eventAPI, aiAPI, vendorAPI } from "../lib/api";
 import Navbar from "../components/Navbar";
 import AIChat from "../components/AIChat";
