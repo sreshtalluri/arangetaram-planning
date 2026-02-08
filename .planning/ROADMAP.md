@@ -55,10 +55,15 @@ Plans:
   6. Vendor availability is visible when users browse vendor profiles
   7. Vendor profile displays in public vendor listings
   8. Vendor can access dashboard showing their profile and availability
-**Plans**: TBD
+**Plans**: 6 plans
 
 Plans:
-- [ ] TBD during plan-phase
+- [ ] 02-01-PLAN.md — Database schema (vendor_profiles, portfolio_images, vendor_availability), Storage bucket, RLS
+- [ ] 02-02-PLAN.md — Category definitions, metro areas, vendor data hooks (useVendorProfile, usePortfolio, useAvailability)
+- [ ] 02-03-PLAN.md — dnd-kit installation and storage upload helpers
+- [ ] 02-04-PLAN.md — Multi-step profile wizard with auto-save
+- [ ] 02-05-PLAN.md — Portfolio uploader/gallery and availability calendar components
+- [ ] 02-06-PLAN.md — Vendor dashboard rebuild with sidebar navigation and verification
 
 ### Phase 3: Event Planning & Discovery
 **Goal**: Users can create events, browse vendors with filters, and view detailed vendor profiles
@@ -122,7 +127,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation & Authentication | 6/6 | Complete | 2026-02-08 |
-| 2. Vendor Supply Platform | 0/TBD | Ready to plan | - |
+| 2. Vendor Supply Platform | 0/6 | Ready to execute | - |
 | 3. Event Planning & Discovery | 0/TBD | Not started | - |
 | 4. AI Enhancement | 0/TBD | Not started | - |
 | 5. Inquiry & Connection | 0/TBD | Not started | - |
