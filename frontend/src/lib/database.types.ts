@@ -14,6 +14,41 @@ export type Database = {
   }
   public: {
     Tables: {
+      portfolio_images: {
+        Row: {
+          caption: string | null
+          created_at: string | null
+          id: string
+          order_index: number
+          storage_path: string
+          vendor_id: string
+        }
+        Insert: {
+          caption?: string | null
+          created_at?: string | null
+          id?: string
+          order_index: number
+          storage_path: string
+          vendor_id: string
+        }
+        Update: {
+          caption?: string | null
+          created_at?: string | null
+          id?: string
+          order_index?: number
+          storage_path?: string
+          vendor_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "portfolio_images_vendor_id_fkey"
+            columns: ["vendor_id"]
+            isOneToOne: false
+            referencedRelation: "vendor_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           created_at: string | null
@@ -40,6 +75,88 @@ export type Database = {
           updated_at?: string | null
         }
         Relationships: []
+      }
+      vendor_availability: {
+        Row: {
+          blocked_date: string
+          created_at: string | null
+          id: string
+          note: string | null
+          vendor_id: string
+        }
+        Insert: {
+          blocked_date: string
+          created_at?: string | null
+          id?: string
+          note?: string | null
+          vendor_id: string
+        }
+        Update: {
+          blocked_date?: string
+          created_at?: string | null
+          id?: string
+          note?: string | null
+          vendor_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vendor_availability_vendor_id_fkey"
+            columns: ["vendor_id"]
+            isOneToOne: false
+            referencedRelation: "vendor_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      vendor_profiles: {
+        Row: {
+          business_name: string
+          category: string
+          created_at: string | null
+          description: string | null
+          id: string
+          is_published: boolean | null
+          price_max: number | null
+          price_min: number | null
+          profile_photo_url: string | null
+          service_areas: string[] | null
+          updated_at: string | null
+        }
+        Insert: {
+          business_name: string
+          category: string
+          created_at?: string | null
+          description?: string | null
+          id: string
+          is_published?: boolean | null
+          price_max?: number | null
+          price_min?: number | null
+          profile_photo_url?: string | null
+          service_areas?: string[] | null
+          updated_at?: string | null
+        }
+        Update: {
+          business_name?: string
+          category?: string
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_published?: boolean | null
+          price_max?: number | null
+          price_min?: number | null
+          profile_photo_url?: string | null
+          service_areas?: string[] | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vendor_profiles_id_fkey"
+            columns: ["id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {
