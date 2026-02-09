@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useSearchParams } from "react-router-dom";
 import { useVendorById } from "../hooks/useVendors";
 import { useAuth } from "../hooks/useAuth";
 import Navbar from "../components/Navbar";
@@ -19,6 +19,9 @@ import {
   Star, MapPin, Phone, Mail, ArrowLeft, Check,
   Loader2, Users, DollarSign
 } from "lucide-react";
+import { PortfolioLightbox } from "../components/vendor/PortfolioLightbox";
+import { AvailabilityBadge } from "../components/discovery/AvailabilityBadge";
+import { SaveVendorButton } from "../components/discovery/SaveVendorButton";
 
 const priceColors = {
   "$": "bg-green-100 text-green-800",
@@ -30,11 +33,19 @@ const priceColors = {
 export default function VendorDetailPage() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { user, isAuthenticated } = useAuth();
 
   const { data: vendor, isLoading, error } = useVendorById(id);
   const [bookingOpen, setBookingOpen] = useState(false);
   const [message, setMessage] = useState("");
+
+  // Lightbox state
+  const [lightboxOpen, setLightboxOpen] = useState(false);
+  const [lightboxIndex, setLightboxIndex] = useState(0);
+
+  // Get event date from URL params for availability check
+  const eventDate = searchParams.get("eventDate");
 
   // Handle error state
   if (error) {
@@ -110,6 +121,10 @@ export default function VendorDetailPage() {
                   e.target.src = "https://images.pexels.com/photos/16985130/pexels-photo-16985130.jpeg";
                 }}
               />
+              {/* Save button on hero */}
+              <div className="absolute top-4 left-4">
+                <SaveVendorButton vendorId={id} variant="icon" />
+              </div>
               <div className="absolute top-4 right-4">
                 <Badge className={`${priceColors[vendor.price_range]} border-0 text-sm px-3 py-1`}>
                   {vendor.price_range}
@@ -120,9 +135,13 @@ export default function VendorDetailPage() {
             {/* Title & Rating */}
             <div>
               <div className="flex items-start justify-between gap-4 mb-3">
-                <h1 className="text-3xl font-bold text-[#1A1A1A]" style={{ fontFamily: 'Playfair Display, serif' }}>
-                  {vendor.business_name}
-                </h1>
+                <div className="space-y-2">
+                  <h1 className="text-3xl font-bold text-[#1A1A1A]" style={{ fontFamily: 'Playfair Display, serif' }}>
+                    {vendor.business_name}
+                  </h1>
+                  {/* Availability Badge - shows when eventDate param present */}
+                  <AvailabilityBadge vendorId={id} eventDate={eventDate} />
+                </div>
                 {vendor.rating > 0 && (
                   <div className="flex items-center gap-2 bg-white rounded-full px-4 py-2 shadow-sm">
                     <Star className="w-5 h-5 text-[#C5A059] fill-[#C5A059]" />
@@ -163,12 +182,20 @@ export default function VendorDetailPage() {
                 <h2 className="text-xl font-semibold text-[#1A1A1A] mb-4">Gallery</h2>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                   {vendor.portfolio_images.map((img, idx) => (
-                    <img
+                    <button
                       key={idx}
-                      src={img}
-                      alt={`${vendor.business_name} portfolio ${idx + 1}`}
-                      className="h-32 w-full object-cover rounded-lg"
-                    />
+                      onClick={() => {
+                        setLightboxIndex(idx);
+                        setLightboxOpen(true);
+                      }}
+                      className="relative h-32 w-full overflow-hidden rounded-lg hover:opacity-90 transition-opacity focus:outline-none focus:ring-2 focus:ring-[#0F4C5C] focus:ring-offset-2"
+                    >
+                      <img
+                        src={img}
+                        alt={`${vendor.business_name} portfolio ${idx + 1}`}
+                        className="h-full w-full object-cover"
+                      />
+                    </button>
                   ))}
                 </div>
               </div>
@@ -186,14 +213,17 @@ export default function VendorDetailPage() {
 
               <Button
                 onClick={handleBookClick}
-                className="w-full btn-primary mb-4"
+                className="w-full btn-primary mb-3"
                 data-testid="request-booking-btn"
               >
-                Request Booking
+                Send Inquiry
               </Button>
 
+              {/* Save Button */}
+              <SaveVendorButton vendorId={id} variant="button" className="mb-4" />
+
               <p className="text-xs text-center text-[#888888]">
-                Free to request • No commitment required
+                Free to inquire • No commitment required
               </p>
 
               {/* Contact Info */}
@@ -258,9 +288,9 @@ export default function VendorDetailPage() {
       <Dialog open={bookingOpen} onOpenChange={setBookingOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>Request Booking</DialogTitle>
+            <DialogTitle>Send Inquiry</DialogTitle>
             <DialogDescription>
-              Send a booking request to {vendor.business_name}
+              Send an inquiry to {vendor.business_name}
             </DialogDescription>
           </DialogHeader>
 
@@ -287,11 +317,21 @@ export default function VendorDetailPage() {
               className="btn-primary"
               data-testid="submit-booking-btn"
             >
-              Send Request
+              Send Inquiry
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Portfolio Lightbox */}
+      {vendor.portfolio_images && vendor.portfolio_images.length > 0 && (
+        <PortfolioLightbox
+          images={vendor.portfolio_images}
+          initialIndex={lightboxIndex}
+          open={lightboxOpen}
+          onOpenChange={setLightboxOpen}
+        />
+      )}
     </div>
   );
 }
