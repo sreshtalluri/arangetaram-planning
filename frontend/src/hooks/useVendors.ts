@@ -29,6 +29,8 @@ interface UseVendorsParams {
   category?: string
   search?: string
   price_range?: string
+  location?: string      // Metro area code from service_areas
+  availableDate?: string // yyyy-MM-dd format - exclude blocked vendors
 }
 
 // Map price_min to price range symbol
@@ -67,6 +69,11 @@ export function useVendors(params: UseVendorsParams = {}) {
         query = query.or(`business_name.ilike.%${params.search}%,description.ilike.%${params.search}%`)
       }
 
+      // Filter by location (service area)
+      if (params.location) {
+        query = query.contains('service_areas', [params.location])
+      }
+
       const { data, error } = await query.order('created_at', { ascending: false })
 
       if (error) throw error
@@ -88,6 +95,17 @@ export function useVendors(params: UseVendorsParams = {}) {
       // Filter by price range if specified
       if (params.price_range) {
         vendors = vendors.filter(v => v.price_range === params.price_range)
+      }
+
+      // Filter by availability date - exclude vendors blocked on that date
+      if (params.availableDate) {
+        const { data: blockedVendors } = await supabase
+          .from('vendor_availability')
+          .select('vendor_id')
+          .eq('blocked_date', params.availableDate)
+
+        const blockedIds = new Set(blockedVendors?.map(b => b.vendor_id) || [])
+        vendors = vendors.filter(v => !blockedIds.has(v.id))
       }
 
       return vendors
