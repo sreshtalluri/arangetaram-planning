@@ -20,6 +20,7 @@ interface ProfileFormData {
   service_areas: string[]
   price_min: number | null
   price_max: number | null
+  profile_photo_url?: string | null
 }
 
 export function ProfileWizard() {
@@ -48,6 +49,7 @@ export function ProfileWizard() {
         service_areas: existingProfile.service_areas || [],
         price_min: existingProfile.price_min,
         price_max: existingProfile.price_max,
+        profile_photo_url: existingProfile.profile_photo_url || null,
       }
     }
     return {
@@ -57,6 +59,7 @@ export function ProfileWizard() {
       service_areas: [],
       price_min: null,
       price_max: null,
+      profile_photo_url: null,
     }
   }
 
@@ -75,6 +78,7 @@ export function ProfileWizard() {
         service_areas: existingProfile.service_areas || [],
         price_min: existingProfile.price_min,
         price_max: existingProfile.price_max,
+        profile_photo_url: existingProfile.profile_photo_url || null,
       })
     }
   }, [existingProfile, methods])

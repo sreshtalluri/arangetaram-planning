@@ -17,7 +17,8 @@ const priceColors = {
 };
 
 export const VendorCard = ({ vendor }) => {
-  const imageUrl = vendor.portfolio_images?.[0] || "https://images.pexels.com/photos/16985130/pexels-photo-16985130.jpeg";
+  // Prioritize profile photo, then portfolio images, then default
+  const imageUrl = vendor.profile_photo_url || vendor.portfolio_images?.[0] || "https://images.pexels.com/photos/16985130/pexels-photo-16985130.jpeg";
 
   return (
     <Link to={`/vendors/${vendor.id}`} data-testid={`vendor-card-${vendor.id}`}>

@@ -1,23 +1,24 @@
 /* App-specific styles */
 
 /* Button styles from design guidelines */
+/* Using !important to override shadcn Button component defaults */
 .btn-primary {
-    @apply bg-[#0F4C5C] text-white hover:bg-[#093642] rounded-full px-8 py-3 font-medium shadow-lg;
+    @apply !bg-[#800020] !text-white hover:!bg-[#600018] !rounded-full !px-8 !py-3 !font-medium !shadow-lg !border-0;
     transition: background-color 0.3s, box-shadow 0.3s, transform 0.2s;
 }
 
 .btn-primary:hover {
-    @apply shadow-xl;
+    @apply !shadow-xl;
     transform: translateY(-1px);
 }
 
 .btn-secondary {
-    @apply border-2 border-[#C5A059] text-[#800020] hover:bg-[#C5A059] hover:text-white rounded-full px-8 py-3 font-medium;
+    @apply !bg-white !border-2 !border-[#800020] !text-[#800020] hover:!bg-[#800020] hover:!text-white !rounded-full !px-8 !py-3 !font-medium;
     transition: background-color 0.3s, color 0.3s;
 }
 
 .btn-ghost {
-    @apply text-[#800020] hover:bg-[#800020]/10 rounded-lg px-4 py-2;
+    @apply !bg-transparent !text-[#800020] hover:!bg-[#800020]/10 !rounded-lg !px-4 !py-2 !border-0;
     transition: background-color 0.3s;
 }
 

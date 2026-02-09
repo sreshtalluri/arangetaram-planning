@@ -245,7 +245,7 @@ export default function LandingPage() {
               Start Planning Now
             </Button>
             <Button
-              onClick={() => navigate("/register")}
+              onClick={() => navigate("/vendor/signup")}
               className="border-2 border-white text-white hover:bg-white/10 rounded-full px-8 py-3 font-medium"
               variant="outline"
             >
@@ -283,8 +283,8 @@ export default function LandingPage() {
             <div>
               <h4 className="font-semibold mb-4">For Vendors</h4>
               <ul className="space-y-2 text-white/60 text-sm">
-                <li><Link to="/register" className="hover:text-white">Join as Vendor</Link></li>
-                <li><Link to="/vendor-dashboard" className="hover:text-white">Vendor Dashboard</Link></li>
+                <li><Link to="/vendor/signup" className="hover:text-white">Join as Vendor</Link></li>
+                <li><Link to="/vendor/dashboard" className="hover:text-white">Vendor Dashboard</Link></li>
               </ul>
             </div>
             <div>

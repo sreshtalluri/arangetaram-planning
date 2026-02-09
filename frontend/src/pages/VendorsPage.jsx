@@ -1,6 +1,7 @@
-import { useState, useEffect } from "react";
-import { useSearchParams, Link } from "react-router-dom";
-import { vendorAPI, categoryAPI } from "../lib/api";
+import { useState, useMemo } from "react";
+import { useSearchParams } from "react-router-dom";
+import { useVendors } from "../hooks/useVendors";
+import { useCategories } from "../hooks/useCategories";
 import Navbar from "../components/Navbar";
 import VendorCard from "../components/VendorCard";
 import AIChat from "../components/AIChat";
@@ -14,23 +15,26 @@ import {
   SelectValue,
 } from "../components/ui/select";
 import { Tabs, TabsList, TabsTrigger } from "../components/ui/tabs";
-import { Search, Loader2, Building2, UtensilsCrossed, Camera, Video, Flower2, Music, Grid3X3 } from "lucide-react";
+import { Search, Loader2, Building2, UtensilsCrossed, Camera, Video, Flower2, Music, Grid3X3, Palette, Mic2, Scissors, Gift, Mail } from "lucide-react";
 
 const categoryIcons = {
   venue: Building2,
   catering: UtensilsCrossed,
-  photographer: Camera,
-  videographer: Video,
-  decorations: Flower2,
+  photography: Camera,
+  videography: Video,
+  stage_decoration: Flower2,
   musicians: Music,
+  nattuvanar: Mic2,
+  makeup_artist: Palette,
+  invitations: Mail,
+  costumes: Scissors,
+  return_gifts: Gift,
 };
 
 export default function VendorsPage() {
   const [searchParams, setSearchParams] = useSearchParams();
-  const [vendors, setVendors] = useState([]);
-  const [categories, setCategories] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [chatOpen, setChatOpen] = useState(false);
+  const [searchInput, setSearchInput] = useState(searchParams.get("search") || "");
 
   const [filters, setFilters] = useState({
     category: searchParams.get("category") || "",
@@ -38,37 +42,15 @@ export default function VendorsPage() {
     price_range: searchParams.get("price") || "",
   });
 
-  useEffect(() => {
-    const loadCategories = async () => {
-      try {
-        const response = await categoryAPI.getAll();
-        setCategories(response.data.categories);
-      } catch (error) {
-        console.error("Failed to load categories:", error);
-      }
-    };
-    loadCategories();
-  }, []);
+  // Debounced search - only update filter when user stops typing
+  const debouncedFilters = useMemo(() => ({
+    category: filters.category,
+    search: filters.search,
+    price_range: filters.price_range,
+  }), [filters.category, filters.search, filters.price_range]);
 
-  useEffect(() => {
-    const loadVendors = async () => {
-      setLoading(true);
-      try {
-        const params = {};
-        if (filters.category) params.category = filters.category;
-        if (filters.search) params.search = filters.search;
-        if (filters.price_range) params.price_range = filters.price_range;
-
-        const response = await vendorAPI.getAll(params);
-        setVendors(response.data);
-      } catch (error) {
-        console.error("Failed to load vendors:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    loadVendors();
-  }, [filters]);
+  const { data: vendors = [], isLoading: vendorsLoading } = useVendors(debouncedFilters);
+  const { data: categories = [] } = useCategories();
 
   const handleCategoryChange = (category) => {
     const newCategory = category === "all" ? "" : category;
@@ -82,12 +64,24 @@ export default function VendorsPage() {
   };
 
   const handleSearchChange = (e) => {
-    setFilters({ ...filters, search: e.target.value });
+    setSearchInput(e.target.value);
+  };
+
+  const handleSearchSubmit = (e) => {
+    if (e.key === 'Enter' || e.type === 'blur') {
+      setFilters({ ...filters, search: searchInput });
+    }
   };
 
   const handlePriceChange = (value) => {
     const newPrice = value === "all" ? "" : value;
     setFilters({ ...filters, price_range: newPrice });
+  };
+
+  const handleClearFilters = () => {
+    setFilters({ category: "", search: "", price_range: "" });
+    setSearchInput("");
+    setSearchParams({});
   };
 
   return (
@@ -140,10 +134,12 @@ export default function VendorsPage() {
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-[#888888]" />
             <Input
-              value={filters.search}
+              value={searchInput}
               onChange={handleSearchChange}
+              onKeyDown={handleSearchSubmit}
+              onBlur={handleSearchSubmit}
               placeholder="Search vendors..."
-              className="pl-10 input-styled"
+              className="!pl-10 input-styled"
               data-testid="vendor-search"
             />
           </div>
@@ -162,7 +158,7 @@ export default function VendorsPage() {
         </div>
 
         {/* Results */}
-        {loading ? (
+        {vendorsLoading ? (
           <div className="flex items-center justify-center py-20">
             <Loader2 className="w-8 h-8 animate-spin text-[#0F4C5C]" />
           </div>
@@ -181,7 +177,7 @@ export default function VendorsPage() {
             <p className="text-[#4A4A4A] mb-6">
               Try adjusting your filters or search terms
             </p>
-            <Button onClick={() => setFilters({ category: "", search: "", price_range: "" })} className="btn-secondary">
+            <Button onClick={handleClearFilters} className="btn-secondary">
               Clear Filters
             </Button>
           </div>

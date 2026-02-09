@@ -1,6 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { vendorAPI, bookingAPI, eventAPI } from "../lib/api";
+import { useVendorById } from "../hooks/useVendors";
 import { useAuth } from "../hooks/useAuth";
 import Navbar from "../components/Navbar";
 import { Button } from "../components/ui/button";
@@ -14,17 +14,10 @@ import {
   DialogHeader,
   DialogTitle,
 } from "../components/ui/dialog";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "../components/ui/select";
 import { toast } from "sonner";
 import {
   Star, MapPin, Phone, Mail, ArrowLeft, Check,
-  Loader2, Calendar, Users, DollarSign
+  Loader2, Users, DollarSign
 } from "lucide-react";
 
 const priceColors = {
@@ -37,88 +30,20 @@ const priceColors = {
 export default function VendorDetailPage() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { user, isAuthenticated, continueAsGuest } = useAuth();
-  
-  const [vendor, setVendor] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const { user, isAuthenticated } = useAuth();
+
+  const { data: vendor, isLoading, error } = useVendorById(id);
   const [bookingOpen, setBookingOpen] = useState(false);
-  const [bookingLoading, setBookingLoading] = useState(false);
-  const [events, setEvents] = useState([]);
-  const [selectedEvent, setSelectedEvent] = useState("");
   const [message, setMessage] = useState("");
 
-  useEffect(() => {
-    const loadVendor = async () => {
-      try {
-        const response = await vendorAPI.getById(id);
-        setVendor(response.data);
-      } catch (error) {
-        toast.error("Vendor not found");
-        navigate("/vendors");
-      } finally {
-        setLoading(false);
-      }
-    };
-    loadVendor();
-  }, [id, navigate]);
+  // Handle error state
+  if (error) {
+    toast.error("Vendor not found");
+    navigate("/vendors");
+    return null;
+  }
 
-  useEffect(() => {
-    const loadEvents = async () => {
-      if (isAuthenticated()) {
-        try {
-          const response = await eventAPI.getAll();
-          setEvents(response.data.filter(e => e.status === "planning"));
-        } catch (error) {
-          console.error("Failed to load events:", error);
-        }
-      }
-    };
-    loadEvents();
-  }, [isAuthenticated]);
-
-  const handleBookingRequest = async () => {
-    if (!selectedEvent) {
-      toast.error("Please select an event");
-      return;
-    }
-
-    setBookingLoading(true);
-    try {
-      await bookingAPI.create({
-        event_id: selectedEvent,
-        vendor_id: vendor.id,
-        message: message,
-      });
-      toast.success("Booking request sent successfully!");
-      setBookingOpen(false);
-      setMessage("");
-      setSelectedEvent("");
-    } catch (error) {
-      toast.error(error.response?.data?.detail || "Failed to send booking request");
-    } finally {
-      setBookingLoading(false);
-    }
-  };
-
-  const handleBookClick = async () => {
-    if (!isAuthenticated()) {
-      // Create guest account and redirect to plan
-      try {
-        await continueAsGuest();
-        toast.info("Please create an event first to book vendors");
-        navigate("/plan");
-      } catch (error) {
-        toast.error("Something went wrong");
-      }
-    } else if (events.length === 0) {
-      toast.info("Please create an event first to book vendors");
-      navigate("/plan");
-    } else {
-      setBookingOpen(true);
-    }
-  };
-
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="min-h-screen bg-[#F9F8F4]">
         <Navbar />
@@ -129,9 +54,34 @@ export default function VendorDetailPage() {
     );
   }
 
-  if (!vendor) return null;
+  if (!vendor) {
+    return (
+      <div className="min-h-screen bg-[#F9F8F4]">
+        <Navbar />
+        <div className="flex items-center justify-center py-20">
+          <p className="text-gray-500">Vendor not found</p>
+        </div>
+      </div>
+    );
+  }
 
-  const imageUrl = vendor.portfolio_images?.[0] || "https://images.pexels.com/photos/16985130/pexels-photo-16985130.jpeg";
+  const imageUrl = vendor.profile_photo_url || vendor.portfolio_images?.[0] || "https://images.pexels.com/photos/16985130/pexels-photo-16985130.jpeg";
+
+  const handleBookClick = async () => {
+    if (!isAuthenticated) {
+      toast.info("Please sign in to book vendors");
+      navigate("/login");
+    } else {
+      setBookingOpen(true);
+    }
+  };
+
+  const handleBookingRequest = async () => {
+    // TODO: Implement booking request via Supabase
+    toast.success("Booking request sent! (Demo mode)");
+    setBookingOpen(false);
+    setMessage("");
+  };
 
   return (
     <div className="min-h-screen bg-[#F9F8F4]">
@@ -190,28 +140,25 @@ export default function VendorDetailPage() {
             {/* Description */}
             <div className="bg-white rounded-xl p-6 shadow-sm">
               <h2 className="text-xl font-semibold text-[#1A1A1A] mb-4">About</h2>
-              <p className="text-[#4A4A4A] leading-relaxed">{vendor.description}</p>
+              <p className="text-[#4A4A4A] leading-relaxed">{vendor.description || "No description available."}</p>
             </div>
 
-            {/* Services */}
-            {vendor.services && vendor.services.length > 0 && (
+            {/* Service Areas */}
+            {vendor.service_areas && vendor.service_areas.length > 0 && (
               <div className="bg-white rounded-xl p-6 shadow-sm">
-                <h2 className="text-xl font-semibold text-[#1A1A1A] mb-4">Services Included</h2>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  {vendor.services.map((service, idx) => (
-                    <div key={idx} className="flex items-center gap-2">
-                      <div className="w-5 h-5 rounded-full bg-[#0F4C5C]/10 flex items-center justify-center">
-                        <Check className="w-3 h-3 text-[#0F4C5C]" />
-                      </div>
-                      <span className="text-[#4A4A4A]">{service}</span>
-                    </div>
+                <h2 className="text-xl font-semibold text-[#1A1A1A] mb-4">Service Areas</h2>
+                <div className="flex flex-wrap gap-2">
+                  {vendor.service_areas.map((area, idx) => (
+                    <Badge key={idx} variant="secondary" className="bg-[#F9F8F4]">
+                      {area}
+                    </Badge>
                   ))}
                 </div>
               </div>
             )}
 
             {/* Gallery */}
-            {vendor.portfolio_images && vendor.portfolio_images.length > 1 && (
+            {vendor.portfolio_images && vendor.portfolio_images.length > 0 && (
               <div className="bg-white rounded-xl p-6 shadow-sm">
                 <h2 className="text-xl font-semibold text-[#1A1A1A] mb-4">Gallery</h2>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
@@ -263,6 +210,9 @@ export default function VendorDetailPage() {
                     <Mail className="w-4 h-4" />
                     <span>{vendor.contact_email}</span>
                   </a>
+                )}
+                {!vendor.contact_phone && !vendor.contact_email && (
+                  <p className="text-sm text-[#888888]">Contact info available after booking request</p>
                 )}
               </div>
             </div>
@@ -316,22 +266,6 @@ export default function VendorDetailPage() {
 
           <div className="space-y-4 py-4">
             <div className="space-y-2">
-              <label className="text-sm font-medium">Select Event</label>
-              <Select value={selectedEvent} onValueChange={setSelectedEvent}>
-                <SelectTrigger data-testid="select-event">
-                  <SelectValue placeholder="Choose an event" />
-                </SelectTrigger>
-                <SelectContent>
-                  {events.map((event) => (
-                    <SelectItem key={event.id} value={event.id}>
-                      {event.event_name} - {event.event_date}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="space-y-2">
               <label className="text-sm font-medium">Message (Optional)</label>
               <Textarea
                 value={message}
@@ -350,18 +284,10 @@ export default function VendorDetailPage() {
             </Button>
             <Button
               onClick={handleBookingRequest}
-              disabled={bookingLoading}
               className="btn-primary"
               data-testid="submit-booking-btn"
             >
-              {bookingLoading ? (
-                <>
-                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  Sending...
-                </>
-              ) : (
-                "Send Request"
-              )}
+              Send Request
             </Button>
           </DialogFooter>
         </DialogContent>

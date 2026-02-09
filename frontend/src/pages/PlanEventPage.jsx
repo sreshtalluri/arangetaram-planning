@@ -246,7 +246,7 @@ export default function PlanEventPage() {
                       type="number"
                       value={eventData.guest_count}
                       onChange={(e) => handleInputChange("guest_count", parseInt(e.target.value) || 0)}
-                      className="pl-10 input-styled"
+                      className="!pl-10 input-styled"
                       min={1}
                       data-testid="guest-count-input"
                     />
@@ -280,7 +280,7 @@ export default function PlanEventPage() {
                     id="location"
                     value={eventData.location_preference}
                     onChange={(e) => handleInputChange("location_preference", e.target.value)}
-                    className="pl-10 input-styled"
+                    className="!pl-10 input-styled"
                     placeholder="e.g., Fremont, Sunnyvale"
                     data-testid="location-input"
                   />

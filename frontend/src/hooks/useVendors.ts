@@ -1,0 +1,148 @@
+import { useQuery } from '@tanstack/react-query'
+import { supabase } from '../lib/supabase'
+
+export interface PublicVendor {
+  id: string
+  business_name: string
+  description: string | null
+  category: string
+  service_areas: string[]
+  price_min: number | null
+  price_max: number | null
+  profile_photo_url: string | null
+  is_published: boolean
+  created_at: string | null
+  updated_at?: string | null
+  // Computed fields for display
+  price_range: string
+  price_estimate: string
+  location: string
+  rating: number
+  review_count: number
+  portfolio_images: string[]
+  services: string[]
+  contact_phone?: string
+  contact_email?: string
+}
+
+interface UseVendorsParams {
+  category?: string
+  search?: string
+  price_range?: string
+}
+
+// Map price_min to price range symbol
+function getPriceRange(priceMin: number | null): string {
+  if (!priceMin) return '$$'
+  if (priceMin < 500) return '$'
+  if (priceMin < 2000) return '$$'
+  if (priceMin < 5000) return '$$$'
+  return '$$$$'
+}
+
+// Format price estimate
+function getPriceEstimate(priceMin: number | null, priceMax: number | null): string {
+  if (!priceMin && !priceMax) return 'Contact for pricing'
+  if (priceMin && priceMax) return `$${priceMin.toLocaleString()} - $${priceMax.toLocaleString()}`
+  if (priceMin) return `From $${priceMin.toLocaleString()}`
+  return `Up to $${priceMax?.toLocaleString()}`
+}
+
+export function useVendors(params: UseVendorsParams = {}) {
+  return useQuery({
+    queryKey: ['vendors', params],
+    queryFn: async (): Promise<PublicVendor[]> => {
+      let query = supabase
+        .from('vendor_profiles')
+        .select('*')
+        .eq('is_published', true)
+
+      // Filter by category
+      if (params.category) {
+        query = query.eq('category', params.category)
+      }
+
+      // Search by business name or description
+      if (params.search) {
+        query = query.or(`business_name.ilike.%${params.search}%,description.ilike.%${params.search}%`)
+      }
+
+      const { data, error } = await query.order('created_at', { ascending: false })
+
+      if (error) throw error
+
+      // Transform data for display
+      let vendors: PublicVendor[] = (data || []).map((vendor) => ({
+        ...vendor,
+        service_areas: vendor.service_areas || [],
+        is_published: vendor.is_published ?? false,
+        price_range: getPriceRange(vendor.price_min),
+        price_estimate: getPriceEstimate(vendor.price_min, vendor.price_max),
+        location: vendor.service_areas?.[0] || 'Bay Area',
+        rating: 0, // TODO: Implement reviews
+        review_count: 0,
+        portfolio_images: [], // TODO: Fetch from portfolio_images table
+        services: [], // TODO: Add services field
+      }))
+
+      // Filter by price range if specified
+      if (params.price_range) {
+        vendors = vendors.filter(v => v.price_range === params.price_range)
+      }
+
+      return vendors
+    },
+    staleTime: 30 * 1000, // Cache for 30 seconds
+  })
+}
+
+export function useVendorById(vendorId: string | undefined) {
+  return useQuery({
+    queryKey: ['vendor', vendorId],
+    queryFn: async (): Promise<PublicVendor | null> => {
+      if (!vendorId) return null
+
+      // Fetch vendor profile
+      const { data: vendor, error } = await supabase
+        .from('vendor_profiles')
+        .select('*')
+        .eq('id', vendorId)
+        .single()
+
+      if (error) {
+        if (error.code === 'PGRST116') return null // Not found
+        throw error
+      }
+
+      // Fetch portfolio images
+      const { data: portfolioImages } = await supabase
+        .from('portfolio_images')
+        .select('storage_path')
+        .eq('vendor_id', vendorId)
+        .order('order_index', { ascending: true })
+
+      // Get public URLs for portfolio images
+      const imageUrls = (portfolioImages || []).map(img => {
+        const { data } = supabase.storage
+          .from('portfolio-images')
+          .getPublicUrl(img.storage_path)
+        return data.publicUrl
+      })
+
+      return {
+        ...vendor,
+        service_areas: vendor.service_areas || [],
+        is_published: vendor.is_published ?? false,
+        price_range: getPriceRange(vendor.price_min),
+        price_estimate: getPriceEstimate(vendor.price_min, vendor.price_max),
+        location: vendor.service_areas?.[0] || 'Bay Area',
+        rating: 0,
+        review_count: 0,
+        portfolio_images: imageUrls,
+        services: [],
+      }
+    },
+    enabled: !!vendorId,
+    staleTime: 60 * 1000,
+  })
+}

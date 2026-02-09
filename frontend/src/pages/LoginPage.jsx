@@ -27,7 +27,7 @@ export default function LoginPage() {
       const role = user?.user_metadata?.role;
       toast.success(`Welcome back!`);
       if (role === "vendor") {
-        navigate("/vendor-dashboard");
+        navigate("/vendor/dashboard");
       } else {
         navigate("/dashboard");
       }

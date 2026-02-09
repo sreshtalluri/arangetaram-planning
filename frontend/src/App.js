@@ -7,7 +7,6 @@ import { Toaster } from "./components/ui/sonner";
 // Pages
 import LandingPage from "./pages/LandingPage";
 import LoginPage from "./pages/LoginPage";
-import RegisterPage from "./pages/RegisterPage";
 import SignupPage from "./pages/SignupPage";
 import VendorSignupPage from "./pages/VendorSignupPage";
 import PasswordResetPage from "./pages/PasswordResetPage";
@@ -27,7 +26,6 @@ function App() {
           <Routes>
             <Route path="/" element={<LandingPage />} />
             <Route path="/login" element={<LoginPage />} />
-            <Route path="/register" element={<RegisterPage />} />
             <Route path="/signup" element={<SignupPage />} />
             <Route path="/vendor/signup" element={<VendorSignupPage />} />
             <Route path="/forgot-password" element={<PasswordResetPage />} />
@@ -45,7 +43,7 @@ function App() {
               }
             />
             <Route
-              path="/vendor-dashboard"
+              path="/vendor/dashboard"
               element={
                 <ProtectedRoute requiredRole="vendor">
                   <VendorDashboard />

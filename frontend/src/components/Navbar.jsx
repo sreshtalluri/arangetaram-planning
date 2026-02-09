@@ -68,7 +68,7 @@ export const Navbar = () => {
                   </div>
                   <DropdownMenuSeparator />
                   {isVendor ? (
-                    <DropdownMenuItem onClick={() => navigate("/vendor-dashboard")}>
+                    <DropdownMenuItem onClick={() => navigate("/vendor/dashboard")}>
                       <Store className="w-4 h-4 mr-2" />
                       Vendor Dashboard
                     </DropdownMenuItem>

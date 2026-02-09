@@ -44,7 +44,7 @@ export default function AuthCallbackPage() {
 
     const handleRedirect = (role?: string) => {
       if (role === "vendor") {
-        navigate("/vendor-dashboard", { replace: true });
+        navigate("/vendor/dashboard", { replace: true });
       } else {
         navigate("/dashboard", { replace: true });
       }
