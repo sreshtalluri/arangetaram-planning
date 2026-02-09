@@ -78,10 +78,14 @@ Plans:
   6. User can view vendor detail page with full profile and portfolio
   7. User can filter vendors by availability for their event date
   8. User dashboard shows their events and category coverage status
-**Plans**: TBD
+**Plans**: 5 plans
 
 Plans:
-- [ ] TBD during plan-phase
+- [ ] 03-01-PLAN.md — Database schema (events, saved_vendors) with RLS, useEvents and useSavedVendors hooks
+- [ ] 03-02-PLAN.md — Event creation wizard (3-step: Details, Categories, Review)
+- [ ] 03-03-PLAN.md — Vendor discovery with sidebar filters (location, availability date) and URL state
+- [ ] 03-04-PLAN.md — Vendor detail enhancements (portfolio lightbox, availability badge, save button)
+- [ ] 03-05-PLAN.md — User dashboard rebuild with events, category progress, saved vendors
 
 ### Phase 4: AI Enhancement
 **Goal**: Users receive AI-powered vendor recommendations with explanations and can use chat assistant for planning questions
@@ -128,6 +132,6 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 |-------|----------------|--------|-----------|
 | 1. Foundation & Authentication | 6/6 | Complete | 2026-02-08 |
 | 2. Vendor Supply Platform | 0/6 | Ready to execute | - |
-| 3. Event Planning & Discovery | 0/TBD | Not started | - |
+| 3. Event Planning & Discovery | 0/5 | Planned | - |
 | 4. AI Enhancement | 0/TBD | Not started | - |
 | 5. Inquiry & Connection | 0/TBD | Not started | - |
