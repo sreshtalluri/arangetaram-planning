@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-02-07)
 
 **Core value:** Users discover the right vendors for their needs, budget, and location
-**Current focus:** Phase 3 - Event Planning & Discovery (ready to execute)
+**Current focus:** Phase 3 - Event Planning & Discovery (executing)
 
 ## Current Position
 
 Phase: 3 of 5 (Event Planning & Discovery)
-Plan: 1 of 5 in current phase
+Plan: 2 of 5 in current phase
 Status: In progress
-Last activity: 2026-02-09 - Completed 03-01-PLAN.md (Event Data Layer)
+Last activity: 2026-02-09 - Completed 03-02-PLAN.md (Event Creation Wizard)
 
-Progress: [████████░░] ~43% (13/30+ plans estimated)
+Progress: [████████░░] ~47% (14/30+ plans estimated)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 13
-- Average duration: 2.5 min
-- Total execution time: 0.53 hours
+- Total plans completed: 14
+- Average duration: 2.6 min
+- Total execution time: 0.60 hours
 
 **By Phase:**
 
@@ -29,11 +29,11 @@ Progress: [████████░░] ~43% (13/30+ plans estimated)
 |-------|-------|-------|----------|
 | 01-foundation-authentication | 6 | 16 min | 2.7 min |
 | 02-vendor-supply-platform | 6 | 16 min | 2.7 min |
-| 03-event-planning-discovery | 1 | 3 min | 3.0 min |
+| 03-event-planning-discovery | 2 | 7 min | 3.5 min |
 
 **Recent Trend:**
-- Last 5 plans: 02-03 (3 min), 02-04 (2 min), 02-05 (3 min), 02-06 (3 min), 03-01 (3 min)
-- Trend: Stable ~2-3 min/plan
+- Last 5 plans: 02-04 (2 min), 02-05 (3 min), 02-06 (3 min), 03-01 (3 min), 03-02 (4 min)
+- Trend: Stable ~2-4 min/plan
 
 *Updated after each plan completion*
 
@@ -79,6 +79,10 @@ Recent decisions affecting current work:
 | 03-01 | saved_vendors has no UPDATE policy | Save/unsave is binary operation |
 | 03-01 | useSavedVendors joins vendor_profiles | UI needs vendor details, not just IDs |
 | 03-01 | Handle 23505 as success | Idempotent save operation |
+| 03-02 | Pre-select 5 common categories | Most Arangetrams need venue, catering, photography, musicians, makeup |
+| 03-02 | Use DayPicker directly | Calendar component is .jsx without TypeScript support |
+| 03-02 | Vendors can create events too | Vendors may plan their own family's Arangetram |
+| 03-02 | Covered toggle only when needed | Reduces UI clutter; can't mark covered if not needed |
 
 ### Pending Todos
 
@@ -99,6 +103,6 @@ Recent decisions affecting current work:
 
 ## Session Continuity
 
-Last session: 2026-02-09T22:15:00Z
-Stopped at: Completed 03-01-PLAN.md (Event Data Layer)
-Resume file: None - continue with 03-02-PLAN.md
+Last session: 2026-02-09T23:13:38Z
+Stopped at: Completed 03-02-PLAN.md (Event Creation Wizard)
+Resume file: None - continue with 03-03-PLAN.md
