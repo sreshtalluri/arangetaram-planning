@@ -1,88 +1,66 @@
-import { useState, useMemo } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useState, useEffect } from "react";
 import { useVendors } from "../hooks/useVendors";
-import { useCategories } from "../hooks/useCategories";
+import { useDiscoveryFilters } from "../hooks/useDiscoveryFilters";
 import Navbar from "../components/Navbar";
-import VendorCard from "../components/VendorCard";
 import AIChat from "../components/AIChat";
+import { FilterSidebar, MobileFilters } from "../components/discovery/FilterSidebar";
+import { VendorGrid } from "../components/discovery/VendorGrid";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "../components/ui/select";
-import { Tabs, TabsList, TabsTrigger } from "../components/ui/tabs";
-import { Search, Loader2, Building2, UtensilsCrossed, Camera, Video, Flower2, Music, Grid3X3, Palette, Mic2, Scissors, Gift, Mail } from "lucide-react";
-
-const categoryIcons = {
-  venue: Building2,
-  catering: UtensilsCrossed,
-  photography: Camera,
-  videography: Video,
-  stage_decoration: Flower2,
-  musicians: Music,
-  nattuvanar: Mic2,
-  makeup_artist: Palette,
-  invitations: Mail,
-  costumes: Scissors,
-  return_gifts: Gift,
-};
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "../components/ui/sheet";
+import { Search, SlidersHorizontal } from "lucide-react";
 
 export default function VendorsPage() {
-  const [searchParams, setSearchParams] = useSearchParams();
   const [chatOpen, setChatOpen] = useState(false);
-  const [searchInput, setSearchInput] = useState(searchParams.get("search") || "");
+  const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
+  const [searchInput, setSearchInput] = useState("");
 
-  const [filters, setFilters] = useState({
-    category: searchParams.get("category") || "",
-    search: searchParams.get("search") || "",
-    price_range: searchParams.get("price") || "",
-  });
+  const { filters, setFilter, clearFilters, hasActiveFilters } = useDiscoveryFilters();
 
-  // Debounced search - only update filter when user stops typing
-  const debouncedFilters = useMemo(() => ({
-    category: filters.category,
-    search: filters.search,
-    price_range: filters.price_range,
-  }), [filters.category, filters.search, filters.price_range]);
-
-  const { data: vendors = [], isLoading: vendorsLoading } = useVendors(debouncedFilters);
-  const { data: categories = [] } = useCategories();
-
-  const handleCategoryChange = (category) => {
-    const newCategory = category === "all" ? "" : category;
-    setFilters({ ...filters, category: newCategory });
-    if (newCategory) {
-      searchParams.set("category", newCategory);
-    } else {
-      searchParams.delete("category");
+  // Sync search input with URL param on mount
+  useEffect(() => {
+    if (filters.search && !searchInput) {
+      setSearchInput(filters.search);
     }
-    setSearchParams(searchParams);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Map filters to useVendors params
+  const vendorParams = {
+    category: filters.category || undefined,
+    search: filters.search || undefined,
+    price_range: filters.priceRange || undefined,
+    location: filters.location || undefined,
+    availableDate: filters.availableDate || undefined,
   };
 
-  const handleSearchChange = (e) => {
-    setSearchInput(e.target.value);
-  };
+  const { data: vendors = [], isLoading: vendorsLoading } = useVendors(vendorParams);
 
   const handleSearchSubmit = (e) => {
-    if (e.key === 'Enter' || e.type === 'blur') {
-      setFilters({ ...filters, search: searchInput });
+    if (e.key === 'Enter') {
+      setFilter('search', searchInput);
     }
   };
 
-  const handlePriceChange = (value) => {
-    const newPrice = value === "all" ? "" : value;
-    setFilters({ ...filters, price_range: newPrice });
+  const handleSearchBlur = () => {
+    if (searchInput !== filters.search) {
+      setFilter('search', searchInput);
+    }
   };
 
-  const handleClearFilters = () => {
-    setFilters({ category: "", search: "", price_range: "" });
-    setSearchInput("");
-    setSearchParams({});
-  };
+  // Count active filters for badge
+  const activeFilterCount = [
+    filters.category,
+    filters.location,
+    filters.priceRange,
+    filters.availableDate,
+  ].filter(Boolean).length;
 
   return (
     <div className="min-h-screen bg-[#F9F8F4]">
@@ -95,93 +73,92 @@ export default function VendorsPage() {
             Browse Vendors
           </h1>
           <p className="text-[#4A4A4A]">
-            Discover Bay Area's finest vendors for your Arangetram
+            Discover the finest vendors for your Arangetram
           </p>
         </div>
 
-        {/* Category Tabs */}
-        <div className="mb-6 overflow-x-auto">
-          <Tabs value={filters.category || "all"} onValueChange={handleCategoryChange}>
-            <TabsList className="bg-white border border-[#E5E5E5] p-1 h-auto flex-wrap">
-              <TabsTrigger
-                value="all"
-                className="data-[state=active]:bg-[#0F4C5C] data-[state=active]:text-white rounded-lg px-4 py-2"
-                data-testid="category-tab-all"
-              >
-                <Grid3X3 className="w-4 h-4 mr-2" />
-                All
-              </TabsTrigger>
-              {categories.map((cat) => {
-                const Icon = categoryIcons[cat.id] || Grid3X3;
-                return (
-                  <TabsTrigger
-                    key={cat.id}
-                    value={cat.id}
-                    className="data-[state=active]:bg-[#0F4C5C] data-[state=active]:text-white rounded-lg px-4 py-2"
-                    data-testid={`category-tab-${cat.id}`}
-                  >
-                    <Icon className="w-4 h-4 mr-2" />
-                    {cat.name}
-                  </TabsTrigger>
-                );
-              })}
-            </TabsList>
-          </Tabs>
-        </div>
-
-        {/* Filters */}
-        <div className="flex flex-col sm:flex-row gap-4 mb-8">
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-[#888888]" />
-            <Input
-              value={searchInput}
-              onChange={handleSearchChange}
-              onKeyDown={handleSearchSubmit}
-              onBlur={handleSearchSubmit}
-              placeholder="Search vendors..."
-              className="!pl-10 input-styled"
-              data-testid="vendor-search"
+        <div className="flex gap-6">
+          {/* Left Sidebar - hidden on mobile, sticky on desktop */}
+          <aside className="w-64 shrink-0 hidden lg:block">
+            <FilterSidebar
+              filters={filters}
+              setFilter={setFilter}
+              clearFilters={clearFilters}
+              hasActiveFilters={hasActiveFilters}
             />
-          </div>
-          <Select value={filters.price_range || "all"} onValueChange={handlePriceChange}>
-            <SelectTrigger className="w-full sm:w-48 input-styled" data-testid="price-filter">
-              <SelectValue placeholder="Price Range" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Prices</SelectItem>
-              <SelectItem value="$">$ - Budget</SelectItem>
-              <SelectItem value="$$">$$ - Moderate</SelectItem>
-              <SelectItem value="$$$">$$$ - Premium</SelectItem>
-              <SelectItem value="$$$$">$$$$ - Luxury</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
+          </aside>
 
-        {/* Results */}
-        {vendorsLoading ? (
-          <div className="flex items-center justify-center py-20">
-            <Loader2 className="w-8 h-8 animate-spin text-[#0F4C5C]" />
-          </div>
-        ) : vendors.length > 0 ? (
-          <div className="bento-grid" data-testid="vendors-grid">
-            {vendors.map((vendor) => (
-              <VendorCard key={vendor.id} vendor={vendor} />
-            ))}
-          </div>
-        ) : (
-          <div className="text-center py-20">
-            <div className="w-20 h-20 rounded-full bg-[#F9F8F4] flex items-center justify-center mx-auto mb-4">
-              <Search className="w-10 h-10 text-[#888888]" />
+          {/* Main Content */}
+          <main className="flex-1 min-w-0">
+            {/* Search bar + Mobile filter button */}
+            <div className="flex gap-3 mb-6">
+              {/* Mobile Filters Button */}
+              <Sheet open={mobileFiltersOpen} onOpenChange={setMobileFiltersOpen}>
+                <SheetTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className="lg:hidden shrink-0 input-styled relative"
+                  >
+                    <SlidersHorizontal className="w-5 h-5" />
+                    {activeFilterCount > 0 && (
+                      <span className="absolute -top-1 -right-1 w-5 h-5 bg-[#0F4C5C] text-white text-xs rounded-full flex items-center justify-center">
+                        {activeFilterCount}
+                      </span>
+                    )}
+                  </Button>
+                </SheetTrigger>
+                <SheetContent side="left" className="w-full sm:max-w-md overflow-y-auto">
+                  <SheetHeader>
+                    <SheetTitle className="sr-only">Filters</SheetTitle>
+                  </SheetHeader>
+                  <MobileFilters
+                    filters={filters}
+                    setFilter={setFilter}
+                    clearFilters={clearFilters}
+                    hasActiveFilters={hasActiveFilters}
+                  />
+                  <div className="pt-4 border-t mt-6">
+                    <Button
+                      onClick={() => setMobileFiltersOpen(false)}
+                      className="w-full btn-primary"
+                    >
+                      Show {vendors.length} Results
+                    </Button>
+                  </div>
+                </SheetContent>
+              </Sheet>
+
+              {/* Search Input */}
+              <div className="relative flex-1">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-[#888888]" />
+                <Input
+                  value={searchInput}
+                  onChange={(e) => setSearchInput(e.target.value)}
+                  onKeyDown={handleSearchSubmit}
+                  onBlur={handleSearchBlur}
+                  placeholder="Search vendors by name..."
+                  className="!pl-10 input-styled"
+                  data-testid="vendor-search"
+                />
+              </div>
             </div>
-            <h3 className="text-xl font-semibold text-[#1A1A1A] mb-2">No vendors found</h3>
-            <p className="text-[#4A4A4A] mb-6">
-              Try adjusting your filters or search terms
-            </p>
-            <Button onClick={handleClearFilters} className="btn-secondary">
-              Clear Filters
-            </Button>
-          </div>
-        )}
+
+            {/* Results count */}
+            {!vendorsLoading && (
+              <p className="text-sm text-[#4A4A4A] mb-4">
+                {vendors.length} {vendors.length === 1 ? 'vendor' : 'vendors'} found
+                {hasActiveFilters && ' matching your filters'}
+              </p>
+            )}
+
+            {/* Vendor Grid */}
+            <VendorGrid
+              vendors={vendors}
+              isLoading={vendorsLoading}
+              onClearFilters={clearFilters}
+            />
+          </main>
+        </div>
       </div>
 
       {/* AI Chat */}
