@@ -11,7 +11,7 @@ Requirements for initial release. Each maps to roadmap phases.
 
 - [x] **INFRA-01**: Migrate database from MongoDB to Supabase PostgreSQL
 - [x] **INFRA-02**: Replace JWT auth with Supabase Auth (email/password)
-- [ ] **INFRA-03**: Implement Supabase Storage for vendor media
+- [x] **INFRA-03**: Implement Supabase Storage for vendor media
 - [x] **INFRA-04**: Configure Row Level Security policies on all tables
 - [x] **INFRA-05**: Set up TypeScript with generated database types
 
@@ -26,34 +26,34 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Vendor Categories
 
-- [ ] **CAT-01**: Platform supports venue vendors
-- [ ] **CAT-02**: Platform supports catering vendors
-- [ ] **CAT-03**: Platform supports photography vendors
-- [ ] **CAT-04**: Platform supports videography vendors
-- [ ] **CAT-05**: Platform supports stage decoration vendors
-- [ ] **CAT-06**: Platform supports musician vendors
-- [ ] **CAT-07**: Platform supports nattuvanar vendors
-- [ ] **CAT-08**: Platform supports makeup artist vendors
-- [ ] **CAT-09**: Platform supports invitation/printing vendors
-- [ ] **CAT-10**: Platform supports costume/jewelry rental vendors
-- [ ] **CAT-11**: Platform supports return gift vendors
+- [x] **CAT-01**: Platform supports venue vendors
+- [x] **CAT-02**: Platform supports catering vendors
+- [x] **CAT-03**: Platform supports photography vendors
+- [x] **CAT-04**: Platform supports videography vendors
+- [x] **CAT-05**: Platform supports stage decoration vendors
+- [x] **CAT-06**: Platform supports musician vendors
+- [x] **CAT-07**: Platform supports nattuvanar vendors
+- [x] **CAT-08**: Platform supports makeup artist vendors
+- [x] **CAT-09**: Platform supports invitation/printing vendors
+- [x] **CAT-10**: Platform supports costume/jewelry rental vendors
+- [x] **CAT-11**: Platform supports return gift vendors
 
 ### Vendor Profiles
 
-- [ ] **VEND-01**: Vendor can create profile with business name and description
-- [ ] **VEND-02**: Vendor can select service category
-- [ ] **VEND-03**: Vendor can specify service areas (cities/metros)
-- [ ] **VEND-04**: Vendor can upload portfolio images
-- [ ] **VEND-05**: Vendor can set pricing information (packages or ranges)
-- [ ] **VEND-06**: Vendor can edit their profile at any time
-- [ ] **VEND-07**: Vendor profile displays in public vendor listings
+- [x] **VEND-01**: Vendor can create profile with business name and description
+- [x] **VEND-02**: Vendor can select service category
+- [x] **VEND-03**: Vendor can specify service areas (cities/metros)
+- [x] **VEND-04**: Vendor can upload portfolio images
+- [x] **VEND-05**: Vendor can set pricing information (packages or ranges)
+- [x] **VEND-06**: Vendor can edit their profile at any time
+- [x] **VEND-07**: Vendor profile displays in public vendor listings
 
 ### Vendor Availability
 
-- [ ] **AVAIL-01**: Vendor can manage availability calendar
-- [ ] **AVAIL-02**: Vendor can mark dates as booked/unavailable
-- [ ] **AVAIL-03**: Availability is visible when users browse vendors
-- [ ] **AVAIL-04**: Users can filter vendors by availability for their event date
+- [x] **AVAIL-01**: Vendor can manage availability calendar
+- [x] **AVAIL-02**: Vendor can mark dates as booked/unavailable
+- [x] **AVAIL-03**: Availability is visible when users browse vendors
+- [x] **AVAIL-04**: Users can filter vendors by availability for their event date
 
 ### Event Planning
 
@@ -109,10 +109,10 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Vendor Dashboard
 
-- [ ] **VDASH-01**: Vendor can view their profile
-- [ ] **VDASH-02**: Vendor can view received inquiries
-- [ ] **VDASH-03**: Vendor can manage their availability calendar
-- [ ] **VDASH-04**: Vendor can see inquiry statistics
+- [x] **VDASH-01**: Vendor can view their profile
+- [x] **VDASH-02**: Vendor can view received inquiries
+- [x] **VDASH-03**: Vendor can manage their availability calendar
+- [x] **VDASH-04**: Vendor can see inquiry statistics
 
 ## v2 Requirements
 
@@ -165,7 +165,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 |-------------|-------|--------|
 | INFRA-01 | Phase 1 | Complete |
 | INFRA-02 | Phase 1 | Complete |
-| INFRA-03 | Phase 2 | Pending |
+| INFRA-03 | Phase 2 | Complete |
 | INFRA-04 | Phase 1 | Complete |
 | INFRA-05 | Phase 1 | Complete |
 | AUTH-01 | Phase 1 | Complete |
@@ -174,32 +174,32 @@ Which phases cover which requirements. Updated during roadmap creation.
 | AUTH-04 | Phase 1 | Complete |
 | AUTH-05 | Phase 1 | Complete |
 | AUTH-06 | Phase 1 | Complete |
-| CAT-01 | Phase 2 | Pending |
-| CAT-02 | Phase 2 | Pending |
-| CAT-03 | Phase 2 | Pending |
-| CAT-04 | Phase 2 | Pending |
-| CAT-05 | Phase 2 | Pending |
-| CAT-06 | Phase 2 | Pending |
-| CAT-07 | Phase 2 | Pending |
-| CAT-08 | Phase 2 | Pending |
-| CAT-09 | Phase 2 | Pending |
-| CAT-10 | Phase 2 | Pending |
-| CAT-11 | Phase 2 | Pending |
-| VEND-01 | Phase 2 | Pending |
-| VEND-02 | Phase 2 | Pending |
-| VEND-03 | Phase 2 | Pending |
-| VEND-04 | Phase 2 | Pending |
-| VEND-05 | Phase 2 | Pending |
-| VEND-06 | Phase 2 | Pending |
-| VEND-07 | Phase 2 | Pending |
-| AVAIL-01 | Phase 2 | Pending |
-| AVAIL-02 | Phase 2 | Pending |
-| AVAIL-03 | Phase 2 | Pending |
-| AVAIL-04 | Phase 2 | Pending |
-| VDASH-01 | Phase 2 | Pending |
-| VDASH-02 | Phase 2 | Pending |
-| VDASH-03 | Phase 2 | Pending |
-| VDASH-04 | Phase 2 | Pending |
+| CAT-01 | Phase 2 | Complete |
+| CAT-02 | Phase 2 | Complete |
+| CAT-03 | Phase 2 | Complete |
+| CAT-04 | Phase 2 | Complete |
+| CAT-05 | Phase 2 | Complete |
+| CAT-06 | Phase 2 | Complete |
+| CAT-07 | Phase 2 | Complete |
+| CAT-08 | Phase 2 | Complete |
+| CAT-09 | Phase 2 | Complete |
+| CAT-10 | Phase 2 | Complete |
+| CAT-11 | Phase 2 | Complete |
+| VEND-01 | Phase 2 | Complete |
+| VEND-02 | Phase 2 | Complete |
+| VEND-03 | Phase 2 | Complete |
+| VEND-04 | Phase 2 | Complete |
+| VEND-05 | Phase 2 | Complete |
+| VEND-06 | Phase 2 | Complete |
+| VEND-07 | Phase 2 | Complete |
+| AVAIL-01 | Phase 2 | Complete |
+| AVAIL-02 | Phase 2 | Complete |
+| AVAIL-03 | Phase 2 | Complete |
+| AVAIL-04 | Phase 2 | Complete |
+| VDASH-01 | Phase 2 | Complete |
+| VDASH-02 | Phase 2 | Complete |
+| VDASH-03 | Phase 2 | Complete |
+| VDASH-04 | Phase 2 | Complete |
 | EVENT-01 | Phase 3 | Pending |
 | EVENT-02 | Phase 3 | Pending |
 | EVENT-03 | Phase 3 | Pending |
@@ -242,4 +242,4 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ---
 *Requirements defined: 2026-02-07*
-*Last updated: 2026-02-08 after Phase 1 completion*
+*Last updated: 2026-02-09 after Phase 2 completion*
