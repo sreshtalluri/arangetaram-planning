@@ -81,3 +81,16 @@ android-sdk/
 
 # GSD Planning (intel is auto-generated, always local)
 .planning/intel/
+
+# Local notes and todos
+TODO
+TODO.md
+
+# Claude Code local files
+.claude/
+
+# Environment files
+.env
+.env.local
+.env.*.local
+*.env
