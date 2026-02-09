@@ -32,7 +32,7 @@ Progress: [████████░░] ~56% (17/30+ plans estimated)
 | 03-event-planning-discovery | 5 | 15 min | 3.0 min |
 
 **Recent Trend:**
-- Last 5 plans: 03-01 (3 min), 03-02 (4 min), 03-03 (5 min), 03-04 (tbd), 03-05 (3 min)
+- Last 5 plans: 03-01 (3 min), 03-02 (4 min), 03-03 (5 min), 03-04 (4 min), 03-05 (3 min)
 - Trend: Stable ~3-5 min/plan
 
 *Updated after each plan completion*
@@ -86,6 +86,10 @@ Recent decisions affecting current work:
 | 03-03 | URL params for filter state | Enables shareable search links |
 | 03-03 | Batch availability query then client filter | Avoids N+1 query pattern |
 | 03-03 | JSX for discovery components | Matches codebase conventions |
+| 03-04 | Radix Dialog for lightbox | Built-in focus trap, escape handling, accessibility |
+| 03-04 | eventDate via URL param | Links to vendor pages with availability context |
+| 03-04 | Two SaveVendorButton variants | Icon for compact, button for prominent placement |
+| 03-04 | Send Inquiry naming | Softer CTA per CONTEXT.md guidance |
 | 03-05 | Progress ring uses teal (#0F4C5C) | Brand consistency with primary color palette |
 | 03-05 | Pending categories are clickable | Links to /vendors?category=X for discovery |
 | 03-05 | Saved vendors show unsave inline | Filled heart toggles without confirmation |
@@ -110,6 +114,6 @@ Recent decisions affecting current work:
 
 ## Session Continuity
 
-Last session: 2026-02-09T23:20:32Z
-Stopped at: Completed 03-05-PLAN.md (User Dashboard)
-Resume file: None - Phase 3 complete, continue with Phase 4
+Last session: 2026-02-09T23:21:31Z
+Stopped at: Completed 03-04-PLAN.md (Vendor Detail Enhancements)
+Resume file: None - continue with remaining Phase 3 plans or Phase 4
