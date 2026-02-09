@@ -17,6 +17,7 @@ import PlanEventPage from "./pages/PlanEventPage";
 import UserDashboard from "./pages/UserDashboard";
 import VendorDashboard from "./pages/VendorDashboard";
 import ProfileWizardPage from "./pages/vendor/ProfileWizardPage";
+import CreateEventPage from "./pages/CreateEventPage";
 
 function App() {
   return (
@@ -34,6 +35,14 @@ function App() {
             <Route path="/vendors" element={<VendorsPage />} />
             <Route path="/vendors/:id" element={<VendorDetailPage />} />
             <Route path="/plan" element={<PlanEventPage />} />
+            <Route
+              path="/events/create"
+              element={
+                <ProtectedRoute>
+                  <CreateEventPage />
+                </ProtectedRoute>
+              }
+            />
             <Route
               path="/dashboard"
               element={
