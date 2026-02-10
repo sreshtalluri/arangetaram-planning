@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { useVendors } from "../hooks/useVendors";
 import { useDiscoveryFilters } from "../hooks/useDiscoveryFilters";
 import Navbar from "../components/Navbar";
-import AIChat from "../components/AIChat";
 import { FilterSidebar, MobileFilters } from "../components/discovery/FilterSidebar";
 import { VendorGrid } from "../components/discovery/VendorGrid";
 import { Button } from "../components/ui/button";
@@ -17,7 +16,6 @@ import {
 import { Search, SlidersHorizontal } from "lucide-react";
 
 export default function VendorsPage() {
-  const [chatOpen, setChatOpen] = useState(false);
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
   const [searchInput, setSearchInput] = useState("");
 
@@ -160,9 +158,6 @@ export default function VendorsPage() {
           </main>
         </div>
       </div>
-
-      {/* AI Chat */}
-      <AIChat isOpen={chatOpen} onClose={() => setChatOpen(!chatOpen)} />
     </div>
   );
 }

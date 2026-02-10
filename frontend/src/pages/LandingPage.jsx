@@ -2,7 +2,6 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "../components/ui/button";
 import Navbar from "../components/Navbar";
-import AIChat from "../components/AIChat";
 import { 
   Building2, UtensilsCrossed, Camera, Video, 
   Flower2, Music, ArrowRight, CheckCircle2, Sparkles 
@@ -37,7 +36,6 @@ const steps = [
 
 export default function LandingPage() {
   const navigate = useNavigate();
-  const [chatOpen, setChatOpen] = useState(false);
 
   return (
     <div className="min-h-screen bg-[#F9F8F4] noise-bg">
@@ -305,9 +303,6 @@ export default function LandingPage() {
           </div>
         </div>
       </footer>
-
-      {/* AI Chat */}
-      <AIChat isOpen={chatOpen} onClose={() => setChatOpen(!chatOpen)} />
     </div>
   );
 }

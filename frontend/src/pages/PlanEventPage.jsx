@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import { eventAPI, aiAPI, vendorAPI } from "../lib/api";
 import Navbar from "../components/Navbar";
-import AIChat from "../components/AIChat";
 import VendorCard from "../components/VendorCard";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
@@ -52,7 +51,6 @@ export default function PlanEventPage() {
   
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
-  const [chatOpen, setChatOpen] = useState(false);
   const [recommendations, setRecommendations] = useState({});
   const [createdEvent, setCreatedEvent] = useState(null);
 
@@ -444,18 +442,6 @@ export default function PlanEventPage() {
           </div>
         )}
       </div>
-
-      {/* AI Chat */}
-      <AIChat 
-        isOpen={chatOpen} 
-        onClose={() => setChatOpen(!chatOpen)}
-        eventContext={eventData.event_date ? {
-          event_date: format(eventData.event_date, "yyyy-MM-dd"),
-          guest_count: eventData.guest_count,
-          budget: eventData.budget,
-          location: eventData.location_preference,
-        } : null}
-      />
     </div>
   );
 }
