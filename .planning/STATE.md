@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-02-07)
 ## Current Position
 
 Phase: 4 of 5 (AI Enhancement)
-Plan: 0 of TBD in current phase
-Status: Ready to plan
-Last activity: 2026-02-09 - Completed Phase 3 (Event Planning & Discovery)
+Plan: 1 of TBD in current phase
+Status: In progress
+Last activity: 2026-02-09 - Completed 04-01a-PLAN.md
 
-Progress: [██████████] ~57% (17/30+ plans estimated)
+Progress: [██████████░] ~60% (18/30+ plans estimated)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 17
-- Average duration: 2.8 min
-- Total execution time: 0.78 hours
+- Total plans completed: 18
+- Average duration: 2.7 min
+- Total execution time: 0.80 hours
 
 **By Phase:**
 
@@ -30,10 +30,11 @@ Progress: [██████████] ~57% (17/30+ plans estimated)
 | 01-foundation-authentication | 6 | 16 min | 2.7 min |
 | 02-vendor-supply-platform | 6 | 16 min | 2.7 min |
 | 03-event-planning-discovery | 5 | 15 min | 3.0 min |
+| 04-ai-enhancement | 1 | 1 min | 1.0 min |
 
 **Recent Trend:**
-- Last 5 plans: 03-01 (3 min), 03-02 (4 min), 03-03 (5 min), 03-04 (4 min), 03-05 (3 min)
-- Trend: Stable ~3-5 min/plan
+- Last 5 plans: 03-02 (4 min), 03-03 (5 min), 03-04 (4 min), 03-05 (3 min), 04-01a (1 min)
+- Trend: Fast execution on Phase 4 start
 
 *Updated after each plan completion*
 
@@ -94,12 +95,21 @@ Recent decisions affecting current work:
 | 03-05 | Pending categories are clickable | Links to /vendors?category=X for discovery |
 | 03-05 | Saved vendors show unsave inline | Filled heart toggles without confirmation |
 | 03-05 | Removed legacy Tabs structure | Bookings tab moves to Phase 5 (Inquiry system) |
+| 04-01a | Anthropic SDK via npm: specifier | Deno Edge Functions compatible import |
+| 04-01a | Prompt caching with ephemeral control | 50-80% cost reduction on system prompts |
+| 04-01a | Event context injection | Prepends date/budget/location/categories to messages |
+| 04-01a | Last 10 messages history | Balances continuity with token limits |
+| 04-01a | SSE format for streaming | data: {text} for deltas, data: [DONE] for completion |
+| 04-01a | CORS headers shared constant | Consistent CORS across all Edge Functions |
+| 04-01a | XML system prompt structure | Clear sections improve caching effectiveness |
+| 04-01a | Domain knowledge embedded | Budget ranges, timeline, Bay Area specifics |
 
 ### Pending Todos
 
 - Create portfolio-images storage bucket via Supabase Dashboard
 - Apply 00003_event_tables.sql migration to Supabase
 - Regenerate database.types.ts after migration applied
+- Add ANTHROPIC_API_KEY to Supabase Edge Function secrets (Dashboard -> Project Settings -> Edge Functions -> Secrets)
 
 ### Blockers/Concerns
 
@@ -114,6 +124,6 @@ Recent decisions affecting current work:
 
 ## Session Continuity
 
-Last session: 2026-02-09T23:30:00Z
-Stopped at: Completed Phase 3 (Event Planning & Discovery) - all 5 plans done, goal verified
-Resume file: None - ready for Phase 4
+Last session: 2026-02-10T02:57:34Z
+Stopped at: Completed 04-01a-PLAN.md (Claude client & ai-chat Edge Function)
+Resume file: None
