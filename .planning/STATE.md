@@ -33,8 +33,8 @@ Progress: [██████████░] ~67% (20/30+ plans estimated)
 | 04-ai-enhancement | 3 | 4 min | 1.3 min |
 
 **Recent Trend:**
-- Last 5 plans: 03-04 (4 min), 03-05 (3 min), 04-01a (1 min), 04-02 (2 min), 04-04a (1 min)
-- Trend: Phase 4 executing quickly
+- Last 5 plans: 03-05 (3 min), 04-01a (1 min), 04-02 (2 min), 04-03a (1 min), 04-04a (1 min)
+- Trend: Phase 4 executing very quickly
 
 *Updated after each plan completion*
 
@@ -107,6 +107,9 @@ Recent decisions affecting current work:
 | 04-02 | 5-minute cache for recommendations | Reduces AI Edge Function calls via React Query staleTime |
 | 04-02 | Abort controllers for chat cancellation | Prevents multiple concurrent streaming requests |
 | 04-02 | Last 10 messages as chat history | Balances conversation continuity with token limits |
+| 04-03a | User messages right-aligned with teal, assistant left-aligned with cream | Standard chat UI conventions with brand colors |
+| 04-03a | Streaming cursor as inline pulsing bar | Visual feedback during AI response generation |
+| 04-03a | 4 Arangetram-specific starter prompts | Domain-specific questions guide users to valuable AI assistance |
 | 04-04a | AI explanation always visible inline | Gold background (#FFF9E6) with sparkle icon for transparency |
 | 04-04a | Dismiss button on hover | Clean UI by default, opacity transition reveals functionality |
 | 04-04a | service_areas[0] for location | First service area shown with "Bay Area" fallback |
