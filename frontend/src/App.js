@@ -1,6 +1,5 @@
 import "@/App.css";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { AuthProvider } from "./contexts/AuthContext";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { Toaster } from "./components/ui/sonner";
 import { ChatWidget } from "./components/ai/ChatWidget";
@@ -22,58 +21,56 @@ import CreateEventPage from "./pages/CreateEventPage";
 
 function App() {
   return (
-    <AuthProvider>
-      <div className="min-h-screen bg-[#F9F8F4]">
-        <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<LandingPage />} />
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/signup" element={<SignupPage />} />
-            <Route path="/vendor/signup" element={<VendorSignupPage />} />
-            <Route path="/forgot-password" element={<PasswordResetPage />} />
-            <Route path="/auth/reset-password" element={<PasswordResetPage />} />
-            <Route path="/auth/callback" element={<AuthCallbackPage />} />
-            <Route path="/vendors" element={<VendorsPage />} />
-            <Route path="/vendors/:id" element={<VendorDetailPage />} />
-            <Route path="/plan" element={<PlanEventPage />} />
-            <Route
-              path="/events/create"
-              element={
-                <ProtectedRoute>
-                  <CreateEventPage />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/dashboard"
-              element={
-                <ProtectedRoute>
-                  <UserDashboard />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/vendor/dashboard"
-              element={
-                <ProtectedRoute requiredRole="vendor">
-                  <VendorDashboard />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/vendor/profile/create"
-              element={
-                <ProtectedRoute requiredRole="vendor">
-                  <ProfileWizardPage />
-                </ProtectedRoute>
-              }
-            />
-          </Routes>
-          <ChatWidget />
-        </BrowserRouter>
-        <Toaster position="top-right" richColors />
-      </div>
-    </AuthProvider>
+    <div className="min-h-screen bg-[#F9F8F4]">
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<LandingPage />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/signup" element={<SignupPage />} />
+          <Route path="/vendor/signup" element={<VendorSignupPage />} />
+          <Route path="/forgot-password" element={<PasswordResetPage />} />
+          <Route path="/auth/reset-password" element={<PasswordResetPage />} />
+          <Route path="/auth/callback" element={<AuthCallbackPage />} />
+          <Route path="/vendors" element={<VendorsPage />} />
+          <Route path="/vendors/:id" element={<VendorDetailPage />} />
+          <Route path="/plan" element={<PlanEventPage />} />
+          <Route
+            path="/events/create"
+            element={
+              <ProtectedRoute>
+                <CreateEventPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/dashboard"
+            element={
+              <ProtectedRoute>
+                <UserDashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/vendor/dashboard"
+            element={
+              <ProtectedRoute requiredRole="vendor">
+                <VendorDashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/vendor/profile/create"
+            element={
+              <ProtectedRoute requiredRole="vendor">
+                <ProfileWizardPage />
+              </ProtectedRoute>
+            }
+          />
+        </Routes>
+        <ChatWidget />
+      </BrowserRouter>
+      <Toaster position="top-right" richColors />
+    </div>
   );
 }
 
