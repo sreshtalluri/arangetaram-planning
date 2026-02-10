@@ -199,6 +199,12 @@ export function useRespondToInquiry() {
       queryClient.invalidateQueries({ queryKey: ['inquiries', 'vendor', data.vendor_id] })
       queryClient.invalidateQueries({ queryKey: ['inquiry-stats', data.vendor_id] })
       queryClient.invalidateQueries({ queryKey: ['unread-count'] })
+      // When accepted, the event's categories_covered is updated by DB trigger
+      // Invalidate events so user's dashboard reflects the change
+      if (data.status === 'accepted') {
+        queryClient.invalidateQueries({ queryKey: ['events'] })
+        queryClient.invalidateQueries({ queryKey: ['event', data.event_id] })
+      }
     },
   })
 }
