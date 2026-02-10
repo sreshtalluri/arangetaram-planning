@@ -1,5 +1,5 @@
 import { createClient } from 'jsr:@supabase/supabase-js@2';
-import { createClaudeClient, corsHeaders } from '../_shared/claude-client.ts';
+import { createGroqClient, corsHeaders, GROQ_MODEL } from '../_shared/groq-client.ts';
 import { RECOMMENDATION_SYSTEM_PROMPT } from '../_shared/prompts/recommendation.ts';
 
 interface Event {
@@ -188,7 +188,7 @@ Deno.serve(async (req) => {
     }
 
     // Step 3: AI ranking
-    const anthropic = createClaudeClient();
+    const groq = createGroqClient();
 
     // Build context for AI
     const eventContext = {
@@ -222,36 +222,34 @@ ${JSON.stringify(candidateSummary, null, 2)}
 
 Please rank and return the top 3 vendors per category with explanations.`;
 
-    const response = await anthropic.messages.create({
-      model: 'claude-sonnet-4-5-20250929',
+    const response = await groq.chat.completions.create({
+      model: GROQ_MODEL,
       max_tokens: 2048,
-      system: [
-        {
-          type: 'text',
-          text: RECOMMENDATION_SYSTEM_PROMPT,
-          cache_control: { type: 'ephemeral' },
-        },
-      ],
       messages: [
+        {
+          role: 'system',
+          content: RECOMMENDATION_SYSTEM_PROMPT,
+        },
         {
           role: 'user',
           content: userMessage,
         },
       ],
+      response_format: { type: 'json_object' },
     });
 
     // Extract text from response
-    const textContent = response.content.find(block => block.type === 'text');
-    if (!textContent || textContent.type !== 'text') {
-      throw new Error('No text content in AI response');
+    const textContent = response.choices[0]?.message?.content;
+    if (!textContent) {
+      throw new Error('No content in AI response');
     }
 
     // Parse AI response JSON
     let aiRecommendations: AIResponse;
     try {
-      aiRecommendations = JSON.parse(textContent.text);
+      aiRecommendations = JSON.parse(textContent);
     } catch (parseError) {
-      console.error('Failed to parse AI response:', textContent.text);
+      console.error('Failed to parse AI response:', textContent);
       throw new Error('Invalid AI response format');
     }
 

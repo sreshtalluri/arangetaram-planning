@@ -1,4 +1,4 @@
-import { createClaudeClient, corsHeaders } from '../_shared/claude-client.ts';
+import { createGroqClient, corsHeaders, GROQ_MODEL } from '../_shared/groq-client.ts';
 import { CHAT_SYSTEM_PROMPT } from '../_shared/prompts/chat-system.ts';
 
 interface Message {
@@ -42,15 +42,25 @@ Deno.serve(async (req) => {
       );
     }
 
-    // Create Anthropic client
-    const anthropic = createClaudeClient();
+    // Create Groq client
+    const groq = createGroqClient();
 
-    // Build messages array
-    const messages: Message[] = [];
+    // Build messages array with system prompt
+    const messages: Array<{ role: 'system' | 'user' | 'assistant'; content: string }> = [
+      {
+        role: 'system',
+        content: CHAT_SYSTEM_PROMPT,
+      },
+    ];
 
     // Include last 10 messages from history
     const recentHistory = history.slice(-10);
-    messages.push(...recentHistory);
+    for (const msg of recentHistory) {
+      messages.push({
+        role: msg.role,
+        content: msg.content,
+      });
+    }
 
     // Prepend event context to current message if provided
     let userMessage = message;
@@ -81,26 +91,21 @@ Deno.serve(async (req) => {
     });
 
     // Create streaming response
-    const stream = await anthropic.messages.stream({
-      model: 'claude-sonnet-4-5-20250929',
+    const stream = await groq.chat.completions.create({
+      model: GROQ_MODEL,
       max_tokens: 1024,
-      system: [
-        {
-          type: 'text',
-          text: CHAT_SYSTEM_PROMPT,
-          cache_control: { type: 'ephemeral' },
-        },
-      ],
       messages,
+      stream: true,
     });
 
     // Create ReadableStream for SSE
     const readableStream = new ReadableStream({
       async start(controller) {
         try {
-          for await (const event of stream) {
-            if (event.type === 'content_block_delta' && event.delta.type === 'text_delta') {
-              const data = JSON.stringify({ text: event.delta.text });
+          for await (const chunk of stream) {
+            const text = chunk.choices[0]?.delta?.content || '';
+            if (text) {
+              const data = JSON.stringify({ text });
               controller.enqueue(new TextEncoder().encode(`data: ${data}\n\n`));
             }
           }
