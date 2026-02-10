@@ -94,3 +94,6 @@ TODO.md
 .env.local
 .env.*.local
 *.env
+**/.env
+**/.env.local
+**/.env.*.local
