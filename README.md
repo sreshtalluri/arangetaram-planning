@@ -56,7 +56,7 @@ A full-stack SaaS web application that helps families plan their child's Aranget
 
 ### Prerequisites
 - Node.js 16+
-- Yarn package manager
+- npm package manager
 - Supabase account
 
 ### Installation
@@ -70,7 +70,7 @@ A full-stack SaaS web application that helps families plan their child's Aranget
 2. Install frontend dependencies
    ```bash
    cd frontend
-   yarn install
+   npm install
    ```
 
 3. Configure environment variables
@@ -81,7 +81,7 @@ A full-stack SaaS web application that helps families plan their child's Aranget
 
 4. Start the development server
    ```bash
-   yarn start
+   npm start
    ```
 
 ### Environment Variables
@@ -97,13 +97,13 @@ A full-stack SaaS web application that helps families plan their child's Aranget
 
 ```bash
 # Start frontend dev server
-cd frontend && yarn start
+cd frontend && npm start
 
 # Generate TypeScript types from Supabase
-yarn gen:types
+npm run gen:types
 
 # Run linting
-yarn lint
+npm run lint
 ```
 
 ## Database
