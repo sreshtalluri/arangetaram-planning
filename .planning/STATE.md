@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-02-07)
 
 **Core value:** Users discover the right vendors for their needs, budget, and location
-**Current focus:** Phase 4 - AI Enhancement (ready to plan)
+**Current focus:** Phase 5 - Inquiry & Connection (ready to plan)
 
 ## Current Position
 
-Phase: 4 of 5 (AI Enhancement)
-Plan: 3 of TBD in current phase
-Status: In progress
-Last activity: 2026-02-10 - Completed 04-04a-PLAN.md
+Phase: 5 of 5 (Inquiry & Connection)
+Plan: Not started
+Status: Ready to plan
+Last activity: 2026-02-10 - Completed Phase 4 (AI Enhancement)
 
-Progress: [██████████░] ~67% (20/30+ plans estimated)
+Progress: [████████████░░] ~80% (24/30 plans estimated)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 20
-- Average duration: 2.5 min
-- Total execution time: 0.85 hours
+- Total plans completed: 24
+- Average duration: 2.3 min
+- Total execution time: 0.93 hours
 
 **By Phase:**
 
@@ -30,11 +30,11 @@ Progress: [██████████░] ~67% (20/30+ plans estimated)
 | 01-foundation-authentication | 6 | 16 min | 2.7 min |
 | 02-vendor-supply-platform | 6 | 16 min | 2.7 min |
 | 03-event-planning-discovery | 5 | 15 min | 3.0 min |
-| 04-ai-enhancement | 3 | 4 min | 1.3 min |
+| 04-ai-enhancement | 7 | 17 min | 2.4 min |
 
 **Recent Trend:**
-- Last 5 plans: 03-05 (3 min), 04-01a (1 min), 04-02 (2 min), 04-03a (1 min), 04-04a (1 min)
-- Trend: Phase 4 executing very quickly
+- Last 5 plans: 04-02 (2 min), 04-03a (1 min), 04-03b (8 min), 04-04a (1 min), 04-04b (5 min)
+- Trend: Phase 4 complete with AI chat and recommendations
 
 *Updated after each plan completion*
 
@@ -114,13 +114,16 @@ Recent decisions affecting current work:
 | 04-04a | Dismiss button on hover | Clean UI by default, opacity transition reveals functionality |
 | 04-04a | service_areas[0] for location | First service area shown with "Bay Area" fallback |
 | 04-04a | Price formatted from price_min/price_max | Direct computation with fallback messages |
+| 04-01 | Groq SDK with Llama 3.3 70B | Free tier, 6000 tokens/min sufficient for MVP |
+| 04-01 | --no-verify-jwt for Edge Functions | Enables guest access without Supabase auth |
+| 04-01 | Anon key fallback for auth headers | `session?.access_token || anonKey` for guest users |
+| 04-03b | Global ChatWidget in App.jsx | Single source of truth, removed per-page duplicates |
+| 04-03b | Burgundy #800020 with gold pulse | Brand-aligned floating button design |
+| 04-04b | VENDOR_CATEGORIES from vendor-categories | Correct import path with value/label pattern |
 
 ### Pending Todos
 
-- Create portfolio-images storage bucket via Supabase Dashboard
-- Apply 00003_event_tables.sql migration to Supabase
-- Regenerate database.types.ts after migration applied
-- Add ANTHROPIC_API_KEY to Supabase Edge Function secrets (Dashboard -> Project Settings -> Edge Functions -> Secrets)
+- Run supabase/seed-vendors.sql in Supabase Dashboard SQL Editor to add dummy vendors for testing
 
 ### Blockers/Concerns
 
@@ -135,6 +138,7 @@ Recent decisions affecting current work:
 
 ## Session Continuity
 
-Last session: 2026-02-10T03:15:37Z
-Stopped at: Completed 04-04a-PLAN.md (RecommendationCard component)
+Last session: 2026-02-10
+Stopped at: Completed Phase 4 (AI Enhancement) - all 7 plans executed
 Resume file: None
+Next: Phase 5 planning (Inquiry & Connection)
