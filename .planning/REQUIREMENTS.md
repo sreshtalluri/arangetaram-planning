@@ -78,33 +78,33 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### AI Recommendations
 
-- [ ] **AI-01**: System provides vendor recommendations based on event details
-- [ ] **AI-02**: Recommendations use hybrid approach (database filter + AI ranking)
-- [ ] **AI-03**: AI explains why each vendor is recommended
-- [ ] **AI-04**: User can refresh recommendations with updated preferences
-- [ ] **AI-05**: Recommendations respect user's budget constraints
+- [x] **AI-01**: System provides vendor recommendations based on event details
+- [x] **AI-02**: Recommendations use hybrid approach (database filter + AI ranking)
+- [x] **AI-03**: AI explains why each vendor is recommended
+- [x] **AI-04**: User can refresh recommendations with updated preferences
+- [x] **AI-05**: Recommendations respect user's budget constraints
 
 ### AI Chat Assistant
 
-- [ ] **CHAT-01**: User can access AI chat assistant from any page
-- [ ] **CHAT-02**: Chat assistant answers Arangetram planning questions
-- [ ] **CHAT-03**: Chat assistant has context of user's event details
-- [ ] **CHAT-04**: Chat maintains conversation history within session
+- [x] **CHAT-01**: User can access AI chat assistant from any page
+- [x] **CHAT-02**: Chat assistant answers Arangetram planning questions
+- [x] **CHAT-03**: Chat assistant has context of user's event details
+- [x] **CHAT-04**: Chat maintains conversation history within session
 
 ### Inquiry System
 
-- [ ] **INQ-01**: User can send inquiry to vendor from vendor profile
-- [ ] **INQ-02**: Inquiry includes user's event details automatically
-- [ ] **INQ-03**: User can add custom message to inquiry
-- [ ] **INQ-04**: Vendor can view list of received inquiries
-- [ ] **INQ-05**: Vendor can respond to inquiry (accept/decline/provide quote)
-- [ ] **INQ-06**: User can view status of sent inquiries
-- [ ] **INQ-07**: User can view vendor's response/quote
+- [x] **INQ-01**: User can send inquiry to vendor from vendor profile
+- [x] **INQ-02**: Inquiry includes user's event details automatically
+- [x] **INQ-03**: User can add custom message to inquiry
+- [x] **INQ-04**: Vendor can view list of received inquiries
+- [x] **INQ-05**: Vendor can respond to inquiry (accept/decline/provide quote)
+- [x] **INQ-06**: User can view status of sent inquiries
+- [x] **INQ-07**: User can view vendor's response/quote
 
 ### User Dashboard
 
 - [x] **DASH-01**: User can view their events
-- [ ] **DASH-02**: User can view sent inquiries and their status
+- [x] **DASH-02**: User can view sent inquiries and their status
 - [x] **DASH-03**: User can see which categories are covered vs pending
 
 ### Vendor Dashboard
@@ -216,24 +216,24 @@ Which phases cover which requirements. Updated during roadmap creation.
 | DISC-07 | Phase 3 | Complete |
 | DISC-08 | Phase 3 | Complete |
 | DASH-01 | Phase 3 | Complete |
-| DASH-02 | Phase 5 | Pending |
+| DASH-02 | Phase 5 | Complete |
 | DASH-03 | Phase 3 | Complete |
-| AI-01 | Phase 4 | Pending |
-| AI-02 | Phase 4 | Pending |
-| AI-03 | Phase 4 | Pending |
-| AI-04 | Phase 4 | Pending |
-| AI-05 | Phase 4 | Pending |
-| CHAT-01 | Phase 4 | Pending |
-| CHAT-02 | Phase 4 | Pending |
-| CHAT-03 | Phase 4 | Pending |
-| CHAT-04 | Phase 4 | Pending |
-| INQ-01 | Phase 5 | Pending |
-| INQ-02 | Phase 5 | Pending |
-| INQ-03 | Phase 5 | Pending |
-| INQ-04 | Phase 5 | Pending |
-| INQ-05 | Phase 5 | Pending |
-| INQ-06 | Phase 5 | Pending |
-| INQ-07 | Phase 5 | Pending |
+| AI-01 | Phase 4 | Complete |
+| AI-02 | Phase 4 | Complete |
+| AI-03 | Phase 4 | Complete |
+| AI-04 | Phase 4 | Complete |
+| AI-05 | Phase 4 | Complete |
+| CHAT-01 | Phase 4 | Complete |
+| CHAT-02 | Phase 4 | Complete |
+| CHAT-03 | Phase 4 | Complete |
+| CHAT-04 | Phase 4 | Complete |
+| INQ-01 | Phase 5 | Complete |
+| INQ-02 | Phase 5 | Complete |
+| INQ-03 | Phase 5 | Complete |
+| INQ-04 | Phase 5 | Complete |
+| INQ-05 | Phase 5 | Complete |
+| INQ-06 | Phase 5 | Complete |
+| INQ-07 | Phase 5 | Complete |
 
 **Coverage:**
 - v1 requirements: 71 total
@@ -242,4 +242,4 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ---
 *Requirements defined: 2026-02-07*
-*Last updated: 2026-02-09 after Phase 3 completion*
+*Last updated: 2026-02-10 after Phase 5 completion (milestone complete)*
