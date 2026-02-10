@@ -4,10 +4,11 @@ import { useEvents } from "../hooks/useEvents";
 import Navbar from "../components/Navbar";
 import { EventCard } from "../components/dashboard/EventCard";
 import { SavedVendorsList } from "../components/dashboard/SavedVendorsList";
+import { MyInquiriesList } from "../components/dashboard/MyInquiriesList";
 import { RecommendationsSection } from "../components/ai/RecommendationsSection";
 import { Button } from "../components/ui/button";
 import {
-  Calendar, Plus, Loader2, Search, ArrowRight, Sparkles
+  Calendar, Plus, Loader2, Search, ArrowRight, Sparkles, MessageSquare
 } from "lucide-react";
 
 export default function UserDashboard() {
@@ -113,6 +114,16 @@ export default function UserDashboard() {
                 Saved Vendors
               </h2>
               <SavedVendorsList userId={user?.id} />
+            </section>
+
+            {/* My Inquiries Section */}
+            <section>
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-xl font-semibold text-[#1A1A1A]">
+                  My Inquiries
+                </h2>
+              </div>
+              <MyInquiriesList userId={user?.id} />
             </section>
 
             {/* Quick Actions Section */}
