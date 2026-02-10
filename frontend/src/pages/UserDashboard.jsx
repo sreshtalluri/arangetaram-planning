@@ -4,6 +4,7 @@ import { useEvents } from "../hooks/useEvents";
 import Navbar from "../components/Navbar";
 import { EventCard } from "../components/dashboard/EventCard";
 import { SavedVendorsList } from "../components/dashboard/SavedVendorsList";
+import { RecommendationsSection } from "../components/ai/RecommendationsSection";
 import { Button } from "../components/ui/button";
 import {
   Calendar, Plus, Loader2, Search, ArrowRight, Sparkles
@@ -95,6 +96,13 @@ export default function UserDashboard() {
                 <EmptyEventsState onCreateEvent={() => navigate("/events/create")} />
               )}
             </section>
+
+            {/* AI Recommendations Section */}
+            {events.length > 0 && (
+              <section className="mt-8">
+                <RecommendationsSection event={events[0]} />
+              </section>
+            )}
           </div>
 
           {/* Right Column - Saved Vendors + Quick Actions */}
