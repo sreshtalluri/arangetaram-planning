@@ -124,10 +124,15 @@ Plans:
   6. Vendor can view list of received inquiries
   7. Vendor can respond to inquiry (accept/decline/provide quote)
   8. Vendor dashboard shows inquiry statistics
-**Plans**: TBD
+**Plans**: 6 plans
 
 Plans:
-- [ ] TBD during plan-phase
+- [ ] 05-01-PLAN.md — Inquiries database schema with RLS and TypeScript types
+- [ ] 05-02-PLAN.md — useInquiries hook with all CRUD operations
+- [ ] 05-03-PLAN.md — SendInquiryDialog and VendorDetailPage integration
+- [ ] 05-04-PLAN.md — InquiryBadge, InquiryCard, ContactReveal, RespondInquiryDialog components
+- [ ] 05-05-PLAN.md — User Dashboard "My Inquiries" section
+- [ ] 05-06-PLAN.md — Vendor Dashboard "Inquiries" section with stats
 
 ## Progress
 
@@ -140,4 +145,4 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 | 2. Vendor Supply Platform | 6/6 | Complete | 2026-02-09 |
 | 3. Event Planning & Discovery | 5/5 | Complete | 2026-02-09 |
 | 4. AI Enhancement | 7/7 | Complete | 2026-02-10 |
-| 5. Inquiry & Connection | 0/TBD | Not started | - |
+| 5. Inquiry & Connection | 0/6 | Ready | - |
