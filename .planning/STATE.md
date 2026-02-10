@@ -123,7 +123,7 @@ Recent decisions affecting current work:
 
 ### Pending Todos
 
-- Run supabase/seed-vendors.sql in Supabase Dashboard SQL Editor to add dummy vendors for testing
+None - Phase 4 complete, ready for Phase 5 planning
 
 ### Blockers/Concerns
 
