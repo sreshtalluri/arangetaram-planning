@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./contexts/AuthContext";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { Toaster } from "./components/ui/sonner";
+import { ChatWidget } from "./components/ai/ChatWidget";
 
 // Pages
 import LandingPage from "./pages/LandingPage";
@@ -68,6 +69,7 @@ function App() {
               }
             />
           </Routes>
+          <ChatWidget />
         </BrowserRouter>
         <Toaster position="top-right" richColors />
       </div>
