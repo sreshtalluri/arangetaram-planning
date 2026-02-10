@@ -8,54 +8,52 @@ A two-sided marketplace that helps families plan their Arangetram (Bharatanatyam
 
 Users discover the right vendors for their needs, budget, and location. Everything else supports this.
 
+## Current State (v1.0 Shipped)
+
+**Tech Stack:**
+- Frontend: React 19, TypeScript, Tailwind CSS, Radix UI, React Query
+- Backend: Supabase (PostgreSQL, Auth, Storage, Edge Functions)
+- AI: Groq/Llama 3.3 70B for recommendations and chat
+
+**Codebase:**
+- ~13,500 lines of TypeScript/JavaScript/SQL
+- 7 database migrations
+- 2 Edge Functions (ai-chat, ai-recommendations)
+
+**Capabilities:**
+- User/vendor authentication with role-based routing
+- Vendor profiles with portfolios and availability calendars
+- Event creation with category tracking
+- Vendor discovery with filters (category, location, price, availability)
+- AI-powered recommendations with explanations
+- AI chat assistant with event context
+- Inquiry system with status tracking and contact reveal
+
 ## Requirements
 
-### Validated
+### Validated (v1.0)
 
-<!-- Existing capabilities from current codebase -->
-
-- ✓ User authentication (register/login) — existing
-- ✓ Guest access for browsing — existing
-- ✓ Vendor profile display with portfolio images — existing
-- ✓ Vendor browsing with category/location/price filters — existing
-- ✓ Event creation with date, budget, location, categories — existing
-- ✓ AI chat assistant for planning questions — existing
-- ✓ Basic vendor recommendations by category — existing
-- ✓ Booking request workflow (pending/accepted/declined) — existing
-- ✓ User dashboard showing events and bookings — existing
-- ✓ Vendor dashboard showing profile and bookings — existing
+- ✓ Supabase migration (PostgreSQL, Auth, Storage, Edge Functions) — v1.0
+- ✓ User/vendor authentication with roles — v1.0
+- ✓ All 11 Arangetram vendor categories — v1.0
+- ✓ Vendor profiles with portfolios and availability — v1.0
+- ✓ Event creation with category needs/covered tracking — v1.0
+- ✓ Vendor discovery with filters — v1.0
+- ✓ AI recommendations (hybrid filter + ranking) — v1.0
+- ✓ AI chat assistant with event context — v1.0
+- ✓ Inquiry system with status and contact reveal — v1.0
+- ✓ User and vendor dashboards — v1.0
 
 ### Active
 
-<!-- Current scope: Supabase migration + enhanced MVP -->
-
-**Infrastructure Migration**
-- [ ] Migrate database from MongoDB to Supabase PostgreSQL
-- [ ] Replace JWT auth with Supabase Auth
-- [ ] Implement Supabase Storage for vendor media
-- [ ] Set up Supabase Realtime for live updates
-- [ ] Configure Supabase Edge Functions for AI/backend logic
-
-**Enhanced User Experience**
-- [ ] Categories marked as optional ("I've got this covered")
-- [ ] Hybrid recommendation engine (filter + AI ranking with explanations)
-- [ ] Plan curation view to swap vendors and compare options
-- [ ] Inquiry-based contact flow with vendor details display
-
-**Vendor Platform**
-- [ ] Vendor availability calendar management
-- [ ] Inquiry tracking with status management
-- [ ] Enhanced profile with service packages and pricing
-
-**Expanded Categories**
-- [ ] Support all Arangetram vendor types: venue, catering, photographer, videographer, stage decoration, musicians, makeup artists, invitations, nattuvanar, return gifts, costume/jewelry rental
+(To be defined for next milestone)
 
 ### Out of Scope
 
-- In-app payments/booking transactions — future milestone after inquiry flow validated
-- Mobile native apps — web-first, responsive design covers mobile use
-- Real-time chat between users and vendors — contact happens off-platform for MVP
-- Vendor reviews/ratings submission — display only for MVP, user-generated reviews later
+- In-app payments/booking transactions — validate discovery value first
+- Mobile native apps — web-first, responsive design covers mobile
+- Real-time chat between users and vendors — contact happens off-platform
+- User-generated reviews — display only for MVP, user-generated later
 - Multi-event management — one event per user for MVP
 - Vendor subscription/premium tiers — all vendors equal for MVP
 
@@ -70,25 +68,24 @@ Users discover the right vendors for their needs, budget, and location. Everythi
 
 **Geography:** Major US metros with significant South Indian communities — Bay Area, Los Angeles, Houston, Dallas, Chicago, NYC/NJ area, Atlanta, Seattle, and others.
 
-**Existing Codebase:** React 19 frontend with Radix UI components, FastAPI backend with MongoDB. Being rebuilt on Supabase while preserving UI patterns and component library.
-
-**Vendor Supply Strategy:** Hybrid — seed initial vendors to ensure quality supply, then open self-signup.
-
-## Constraints
-
-- **Tech Stack:** Supabase (PostgreSQL, Auth, Storage, Realtime, Edge Functions) + React frontend — clean rebuild, not incremental migration
-- **AI Provider:** Keep Gemini/Emergent LLM integration for recommendations and chat
-- **MVP Scope:** Inquiry-based contact only — no payment processing
-- **Design:** Preserve existing Tailwind + Radix UI component patterns
-
 ## Key Decisions
 
 | Decision | Rationale | Outcome |
 |----------|-----------|---------|
-| Clean Supabase rebuild vs incremental migration | Allows proper data model design, avoids dual-system complexity | — Pending |
-| Hybrid recommendation engine | Pure filtering misses nuance; pure AI is slow and expensive | — Pending |
-| All categories optional | Users often have existing relationships via dance schools | — Pending |
-| Inquiry-based MVP (no payments) | Validate discovery value before building transaction infrastructure | — Pending |
+| Supabase rebuild (not incremental migration) | Proper data model design, avoid dual-system complexity | ✓ Good |
+| RLS on all tables from day one | Multi-tenant security critical for marketplace | ✓ Good |
+| Groq/Llama for AI (not Anthropic) | Free tier sufficient for MVP, 6000 tokens/min | ✓ Good |
+| Hybrid AI recommendations | Database filter + AI ranking balances speed and intelligence | ✓ Good |
+| Inquiry-based MVP (no payments) | Validate discovery before building transactions | ✓ Good |
+| SECURITY DEFINER triggers for RLS | Avoids infinite recursion in cross-table policies | ✓ Good |
+| Categories optional ("I've got this covered") | Users often have existing vendor relationships | ✓ Good |
+
+## Constraints
+
+- **Tech Stack:** Supabase + React — established in v1.0
+- **AI Provider:** Groq/Llama — working well, keep unless scaling issues
+- **MVP Scope:** Inquiry-based contact only — no payment processing yet
+- **Design:** Tailwind + Radix UI component patterns established
 
 ---
-*Last updated: 2026-02-07 after initialization*
+*Last updated: 2026-02-10 after v1.0 milestone*
