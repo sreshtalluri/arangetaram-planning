@@ -12,7 +12,9 @@ export interface PublicVendor {
   profile_photo_url: string | null
   is_published: boolean
   created_at: string | null
-  updated_at?: string | null
+  updated_at: string | null
+  contact_phone: string | null
+  contact_email: string | null
   // Computed fields for display
   price_range: string
   price_estimate: string
@@ -21,8 +23,6 @@ export interface PublicVendor {
   review_count: number
   portfolio_images: string[]
   services: string[]
-  contact_phone?: string
-  contact_email?: string
 }
 
 interface UseVendorsParams {

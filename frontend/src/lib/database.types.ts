@@ -112,6 +112,8 @@ export type Database = {
         Row: {
           business_name: string
           category: string
+          contact_email: string | null
+          contact_phone: string | null
           created_at: string | null
           description: string | null
           id: string
@@ -125,6 +127,8 @@ export type Database = {
         Insert: {
           business_name: string
           category: string
+          contact_email?: string | null
+          contact_phone?: string | null
           created_at?: string | null
           description?: string | null
           id: string
@@ -138,6 +142,8 @@ export type Database = {
         Update: {
           business_name?: string
           category?: string
+          contact_email?: string | null
+          contact_phone?: string | null
           created_at?: string | null
           description?: string | null
           id?: string
@@ -154,6 +160,73 @@ export type Database = {
             columns: ["id"]
             isOneToOne: true
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      inquiries: {
+        Row: {
+          id: string
+          user_id: string
+          vendor_id: string
+          event_id: string
+          message: string | null
+          status: string
+          response_message: string | null
+          responded_at: string | null
+          user_read_at: string | null
+          vendor_read_at: string | null
+          created_at: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          vendor_id: string
+          event_id: string
+          message?: string | null
+          status?: string
+          response_message?: string | null
+          responded_at?: string | null
+          user_read_at?: string | null
+          vendor_read_at?: string | null
+          created_at?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          vendor_id?: string
+          event_id?: string
+          message?: string | null
+          status?: string
+          response_message?: string | null
+          responded_at?: string | null
+          user_read_at?: string | null
+          vendor_read_at?: string | null
+          created_at?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "inquiries_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "inquiries_vendor_id_fkey"
+            columns: ["vendor_id"]
+            isOneToOne: false
+            referencedRelation: "vendor_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "inquiries_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
             referencedColumns: ["id"]
           },
         ]
@@ -296,3 +369,34 @@ export const Constants = {
     Enums: {},
   },
 } as const
+
+// Convenience types for inquiries
+export interface Inquiry {
+  id: string
+  user_id: string
+  vendor_id: string
+  event_id: string
+  message: string | null
+  status: 'pending' | 'accepted' | 'declined'
+  response_message: string | null
+  responded_at: string | null
+  user_read_at: string | null
+  vendor_read_at: string | null
+  created_at: string
+  updated_at: string
+}
+
+export interface InquiryInsert {
+  user_id: string
+  vendor_id: string
+  event_id: string
+  message?: string | null
+}
+
+export interface InquiryUpdate {
+  status?: 'accepted' | 'declined'
+  response_message?: string | null
+  responded_at?: string
+  user_read_at?: string
+  vendor_read_at?: string
+}
