@@ -1,13 +1,11 @@
 ---
 phase: 04-ai-enhancement
-plan: 03
+plan: 03b
 type: execute
 wave: 3
-depends_on: ["04-02"]
+depends_on: ["04-03a"]
 files_modified:
   - frontend/src/components/ai/ChatWidget.tsx
-  - frontend/src/components/ai/ChatMessage.tsx
-  - frontend/src/components/ai/StarterPrompts.tsx
   - frontend/src/App.jsx
 autonomous: false
 
@@ -16,17 +14,11 @@ must_haves:
     - "Floating chat button visible on all pages (bottom-right)"
     - "Chat panel opens/closes on button click"
     - "Messages stream word-by-word when assistant responds"
-    - "Starter prompts shown when conversation is new"
+    - "Chat widget accessible from any page via App.jsx integration"
   artifacts:
     - path: "frontend/src/components/ai/ChatWidget.tsx"
       provides: "Floating button + chat panel"
       exports: ["ChatWidget"]
-    - path: "frontend/src/components/ai/ChatMessage.tsx"
-      provides: "Individual message rendering"
-      exports: ["ChatMessage"]
-    - path: "frontend/src/components/ai/StarterPrompts.tsx"
-      provides: "Quick action prompts for new users"
-      exports: ["StarterPrompts"]
   key_links:
     - from: "frontend/src/components/ai/ChatWidget.tsx"
       to: "useChat hook"
@@ -39,10 +31,10 @@ must_haves:
 ---
 
 <objective>
-Create the floating chat widget UI that appears on all pages.
+Create ChatWidget with floating button and chat panel, integrate globally in App.jsx.
 
-Purpose: Users can access AI chat assistant from anywhere in the app. Widget shows starter prompts for new users and streams responses word-by-word.
-Output: ChatWidget (floating button + panel), ChatMessage, StarterPrompts components, integrated into App.jsx.
+Purpose: Main chat widget that composes ChatMessage and StarterPrompts. Complex component with state management, streaming, auto-scroll.
+Output: ChatWidget.tsx with full functionality, integrated into App.jsx.
 </objective>
 
 <execution_context>
@@ -53,109 +45,16 @@ Output: ChatWidget (floating button + panel), ChatMessage, StarterPrompts compon
 <context>
 @.planning/PROJECT.md
 @.planning/phases/04-ai-enhancement/04-CONTEXT.md
-@.planning/phases/04-ai-enhancement/04-02-SUMMARY.md
+@.planning/phases/04-ai-enhancement/04-03a-SUMMARY.md
 @frontend/src/App.jsx
 @frontend/src/hooks/useEvents.ts
 @frontend/src/hooks/useAuth.ts
-@frontend/src/components/AIChat.jsx
 </context>
 
 <tasks>
 
 <task type="auto">
-  <name>Task 1: Create ChatMessage and StarterPrompts components</name>
-  <files>
-    frontend/src/components/ai/ChatMessage.tsx
-    frontend/src/components/ai/StarterPrompts.tsx
-  </files>
-  <action>
-  Create directory and components:
-  ```bash
-  mkdir -p frontend/src/components/ai
-  ```
-
-  **frontend/src/components/ai/ChatMessage.tsx:**
-  ```typescript
-  import type { ChatMessage as ChatMessageType } from '../../hooks/useChat'
-
-  interface ChatMessageProps {
-    message: ChatMessageType
-    isStreaming?: boolean
-  }
-
-  export function ChatMessage({ message, isStreaming }: ChatMessageProps) {
-    const isUser = message.role === 'user'
-
-    return (
-      <div className={`flex ${isUser ? 'justify-end' : 'justify-start'}`}>
-        <div
-          className={`max-w-[85%] rounded-2xl px-4 py-2.5 ${
-            isUser
-              ? 'bg-[#0F4C5C] text-white rounded-br-md'
-              : 'bg-[#F9F8F4] text-[#1A1A1A] rounded-bl-md'
-          }`}
-        >
-          <p className="text-sm whitespace-pre-wrap leading-relaxed">
-            {message.content}
-            {isStreaming && !isUser && (
-              <span className="inline-block w-1.5 h-4 bg-[#0F4C5C] ml-0.5 animate-pulse" />
-            )}
-          </p>
-        </div>
-      </div>
-    )
-  }
-
-  export default ChatMessage
-  ```
-
-  **frontend/src/components/ai/StarterPrompts.tsx:**
-  ```typescript
-  interface StarterPromptsProps {
-    onSelect: (prompt: string) => void
-  }
-
-  const STARTER_PROMPTS = [
-    'What should I budget for catering?',
-    'How far in advance should I book vendors?',
-    'What are the must-have vendor categories?',
-    'Tips for choosing a venue in the Bay Area',
-  ]
-
-  export function StarterPrompts({ onSelect }: StarterPromptsProps) {
-    return (
-      <div className="px-4 pb-3 space-y-2">
-        <p className="text-xs text-[#888888] font-medium">Try asking:</p>
-        <div className="flex flex-wrap gap-2">
-          {STARTER_PROMPTS.map((prompt) => (
-            <button
-              key={prompt}
-              onClick={() => onSelect(prompt)}
-              className="text-xs px-3 py-1.5 bg-white border border-[#E5E5E5] rounded-full text-[#4A4A4A] hover:border-[#0F4C5C] hover:text-[#0F4C5C] transition-colors"
-            >
-              {prompt}
-            </button>
-          ))}
-        </div>
-      </div>
-    )
-  }
-
-  export default StarterPrompts
-  ```
-  </action>
-  <verify>
-  ```bash
-  ls /Users/sreshtalluri/Documents/Github/arangetaram-planning/frontend/src/components/ai/
-  cat frontend/src/components/ai/ChatMessage.tsx | grep "export"
-  cat frontend/src/components/ai/StarterPrompts.tsx | grep "export"
-  ```
-  </verify>
-  <done>ChatMessage and StarterPrompts components created with proper styling</done>
-</task>
-
-<task type="auto">
-  <name>Task 2: Create ChatWidget with floating button and panel</name>
+  <name>Task 1: Create ChatWidget with floating button and panel</name>
   <files>frontend/src/components/ai/ChatWidget.tsx</files>
   <action>
   Create **frontend/src/components/ai/ChatWidget.tsx:**
@@ -286,17 +185,25 @@ Output: ChatWidget (floating button + panel), ChatMessage, StarterPrompts compon
 
   export default ChatWidget
   ```
+
+  Key features:
+  - Floating button: burgundy (#800020), gold pulse indicator
+  - Chat panel: 360x500px, fixed position bottom-right
+  - Auto-scroll on new messages
+  - Starter prompts when conversation is new
+  - Enter to send, Shift+Enter for newline
+  - Loading spinner during streaming
   </action>
   <verify>
   ```bash
-  cat /Users/sreshtalluri/Documents/Github/arangetaram-planning/frontend/src/components/ai/ChatWidget.tsx | grep -E "(export function|useChat|isOpen|StarterPrompts)"
+  grep -E "(export function|useChat|isOpen|StarterPrompts)" frontend/src/components/ai/ChatWidget.tsx
   ```
   </verify>
   <done>ChatWidget component with floating button, chat panel, streaming indicator, and starter prompts</done>
 </task>
 
 <task type="auto">
-  <name>Task 3: Integrate ChatWidget globally in App.jsx</name>
+  <name>Task 2: Integrate ChatWidget globally in App.jsx</name>
   <files>frontend/src/App.jsx</files>
   <action>
   Update App.jsx to render ChatWidget on all pages:
@@ -326,7 +233,7 @@ Output: ChatWidget (floating button + panel), ChatMessage, StarterPrompts compon
   </action>
   <verify>
   ```bash
-  cat /Users/sreshtalluri/Documents/Github/arangetaram-planning/frontend/src/App.jsx | grep -E "(ChatWidget|import.*ChatWidget)"
+  grep -E "(ChatWidget|import.*ChatWidget)" frontend/src/App.jsx
   ```
   </verify>
   <done>ChatWidget rendered globally in App.jsx, visible on all pages</done>
@@ -337,7 +244,7 @@ Output: ChatWidget (floating button + panel), ChatMessage, StarterPrompts compon
   <how-to-verify>
   1. Start the frontend dev server:
      ```bash
-     cd /Users/sreshtalluri/Documents/Github/arangetaram-planning/frontend && yarn start
+     cd frontend && yarn start
      ```
 
   2. Open http://localhost:3000 in browser
@@ -371,11 +278,10 @@ Output: ChatWidget (floating button + panel), ChatMessage, StarterPrompts compon
 </tasks>
 
 <verification>
-- [ ] frontend/src/components/ai/ChatMessage.tsx exports ChatMessage
-- [ ] frontend/src/components/ai/StarterPrompts.tsx exports StarterPrompts
 - [ ] frontend/src/components/ai/ChatWidget.tsx exports ChatWidget
 - [ ] ChatWidget uses useChat hook for streaming
 - [ ] ChatWidget uses useEvents to pass event context
+- [ ] ChatWidget composes ChatMessage and StarterPrompts
 - [ ] App.jsx imports and renders ChatWidget
 - [ ] Chat button visible on all pages
 - [ ] Streaming works (word-by-word response)
@@ -391,5 +297,5 @@ Chat widget functional on all pages:
 </success_criteria>
 
 <output>
-After completion, create `.planning/phases/04-ai-enhancement/04-03-SUMMARY.md`
+After completion, create `.planning/phases/04-ai-enhancement/04-03b-SUMMARY.md`
 </output>

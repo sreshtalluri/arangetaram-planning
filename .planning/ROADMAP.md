@@ -100,13 +100,16 @@ Plans:
   6. User can access AI chat assistant from any page
   7. Chat assistant answers Arangetram planning questions with event context
   8. Chat maintains conversation history within session
-**Plans**: 4 plans
+**Plans**: 7 plans
 
 Plans:
-- [ ] 04-01-PLAN.md — Supabase Edge Functions (ai-chat, ai-recommendations) with shared Claude client and prompts
+- [ ] 04-01a-PLAN.md — Shared Claude client and ai-chat Edge Function with SSE streaming
+- [ ] 04-01b-PLAN.md — ai-recommendations Edge Function with hybrid database filter + AI ranking
 - [ ] 04-02-PLAN.md — Frontend AI hooks (useChat with streaming, useRecommendations with React Query)
-- [ ] 04-03-PLAN.md — Chat widget components (ChatWidget, ChatMessage, StarterPrompts) and global integration
-- [ ] 04-04-PLAN.md — Recommendation UI components (RecommendationCard, RecommendationsSection) and dashboard integration
+- [ ] 04-03a-PLAN.md — ChatMessage and StarterPrompts components
+- [ ] 04-03b-PLAN.md — ChatWidget with floating button/panel and App.jsx integration
+- [ ] 04-04a-PLAN.md — RecommendationCard component with AI explanation
+- [ ] 04-04b-PLAN.md — RecommendationsSection and UserDashboard integration
 
 ### Phase 5: Inquiry & Connection
 **Goal**: Users can send inquiries to vendors and track status; vendors can receive, view, and respond to inquiries
@@ -136,5 +139,5 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 | 1. Foundation & Authentication | 6/6 | Complete | 2026-02-08 |
 | 2. Vendor Supply Platform | 6/6 | Complete | 2026-02-09 |
 | 3. Event Planning & Discovery | 5/5 | Complete | 2026-02-09 |
-| 4. AI Enhancement | 0/4 | Ready to execute | - |
+| 4. AI Enhancement | 0/7 | Ready to execute | - |
 | 5. Inquiry & Connection | 0/TBD | Not started | - |

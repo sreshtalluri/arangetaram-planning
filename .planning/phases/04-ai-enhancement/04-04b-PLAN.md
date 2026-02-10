@@ -1,27 +1,21 @@
 ---
 phase: 04-ai-enhancement
-plan: 04
+plan: 04b
 type: execute
 wave: 3
-depends_on: ["04-02"]
+depends_on: ["04-04a"]
 files_modified:
-  - frontend/src/components/ai/RecommendationCard.tsx
   - frontend/src/components/ai/RecommendationsSection.tsx
   - frontend/src/pages/UserDashboard.jsx
-  - frontend/src/pages/VendorDiscovery.jsx
 autonomous: false
 
 must_haves:
   truths:
     - "Dashboard shows AI recommendations section when user has an event"
     - "Recommendations grouped by category with top 3 vendors each"
-    - "Each recommendation card shows AI explanation inline"
     - "User can dismiss a recommendation and see next option"
     - "User can refresh recommendations with updated preferences"
   artifacts:
-    - path: "frontend/src/components/ai/RecommendationCard.tsx"
-      provides: "Vendor card with AI explanation and dismiss button"
-      exports: ["RecommendationCard"]
     - path: "frontend/src/components/ai/RecommendationsSection.tsx"
       provides: "Category-grouped recommendations with loading state"
       exports: ["RecommendationsSection"]
@@ -37,10 +31,10 @@ must_haves:
 ---
 
 <objective>
-Create recommendation UI components and integrate into user dashboard.
+Create RecommendationsSection and integrate into UserDashboard.
 
-Purpose: Users see AI-powered vendor recommendations on their dashboard, grouped by category with explanations. Can dismiss vendors and refresh recommendations.
-Output: RecommendationCard, RecommendationsSection components integrated into UserDashboard.
+Purpose: Container component that groups recommendations by category and integrates into dashboard.
+Output: RecommendationsSection.tsx with category grouping, loading states, and UserDashboard integration.
 </objective>
 
 <execution_context>
@@ -51,121 +45,15 @@ Output: RecommendationCard, RecommendationsSection components integrated into Us
 <context>
 @.planning/PROJECT.md
 @.planning/phases/04-ai-enhancement/04-CONTEXT.md
-@.planning/phases/04-ai-enhancement/04-02-SUMMARY.md
+@.planning/phases/04-ai-enhancement/04-04a-SUMMARY.md
 @frontend/src/pages/UserDashboard.jsx
-@frontend/src/components/VendorCard.jsx
 @frontend/src/hooks/useRecommendations.ts
 </context>
 
 <tasks>
 
 <task type="auto">
-  <name>Task 1: Create RecommendationCard component</name>
-  <files>frontend/src/components/ai/RecommendationCard.tsx</files>
-  <action>
-  Create **frontend/src/components/ai/RecommendationCard.tsx:**
-
-  ```typescript
-  import { X, MapPin, Star, Sparkles } from 'lucide-react'
-  import { Button } from '../ui/button'
-  import type { RecommendedVendor } from '../../hooks/useRecommendations'
-
-  interface RecommendationCardProps {
-    vendor: RecommendedVendor
-    onDismiss: (vendorId: string) => void
-    onViewProfile: (vendorId: string) => void
-  }
-
-  export function RecommendationCard({
-    vendor,
-    onDismiss,
-    onViewProfile,
-  }: RecommendationCardProps) {
-    return (
-      <div className="relative bg-white rounded-xl border border-[#E5E5E5] overflow-hidden hover:shadow-md transition-shadow group">
-        {/* Dismiss button */}
-        <button
-          onClick={() => onDismiss(vendor.id)}
-          className="absolute top-2 right-2 p-1.5 bg-white/80 hover:bg-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity z-10"
-          aria-label="Dismiss recommendation"
-        >
-          <X className="w-4 h-4 text-[#888888]" />
-        </button>
-
-        {/* Vendor image */}
-        <div className="aspect-[4/3] bg-[#F9F8F4] overflow-hidden">
-          {vendor.profile_photo_url ? (
-            <img
-              src={vendor.profile_photo_url}
-              alt={vendor.business_name}
-              className="w-full h-full object-cover"
-            />
-          ) : (
-            <div className="w-full h-full flex items-center justify-center text-[#888888]">
-              <span className="text-4xl font-light">
-                {vendor.business_name.charAt(0)}
-              </span>
-            </div>
-          )}
-        </div>
-
-        {/* Content */}
-        <div className="p-4 space-y-3">
-          {/* Header */}
-          <div>
-            <h4 className="font-semibold text-[#1A1A1A] line-clamp-1">
-              {vendor.business_name}
-            </h4>
-            <div className="flex items-center gap-2 text-sm text-[#888888] mt-0.5">
-              <MapPin className="w-3.5 h-3.5" />
-              <span className="line-clamp-1">{vendor.location}</span>
-              <span className="text-[#E5E5E5]">|</span>
-              <span className="font-medium text-[#0F4C5C]">
-                {vendor.price_range}
-              </span>
-            </div>
-          </div>
-
-          {/* AI Explanation */}
-          <div className="flex gap-2 p-2.5 bg-[#FFF9E6] rounded-lg">
-            <Sparkles className="w-4 h-4 text-[#C5A059] shrink-0 mt-0.5" />
-            <p className="text-sm text-[#4A4A4A] leading-relaxed">
-              {vendor.aiExplanation}
-            </p>
-          </div>
-
-          {/* Action */}
-          <Button
-            onClick={() => onViewProfile(vendor.id)}
-            variant="outline"
-            className="w-full text-sm"
-          >
-            View Profile
-          </Button>
-        </div>
-      </div>
-    )
-  }
-
-  export default RecommendationCard
-  ```
-
-  Key features per CONTEXT.md:
-  - Full vendor card: photo, name, location, price range
-  - Explanation inline, always visible (gold background with sparkle icon)
-  - Dismiss button (X) appears on hover
-  - View Profile button to navigate to vendor detail
-  </action>
-  <verify>
-  ```bash
-  cat /Users/sreshtalluri/Documents/Github/arangetaram-planning/frontend/src/components/ai/RecommendationCard.tsx | grep -E "(export function|aiExplanation|onDismiss)"
-  ```
-  </verify>
-  <done>RecommendationCard component with AI explanation, dismiss button, and view profile action</done>
-</task>
-
-<task type="auto">
-  <name>Task 2: Create RecommendationsSection component</name>
+  <name>Task 1: Create RecommendationsSection component</name>
   <files>frontend/src/components/ai/RecommendationsSection.tsx</files>
   <action>
   Create **frontend/src/components/ai/RecommendationsSection.tsx:**
@@ -332,14 +220,14 @@ Output: RecommendationCard, RecommendationsSection components integrated into Us
   </action>
   <verify>
   ```bash
-  cat /Users/sreshtalluri/Documents/Github/arangetaram-planning/frontend/src/components/ai/RecommendationsSection.tsx | grep -E "(export function|useRecommendations|refreshRecommendations|handleDismiss)"
+  grep -E "(export function|useRecommendations|refreshRecommendations|handleDismiss)" frontend/src/components/ai/RecommendationsSection.tsx
   ```
   </verify>
   <done>RecommendationsSection with category grouping, loading states, refresh, and dismiss functionality</done>
 </task>
 
 <task type="auto">
-  <name>Task 3: Integrate recommendations into UserDashboard</name>
+  <name>Task 2: Integrate recommendations into UserDashboard</name>
   <files>frontend/src/pages/UserDashboard.jsx</files>
   <action>
   Update UserDashboard.jsx to show recommendations:
@@ -367,7 +255,7 @@ Output: RecommendationCard, RecommendationsSection components integrated into Us
   </action>
   <verify>
   ```bash
-  cat /Users/sreshtalluri/Documents/Github/arangetaram-planning/frontend/src/pages/UserDashboard.jsx | grep -E "(RecommendationsSection|import.*RecommendationsSection)"
+  grep -E "(RecommendationsSection|import.*RecommendationsSection)" frontend/src/pages/UserDashboard.jsx
   ```
   </verify>
   <done>UserDashboard shows RecommendationsSection when user has at least one event</done>
@@ -378,7 +266,7 @@ Output: RecommendationCard, RecommendationsSection components integrated into Us
   <how-to-verify>
   1. Ensure frontend is running:
      ```bash
-     cd /Users/sreshtalluri/Documents/Github/arangetaram-planning/frontend && yarn start
+     cd frontend && yarn start
      ```
 
   2. Login to the app and navigate to User Dashboard
@@ -416,10 +304,8 @@ Output: RecommendationCard, RecommendationsSection components integrated into Us
 </tasks>
 
 <verification>
-- [ ] frontend/src/components/ai/RecommendationCard.tsx exports RecommendationCard
 - [ ] frontend/src/components/ai/RecommendationsSection.tsx exports RecommendationsSection
-- [ ] RecommendationCard shows AI explanation inline with gold background
-- [ ] RecommendationCard has dismiss button (X) on hover
+- [ ] RecommendationsSection uses useRecommendations hook
 - [ ] RecommendationsSection groups by category
 - [ ] RecommendationsSection has refresh button
 - [ ] RecommendationsSection shows contextual loading message
@@ -437,5 +323,5 @@ Recommendation UI complete on dashboard:
 </success_criteria>
 
 <output>
-After completion, create `.planning/phases/04-ai-enhancement/04-04-SUMMARY.md`
+After completion, create `.planning/phases/04-ai-enhancement/04-04b-SUMMARY.md`
 </output>
