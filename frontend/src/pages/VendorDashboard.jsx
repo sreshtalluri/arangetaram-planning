@@ -4,9 +4,12 @@ import { useAuth } from "../hooks/useAuth";
 import { useVendorProfile } from "../hooks/useVendorProfile";
 import { usePortfolio } from "../hooks/usePortfolio";
 import { useBlockedDates } from "../hooks/useAvailability";
+import { useUnreadCount } from "../hooks/useInquiries";
 import { PortfolioUploader } from "../components/vendor/PortfolioUploader";
 import { PortfolioGallery } from "../components/vendor/PortfolioGallery";
 import { AvailabilityCalendar } from "../components/vendor/AvailabilityCalendar";
+import { VendorInquiriesList } from "../components/dashboard/VendorInquiriesList";
+import { InquiryStatsCards } from "../components/inquiry/InquiryStatsCards";
 import { getCategoryByValue } from "../lib/vendor-categories";
 import { cn } from "../lib/utils";
 import Navbar from "../components/Navbar";
@@ -15,7 +18,7 @@ import { Badge } from "../components/ui/badge";
 import {
   Store, Calendar, MapPin, DollarSign, Edit2,
   Loader2, Star, LayoutDashboard, Image, ExternalLink,
-  CheckCircle2, AlertCircle, ImageIcon, CalendarDays
+  CheckCircle2, AlertCircle, ImageIcon, CalendarDays, MessageSquare
 } from "lucide-react";
 
 export default function VendorDashboard() {
@@ -24,6 +27,7 @@ export default function VendorDashboard() {
   const { data: vendorProfile, isLoading: profileLoading } = useVendorProfile(user?.id);
   const { data: portfolioImages = [] } = usePortfolio(user?.id);
   const { blockedDates = [], availability = [] } = useBlockedDates(user?.id);
+  const { data: unreadCount = 0 } = useUnreadCount(user?.id, 'vendor');
 
   const [activeSection, setActiveSection] = useState('overview');
 
@@ -32,6 +36,7 @@ export default function VendorDashboard() {
     { id: 'profile', label: 'Profile', icon: Store },
     { id: 'portfolio', label: 'Portfolio', icon: Image },
     { id: 'availability', label: 'Availability', icon: Calendar },
+    { id: 'inquiries', label: 'Inquiries', icon: MessageSquare },
   ];
 
   const loading = authLoading || profileLoading;
@@ -119,6 +124,10 @@ export default function VendorDashboard() {
             upcomingBlockedCount={availability.length}
           />
         );
+      case 'inquiries':
+        return (
+          <InquiriesSection vendorId={user?.id} />
+        );
       default:
         return null;
     }
@@ -145,7 +154,7 @@ export default function VendorDashboard() {
                 key={section.id}
                 onClick={() => setActiveSection(section.id)}
                 className={cn(
-                  "w-full flex items-center gap-3 px-4 py-2 rounded-lg text-left transition-colors",
+                  "relative w-full flex items-center gap-3 px-4 py-2 rounded-lg text-left transition-colors",
                   activeSection === section.id
                     ? "bg-[#0F4C5C] text-white"
                     : "text-gray-600 hover:bg-gray-100"
@@ -153,6 +162,11 @@ export default function VendorDashboard() {
               >
                 <section.icon className="w-5 h-5" />
                 {section.label}
+                {section.id === 'inquiries' && unreadCount > 0 && (
+                  <span className="absolute right-2 min-w-[20px] h-5 rounded-full bg-red-500 text-white text-xs flex items-center justify-center">
+                    {unreadCount > 9 ? '9+' : unreadCount}
+                  </span>
+                )}
               </button>
             ))}
           </nav>
@@ -473,6 +487,31 @@ function AvailabilitySection({ vendorId, upcomingBlockedCount }) {
           )}
         </div>
         <AvailabilityCalendar vendorId={vendorId} />
+      </div>
+    </div>
+  );
+}
+
+// Inquiries Section Component
+function InquiriesSection({ vendorId }) {
+  return (
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-2xl font-bold text-[#1A1A1A]" style={{ fontFamily: 'Playfair Display, serif' }}>
+          Inquiries
+        </h1>
+        <p className="text-gray-500">
+          View and respond to inquiries from families.
+        </p>
+      </div>
+
+      {/* Stats Cards */}
+      <InquiryStatsCards vendorId={vendorId} />
+
+      {/* Inquiries List */}
+      <div className="mt-6">
+        <h3 className="font-medium text-[#1A1A1A] mb-4">All Inquiries</h3>
+        <VendorInquiriesList vendorId={vendorId} />
       </div>
     </div>
   );
