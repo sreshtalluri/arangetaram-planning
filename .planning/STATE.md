@@ -127,6 +127,9 @@ Recent decisions affecting current work:
 | 05-02 | useUnreadCount auto-refreshes every 30s | Ensures badge accuracy without excessive API calls |
 | 05-02 | User unread = responses not read | Tracks only status changes (accepted/declined), not pending inquiries |
 | 05-02 | 23505 error to friendly message | "You have already sent an inquiry to this vendor for this event" |
+| 05-03 | Auto-select event when user has only one | UX convenience for single-event users |
+| 05-03 | Amber warning when no events exist | Clearer than just disabled button |
+| 05-03 | Event details preview in dialog | Shows date, location, guests, budget grid |
 | 05-04 | StatusConfig object pattern for badges | Scalable config-driven badge variants |
 | 05-04 | Green box styling for ContactReveal | Visual indication of positive acceptance state |
 | 05-04 | Dual button layout for respond dialog | Decline (outline red) and Accept (primary teal) |
