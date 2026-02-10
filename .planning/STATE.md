@@ -121,6 +121,9 @@ Recent decisions affecting current work:
 | 04-03b | Global ChatWidget in App.jsx | Single source of truth, removed per-page duplicates |
 | 04-03b | Burgundy #800020 with gold pulse | Brand-aligned floating button design |
 | 04-04b | VENDOR_CATEGORIES from vendor-categories | Correct import path with value/label pattern |
+| 05-01 | UNIQUE(user_id, vendor_id, event_id) constraint | Prevents duplicate inquiries per event |
+| 05-01 | Vendor UPDATE requires status = 'pending' | Vendors cannot change response after responding |
+| 05-01 | User UPDATE restricted to user_read_at | Subquery check ensures users can only mark read |
 | 05-02 | useUnreadCount auto-refreshes every 30s | Ensures badge accuracy without excessive API calls |
 | 05-02 | User unread = responses not read | Tracks only status changes (accepted/declined), not pending inquiries |
 | 05-02 | 23505 error to friendly message | "You have already sent an inquiry to this vendor for this event" |
