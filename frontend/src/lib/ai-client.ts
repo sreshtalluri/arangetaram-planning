@@ -21,12 +21,13 @@ export async function fetchSSE(
   signal?: AbortSignal
 ): Promise<void> {
   const { data: { session } } = await supabase.auth.getSession()
+  const anonKey = process.env.REACT_APP_SUPABASE_ANON_KEY || ''
 
   const response = await fetch(url, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${session?.access_token || ''}`,
+      'Authorization': `Bearer ${session?.access_token || anonKey}`,
     },
     body: JSON.stringify(body),
     signal,
@@ -66,12 +67,13 @@ export async function fetchSSE(
  */
 export async function fetchRecommendations(eventId: string) {
   const { data: { session } } = await supabase.auth.getSession()
+  const anonKey = process.env.REACT_APP_SUPABASE_ANON_KEY || ''
 
   const response = await fetch(AI_ENDPOINTS.recommendations, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${session?.access_token || ''}`,
+      'Authorization': `Bearer ${session?.access_token || anonKey}`,
     },
     body: JSON.stringify({ eventId }),
   })
