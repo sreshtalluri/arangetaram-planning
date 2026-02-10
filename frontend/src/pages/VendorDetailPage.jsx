@@ -5,23 +5,15 @@ import { useAuth } from "../hooks/useAuth";
 import Navbar from "../components/Navbar";
 import { Button } from "../components/ui/button";
 import { Badge } from "../components/ui/badge";
-import { Textarea } from "../components/ui/textarea";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "../components/ui/dialog";
 import { toast } from "sonner";
 import {
-  Star, MapPin, Phone, Mail, ArrowLeft, Check,
+  Star, MapPin, Phone, Mail, ArrowLeft,
   Loader2, Users, DollarSign
 } from "lucide-react";
 import { PortfolioLightbox } from "../components/vendor/PortfolioLightbox";
 import { AvailabilityBadge } from "../components/discovery/AvailabilityBadge";
 import { SaveVendorButton } from "../components/discovery/SaveVendorButton";
+import { SendInquiryDialog } from "../components/inquiry/SendInquiryDialog";
 
 const priceColors = {
   "$": "bg-green-100 text-green-800",
@@ -38,7 +30,6 @@ export default function VendorDetailPage() {
 
   const { data: vendor, isLoading, error } = useVendorById(id);
   const [bookingOpen, setBookingOpen] = useState(false);
-  const [message, setMessage] = useState("");
 
   // Lightbox state
   const [lightboxOpen, setLightboxOpen] = useState(false);
@@ -80,18 +71,11 @@ export default function VendorDetailPage() {
 
   const handleBookClick = async () => {
     if (!isAuthenticated) {
-      toast.info("Please sign in to book vendors");
+      toast.info("Please sign in to send an inquiry");
       navigate("/login");
     } else {
       setBookingOpen(true);
     }
-  };
-
-  const handleBookingRequest = async () => {
-    // TODO: Implement booking request via Supabase
-    toast.success("Booking request sent! (Demo mode)");
-    setBookingOpen(false);
-    setMessage("");
   };
 
   return (
@@ -284,44 +268,14 @@ export default function VendorDetailPage() {
         </div>
       </div>
 
-      {/* Booking Dialog */}
-      <Dialog open={bookingOpen} onOpenChange={setBookingOpen}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>Send Inquiry</DialogTitle>
-            <DialogDescription>
-              Send an inquiry to {vendor.business_name}
-            </DialogDescription>
-          </DialogHeader>
-
-          <div className="space-y-4 py-4">
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Message (Optional)</label>
-              <Textarea
-                value={message}
-                onChange={(e) => setMessage(e.target.value)}
-                placeholder="Add any specific requirements or questions..."
-                className="input-styled resize-none"
-                rows={4}
-                data-testid="booking-message"
-              />
-            </div>
-          </div>
-
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setBookingOpen(false)}>
-              Cancel
-            </Button>
-            <Button
-              onClick={handleBookingRequest}
-              className="btn-primary"
-              data-testid="submit-booking-btn"
-            >
-              Send Inquiry
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      {/* Send Inquiry Dialog */}
+      <SendInquiryDialog
+        vendorId={id}
+        vendorName={vendor.business_name}
+        userId={user?.id}
+        open={bookingOpen}
+        onOpenChange={setBookingOpen}
+      />
 
       {/* Portfolio Lightbox */}
       {vendor.portfolio_images && vendor.portfolio_images.length > 0 && (
