@@ -86,14 +86,6 @@ export function StepCategories({ onNext, onBack }: StepCategoriesProps) {
                 !isNeeded && "border-gray-200 hover:border-gray-300"
               )}
             >
-              {/* Covered badge */}
-              {isCovered && (
-                <div className="absolute top-2 right-2 flex items-center gap-1 text-xs font-medium text-green-700 bg-green-100 px-2 py-1 rounded-full">
-                  <Check className="w-3 h-3" />
-                  Covered
-                </div>
-              )}
-
               <div className="flex items-start gap-4">
                 {/* Need checkbox */}
                 <div className="flex items-center">

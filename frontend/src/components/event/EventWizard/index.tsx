@@ -112,7 +112,8 @@ export function EventWizard() {
     // Validate form data
     const result = eventSchema.safeParse(data)
     if (!result.success) {
-      toast.error('Please fill in all required fields')
+      const firstError = result.error.errors[0]
+      toast.error(firstError?.message || 'Please fill in all required fields')
       return
     }
 

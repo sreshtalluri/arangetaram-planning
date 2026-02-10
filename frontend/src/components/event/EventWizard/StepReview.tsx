@@ -103,7 +103,7 @@ export function StepReview({ onSubmit, onBack, isSubmitting, isEditing }: StepRe
             <p className="text-xs text-gray-500 mt-1">
               {pendingCount === 0
                 ? "All categories covered!"
-                : `${pendingCount} ${pendingCount === 1 ? 'category' : 'categories'} still needed`
+                : `${pendingCount} ${pendingCount === 1 ? 'category' : 'categories'} pending — you can find vendors after creating your event`
               }
             </p>
           </div>
