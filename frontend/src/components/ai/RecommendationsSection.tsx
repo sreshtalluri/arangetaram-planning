@@ -2,7 +2,7 @@ import { useState, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Sparkles, RefreshCw, Loader2, AlertCircle } from 'lucide-react'
 import { useRecommendations } from '../../hooks/useRecommendations'
-import { CATEGORIES } from '../../lib/categories'
+import { VENDOR_CATEGORIES } from '../../lib/vendor-categories'
 import { RecommendationCard } from './RecommendationCard'
 import { Button } from '../ui/button'
 import type { Event } from '../../hooks/useEvents'
@@ -121,13 +121,13 @@ export function RecommendationsSection({ event }: RecommendationsSectionProps) {
 
       {/* Categories */}
       {categoryKeys.map((category) => {
-        const categoryInfo = CATEGORIES.find((c) => c.id === category)
+        const categoryInfo = VENDOR_CATEGORIES.find((c) => c.value === category)
         const vendors = filteredRecommendations[category]?.vendors || []
 
         return (
           <div key={category}>
             <h3 className="text-lg font-medium text-[#1A1A1A] mb-3">
-              {categoryInfo?.name || category}
+              {categoryInfo?.label || category}
             </h3>
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {vendors.slice(0, 3).map((vendor) => (
