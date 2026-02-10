@@ -51,9 +51,4 @@ export const categoryAPI = {
   getAll: () => api.get('/categories'),
 };
 
-// Seed API
-export const seedAPI = {
-  seed: () => api.post('/seed'),
-};
-
 export default api;
