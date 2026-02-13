@@ -4,6 +4,7 @@ import { useDiscoveryFilters } from "../hooks/useDiscoveryFilters";
 import Navbar from "../components/Navbar";
 import { FilterSidebar, MobileFilters } from "../components/discovery/FilterSidebar";
 import { VendorGrid } from "../components/discovery/VendorGrid";
+import { VendorMapView } from "../components/discovery/VendorMapView";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import {
@@ -13,11 +14,12 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "../components/ui/sheet";
-import { Search, SlidersHorizontal } from "lucide-react";
+import { Search, SlidersHorizontal, Map as MapIcon, LayoutGrid } from "lucide-react";
 
 export default function VendorsPage() {
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
   const [searchInput, setSearchInput] = useState("");
+  const [showMap, setShowMap] = useState(false);
 
   const { filters, setFilter, setLocationFilter, clearLocationFilter, clearFilters, hasActiveFilters } = useDiscoveryFilters();
 
@@ -146,6 +148,17 @@ export default function VendorsPage() {
                   data-testid="vendor-search"
                 />
               </div>
+
+              {/* Map/Grid Toggle */}
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setShowMap(!showMap)}
+                className="shrink-0 input-styled flex items-center gap-2"
+              >
+                {showMap ? <LayoutGrid className="w-4 h-4" /> : <MapIcon className="w-4 h-4" />}
+                <span className="hidden sm:inline">{showMap ? 'Grid' : 'Map'}</span>
+              </Button>
             </div>
 
             {/* Results count */}
@@ -156,12 +169,31 @@ export default function VendorsPage() {
               </p>
             )}
 
-            {/* Vendor Grid */}
-            <VendorGrid
-              vendors={vendors}
-              isLoading={vendorsLoading}
-              onClearFilters={clearFilters}
-            />
+            {/* Vendor Grid / Map Split View */}
+            {showMap ? (
+              <div className="flex gap-4 h-[calc(100vh-280px)]">
+                <div className="w-2/5 overflow-y-auto">
+                  <VendorGrid
+                    vendors={vendors}
+                    isLoading={vendorsLoading}
+                    onClearFilters={clearFilters}
+                  />
+                </div>
+                <div className="w-3/5 rounded-xl overflow-hidden">
+                  <VendorMapView
+                    vendors={vendors}
+                    centerLat={filters.locationLat ? parseFloat(filters.locationLat) : undefined}
+                    centerLng={filters.locationLng ? parseFloat(filters.locationLng) : undefined}
+                  />
+                </div>
+              </div>
+            ) : (
+              <VendorGrid
+                vendors={vendors}
+                isLoading={vendorsLoading}
+                onClearFilters={clearFilters}
+              />
+            )}
           </main>
         </div>
       </div>
