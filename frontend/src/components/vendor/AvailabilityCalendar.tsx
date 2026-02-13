@@ -208,7 +208,7 @@ export function AvailabilityCalendar({ vendorId }: AvailabilityCalendarProps) {
                   date{selectedDates.length !== 1 ? 's' : ''} selected
                 </p>
                 <p className="text-xs text-[#888888] mt-1">
-                  {selectedDates
+                  {[...selectedDates]
                     .sort((a, b) => a.getTime() - b.getTime())
                     .map(d => format(d, 'MMM d'))
                     .join(', ')}
@@ -284,7 +284,7 @@ export function AvailabilityCalendar({ vendorId }: AvailabilityCalendarProps) {
                       </div>
                       <button
                         onClick={() => handleUnblock(parseISO(item.blocked_date))}
-                        className="opacity-0 group-hover:opacity-100 p-1 rounded text-[#888888] hover:text-[#D32F2F] hover:bg-[#D32F2F]/10 transition-colors duration-200"
+                        className="opacity-0 group-hover:opacity-100 focus:opacity-100 p-1 rounded text-[#888888] hover:text-[#D32F2F] hover:bg-[#D32F2F]/10 transition-colors duration-200"
                         title="Make available"
                       >
                         <X className="w-3.5 h-3.5" />
