@@ -4,9 +4,16 @@ import { useBlockedDates } from '@/hooks/useAvailability'
 
 interface AvailabilityBadgeProps {
   vendorId: string
+  /** Event date in yyyy-MM-dd format */
   eventDate?: string
 }
 
+/**
+ * AvailabilityBadge - Shows if vendor is available on a specific date
+ *
+ * Only renders when eventDate is provided. Checks vendor's blocked dates
+ * and displays a green (available) or red (unavailable) badge.
+ */
 export function AvailabilityBadge({ vendorId, eventDate }: AvailabilityBadgeProps) {
   const { blockedDates, isLoading } = useBlockedDates(vendorId)
 

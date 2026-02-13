@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { DayPicker } from 'react-day-picker'
 import { format, isSameDay, isAfter, startOfToday, eachDayOfInterval, parseISO } from 'date-fns'
 import { toast } from 'sonner'
@@ -23,7 +23,7 @@ export function AvailabilityCalendar({ vendorId }: AvailabilityCalendarProps) {
   const [lastClickedDate, setLastClickedDate] = useState<Date | null>(null)
   const [note, setNote] = useState('')
   const [showAllBlocked, setShowAllBlocked] = useState(false)
-  const today = startOfToday()
+  const today = useMemo(() => startOfToday(), [])
 
   const isDateBlocked = (date: Date) =>
     blockedDates.some(blocked => isSameDay(blocked, date))
@@ -101,12 +101,15 @@ export function AvailabilityCalendar({ vendorId }: AvailabilityCalendarProps) {
   }
 
   // Group blocked dates by month for display
-  const groupedBlocked = (availability || []).reduce<Record<string, typeof availability>>((acc, item) => {
-    const monthKey = format(parseISO(item.blocked_date), 'MMMM yyyy')
-    if (!acc[monthKey]) acc[monthKey] = []
-    acc[monthKey]!.push(item)
-    return acc
-  }, {})
+  const groupedBlocked = useMemo(() =>
+    (availability || []).reduce<Record<string, typeof availability>>((acc, item) => {
+      const monthKey = format(parseISO(item.blocked_date), 'MMMM yyyy')
+      if (!acc[monthKey]) acc[monthKey] = []
+      acc[monthKey]!.push(item)
+      return acc
+    }, {}),
+    [availability]
+  )
 
   const blockedEntries = Object.entries(groupedBlocked)
   const visibleBlocked = showAllBlocked ? blockedEntries : blockedEntries.slice(0, 3)
