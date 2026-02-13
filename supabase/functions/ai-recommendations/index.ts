@@ -110,6 +110,31 @@ Deno.serve(async (req) => {
     // Step 2: Database filter - get candidate vendors per category
     const candidatesByCategory: { [category: string]: VendorProfile[] } = {};
 
+    // Geocode event location once for all categories
+    let locationContext = eventData.location || 'Not specified';
+    let geocodedLat: number | null = null;
+    let geocodedLng: number | null = null;
+
+    if (eventData.location) {
+      try {
+        const mapboxToken = Deno.env.get('MAPBOX_TOKEN');
+        if (mapboxToken) {
+          const geocodeRes = await fetch(
+            `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(eventData.location)}.json?access_token=${mapboxToken}&types=place,postcode&country=US&limit=1`
+          );
+          const geocodeData = await geocodeRes.json();
+          if (geocodeData.features?.length > 0) {
+            const [lng, lat] = geocodeData.features[0].center;
+            geocodedLat = lat;
+            geocodedLng = lng;
+            locationContext = geocodeData.features[0].place_name || eventData.location;
+          }
+        }
+      } catch (geoErr) {
+        console.error('Geocoding error:', geoErr);
+      }
+    }
+
     for (const category of eventData.categories_needed) {
       // Build query with filters
       let query = supabase
@@ -118,9 +143,20 @@ Deno.serve(async (req) => {
         .eq('is_published', true)
         .eq('category', category);
 
-      // Filter by service area if location specified
-      if (eventData.location) {
-        query = query.contains('service_areas', [eventData.location]);
+      // Filter by location using PostGIS distance if geocoded
+      if (geocodedLat !== null && geocodedLng !== null) {
+        const { data: nearbyVendors } = await supabase
+          .rpc('search_vendors_by_location', {
+            search_lat: geocodedLat,
+            search_lng: geocodedLng,
+            radius_miles: 50,
+            category_filter: category,
+          });
+
+        if (nearbyVendors && nearbyVendors.length > 0) {
+          const nearbyIds = nearbyVendors.map((v: any) => v.id);
+          query = query.in('id', nearbyIds);
+        }
       }
 
       // Filter by budget if specified (price_min should be <= budget)
@@ -193,7 +229,7 @@ Deno.serve(async (req) => {
     // Build context for AI
     const eventContext = {
       date: eventData.event_date,
-      location: eventData.location || 'Not specified',
+      location: locationContext,
       budget: eventData.budget || 'Not specified',
       categories_needed: eventData.categories_needed,
     };
@@ -205,7 +241,7 @@ Deno.serve(async (req) => {
         id: v.id,
         business_name: v.business_name,
         description: v.description || '',
-        service_areas: v.service_areas,
+        location: v.service_areas?.[0] || 'Unknown',
         price_range: v.price_min && v.price_max
           ? `$${v.price_min} - $${v.price_max}`
           : v.price_min
