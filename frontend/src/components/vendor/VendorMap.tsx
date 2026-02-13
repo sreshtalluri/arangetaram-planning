@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import Map, { Marker, Popup, NavigationControl } from 'react-map-gl'
+import Map, { Marker, Popup, NavigationControl } from 'react-map-gl/mapbox'
 import { MapPin } from 'lucide-react'
 
 const MAPBOX_TOKEN = process.env.REACT_APP_MAPBOX_TOKEN

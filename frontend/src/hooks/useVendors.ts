@@ -60,7 +60,7 @@ export function useVendors(params: UseVendorsParams = {}) {
     queryFn: async (): Promise<PublicVendor[]> => {
       // If coordinate-based search, use RPC function
       if (params.searchLat && params.searchLng) {
-        const { data, error } = await supabase.rpc('search_vendors_by_location', {
+        const { data, error } = await (supabase.rpc as any)('search_vendors_by_location', {
           search_lat: params.searchLat,
           search_lng: params.searchLng,
           radius_miles: params.radiusMiles || 25,
