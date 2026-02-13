@@ -8,6 +8,7 @@ interface Event {
   location?: string;
   budget?: number;
   categories_needed: string[];
+  categories_covered: string[];
 }
 
 interface VendorProfile {
@@ -78,7 +79,7 @@ Deno.serve(async (req) => {
     // Step 1: Fetch event details
     const { data: event, error: eventError } = await supabase
       .from('events')
-      .select('id, event_date, location, budget, categories_needed')
+      .select('id, event_date, location, budget, categories_needed, categories_covered')
       .eq('id', eventId)
       .single();
 
@@ -93,6 +94,25 @@ Deno.serve(async (req) => {
     }
 
     const eventData = event as Event;
+
+    // Compute pending categories (needed but not yet covered)
+    const pendingCategories = (eventData.categories_needed || []).filter(
+      cat => !(eventData.categories_covered || []).includes(cat)
+    );
+
+    // All categories covered — return success with allCovered flag
+    if (pendingCategories.length === 0) {
+      return new Response(
+        JSON.stringify({
+          categories: {},
+          allCovered: true,
+        }),
+        {
+          status: 200,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        }
+      );
+    }
 
     if (!eventData.categories_needed || eventData.categories_needed.length === 0) {
       return new Response(
@@ -110,7 +130,7 @@ Deno.serve(async (req) => {
     // Step 2: Database filter - get candidate vendors per category
     const candidatesByCategory: { [category: string]: VendorProfile[] } = {};
 
-    for (const category of eventData.categories_needed) {
+    for (const category of pendingCategories) {
       // Build query with filters
       let query = supabase
         .from('vendor_profiles')
@@ -195,7 +215,7 @@ Deno.serve(async (req) => {
       date: eventData.event_date,
       location: eventData.location || 'Not specified',
       budget: eventData.budget || 'Not specified',
-      categories_needed: eventData.categories_needed,
+      categories_needed: pendingCategories,
     };
 
     // Build candidate summary
