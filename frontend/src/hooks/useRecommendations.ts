@@ -12,6 +12,7 @@ export interface CategoryRecommendations {
 
 export interface RecommendationsResponse {
   categories: Record<string, CategoryRecommendations>
+  allCovered?: boolean
 }
 
 interface UseRecommendationsOptions {
@@ -47,6 +48,7 @@ export function useRecommendations({ eventId, enabled = true }: UseRecommendatio
   return {
     ...query,
     recommendations: query.data?.categories || {},
+    allCovered: query.data?.allCovered || false,
     refreshRecommendations,
   }
 }
