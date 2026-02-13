@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom'
 import { toast } from 'sonner'
 import { useAuth } from '@/hooks/useAuth'
 import { useCreateVendorProfile, useUpdateVendorProfile, useVendorProfile } from '@/hooks/useVendorProfile'
+import { supabase } from '@/lib/supabase'
 import { StepProgress } from './StepProgress'
 import { StepBasics } from './StepBasics'
 import { StepCategory } from './StepCategory'
@@ -17,7 +18,16 @@ interface ProfileFormData {
   business_name: string
   description: string
   category: string
-  service_areas: string[]
+  locations: Array<{
+    label: string
+    address_line1: string
+    city: string
+    state: string
+    zip_code: string
+    formatted_address: string
+    latitude: number
+    longitude: number
+  }>
   price_min: number | null
   price_max: number | null
   profile_photo_url?: string | null
@@ -46,7 +56,7 @@ export function ProfileWizard() {
         business_name: existingProfile.business_name,
         description: existingProfile.description || '',
         category: existingProfile.category,
-        service_areas: existingProfile.service_areas || [],
+        locations: [],
         price_min: existingProfile.price_min,
         price_max: existingProfile.price_max,
         profile_photo_url: existingProfile.profile_photo_url || null,
@@ -56,7 +66,7 @@ export function ProfileWizard() {
       business_name: '',
       description: '',
       category: '',
-      service_areas: [],
+      locations: [],
       price_min: null,
       price_max: null,
       profile_photo_url: null,
@@ -75,7 +85,7 @@ export function ProfileWizard() {
         business_name: existingProfile.business_name,
         description: existingProfile.description || '',
         category: existingProfile.category,
-        service_areas: existingProfile.service_areas || [],
+        locations: [],
         price_min: existingProfile.price_min,
         price_max: existingProfile.price_max,
         profile_photo_url: existingProfile.profile_photo_url || null,
@@ -93,23 +103,53 @@ export function ProfileWizard() {
 
   const handleSubmit = async () => {
     const data = methods.getValues()
+    const { locations, ...profileData } = data
 
     try {
       if (existingProfile) {
         await updateProfile.mutateAsync({
           id: user!.id,
-          ...data,
+          ...profileData,
           is_published: true,
         })
         toast.success('Profile updated!')
       } else {
         await createProfile.mutateAsync({
           id: user!.id,
-          ...data,
+          ...profileData,
           is_published: true,
         })
         toast.success('Profile created!')
       }
+
+      // Save locations
+      if (locations && locations.length > 0) {
+        // Delete existing locations first (in case of re-submission)
+        await supabase
+          .from('vendor_locations')
+          .delete()
+          .eq('vendor_id', user!.id)
+
+        const locationInserts = locations.map((loc, idx) => ({
+          vendor_id: user!.id,
+          label: loc.label || `Location ${idx + 1}`,
+          address_line1: loc.address_line1,
+          city: loc.city,
+          state: loc.state,
+          zip_code: loc.zip_code,
+          formatted_address: loc.formatted_address,
+          latitude: loc.latitude,
+          longitude: loc.longitude,
+          is_primary: idx === 0,
+        }))
+
+        const { error: locError } = await supabase
+          .from('vendor_locations')
+          .insert(locationInserts)
+
+        if (locError) throw locError
+      }
+
       localStorage.removeItem(STORAGE_KEY)
       navigate('/vendor/dashboard')
     } catch (error) {
