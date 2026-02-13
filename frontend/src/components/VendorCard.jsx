@@ -56,7 +56,12 @@ export const VendorCard = ({ vendor }) => {
 
           <div className="flex items-center gap-1 text-[#888888] text-sm mb-2">
             <MapPin className="w-3 h-3" />
-            <span>{vendor.location}</span>
+            <span>{vendor.location || 'Location not set'}</span>
+            {vendor.distance_miles != null && (
+              <span className="ml-1 text-xs bg-[#0F4C5C]/10 text-[#0F4C5C] px-1.5 py-0.5 rounded-full">
+                {vendor.distance_miles} mi
+              </span>
+            )}
           </div>
 
           <p className="text-sm text-[#4A4A4A] line-clamp-2 mb-3 flex-1">
