@@ -14,6 +14,8 @@ import { PortfolioLightbox } from "../components/vendor/PortfolioLightbox";
 import { AvailabilityBadge } from "../components/discovery/AvailabilityBadge";
 import { SaveVendorButton } from "../components/discovery/SaveVendorButton";
 import { SendInquiryDialog } from "../components/inquiry/SendInquiryDialog";
+import { useVendorLocations } from '../hooks/useVendorLocations'
+import { VendorMap } from '../components/vendor/VendorMap'
 
 const priceColors = {
   "$": "bg-green-100 text-green-800",
@@ -29,6 +31,7 @@ export default function VendorDetailPage() {
   const { user, isAuthenticated } = useAuth();
 
   const { data: vendor, isLoading, error } = useVendorById(id);
+  const { locations } = useVendorLocations(vendor?.id)
   const [bookingOpen, setBookingOpen] = useState(false);
 
   // Lightbox state
@@ -146,17 +149,24 @@ export default function VendorDetailPage() {
               <p className="text-[#4A4A4A] leading-relaxed">{vendor.description || "No description available."}</p>
             </div>
 
-            {/* Service Areas */}
-            {vendor.service_areas && vendor.service_areas.length > 0 && (
-              <div className="bg-white rounded-xl p-6 shadow-sm">
-                <h2 className="text-xl font-semibold text-[#1A1A1A] mb-4">Service Areas</h2>
+            {/* Locations & Map */}
+            {locations.length > 0 && (
+              <div className="bg-white rounded-xl p-6 shadow-sm space-y-4">
+                <h2 className="text-xl font-semibold text-[#1A1A1A]">Locations</h2>
                 <div className="flex flex-wrap gap-2">
-                  {vendor.service_areas.map((area, idx) => (
-                    <Badge key={idx} variant="secondary" className="bg-[#F9F8F4]">
-                      {area}
-                    </Badge>
+                  {locations.map((loc) => (
+                    <div key={loc.id} className="flex items-center gap-1.5 text-sm text-[#4A4A4A]">
+                      <MapPin className="w-3 h-3 text-[#0F4C5C]" />
+                      <span>{loc.label ? `${loc.label} — ` : ''}{loc.city}, {loc.state}</span>
+                      {loc.is_primary && (
+                        <span className="text-xs bg-[#C5A059]/20 text-[#C5A059] px-1.5 py-0.5 rounded-full">
+                          Primary
+                        </span>
+                      )}
+                    </div>
                   ))}
                 </div>
+                <VendorMap locations={locations} className="h-64" />
               </div>
             )}
 
@@ -250,7 +260,11 @@ export default function VendorDetailPage() {
                   </div>
                   <div>
                     <p className="text-sm text-[#888888]">Location</p>
-                    <p className="font-medium text-[#1A1A1A]">{vendor.location}</p>
+                    <p className="font-medium text-[#1A1A1A]">
+                      {locations.length > 0
+                        ? `${(locations.find(l => l.is_primary) || locations[0]).city}, ${(locations.find(l => l.is_primary) || locations[0]).state}`
+                        : vendor.location || 'Not set'}
+                    </p>
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
