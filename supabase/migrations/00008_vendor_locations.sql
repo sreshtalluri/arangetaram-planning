@@ -160,6 +160,8 @@ RETURNS TABLE (
   is_published BOOLEAN,
   created_at TIMESTAMPTZ,
   updated_at TIMESTAMPTZ,
+  contact_phone TEXT,
+  contact_email TEXT,
   distance_miles DOUBLE PRECISION,
   nearest_city TEXT,
   nearest_state TEXT
@@ -189,6 +191,8 @@ BEGIN
     vp.is_published,
     vp.created_at,
     vp.updated_at,
+    vp.contact_phone,
+    vp.contact_email,
     (ST_Distance(vl.location, search_point) / 1609.344) AS distance_miles,
     vl.city AS nearest_city,
     vl.state AS nearest_state
