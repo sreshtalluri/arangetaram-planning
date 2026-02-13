@@ -1,5 +1,5 @@
 import React from 'react'
-import { useFormContext, Controller } from 'react-hook-form'
+import { useFormContext, Controller, ControllerRenderProps } from 'react-hook-form'
 import { format, parseISO, startOfToday } from 'date-fns'
 import { CalendarIcon } from 'lucide-react'
 import { Input } from '@/components/ui/input'
@@ -11,13 +11,49 @@ import { METRO_AREAS } from '@/lib/metro-areas'
 import { cn } from '@/lib/utils'
 import type { EventFormData } from './index'
 
+function DatePickerField({ field }: { field: ControllerRenderProps<EventFormData, 'event_date'> }) {
+  const [open, setOpen] = React.useState(false)
+  const today = startOfToday()
+
+  return (
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <Button
+          type="button"
+          variant="outline"
+          className={cn(
+            "w-full justify-start text-left font-normal border-[#E5E5E5] hover:border-[#C5A059] transition-colors duration-200",
+            !field.value && "text-[#888888]"
+          )}
+        >
+          <CalendarIcon className="mr-2 h-4 w-4 text-[#C5A059]" />
+          {field.value ? format(parseISO(field.value), 'PPP') : 'Select a date'}
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="w-auto p-0" align="start">
+        <Calendar
+          mode="single"
+          selected={field.value ? parseISO(field.value) : undefined}
+          onSelect={(date) => {
+            if (date) {
+              field.onChange(format(date, 'yyyy-MM-dd'))
+              setOpen(false)
+            }
+          }}
+          disabled={{ before: today }}
+          initialFocus
+        />
+      </PopoverContent>
+    </Popover>
+  )
+}
+
 interface StepDetailsProps {
   onNext: () => void
 }
 
 export function StepDetails({ onNext }: StepDetailsProps) {
   const { register, formState: { errors }, trigger, control, watch, setValue } = useFormContext<EventFormData>()
-  const today = startOfToday()
 
   const handleNext = async () => {
     const valid = await trigger(['event_name', 'event_date'])
@@ -58,40 +94,7 @@ export function StepDetails({ onNext }: StepDetailsProps) {
           <Controller
             name="event_date"
             control={control}
-            render={({ field }) => {
-              const [open, setOpen] = React.useState(false)
-              return (
-                <Popover open={open} onOpenChange={setOpen}>
-                  <PopoverTrigger asChild>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      className={cn(
-                        "w-full justify-start text-left font-normal border-[#E5E5E5] hover:border-[#C5A059] transition-colors duration-200",
-                        !field.value && "text-[#888888]"
-                      )}
-                    >
-                      <CalendarIcon className="mr-2 h-4 w-4 text-[#C5A059]" />
-                      {field.value ? format(parseISO(field.value), 'PPP') : 'Select a date'}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
-                    <Calendar
-                      mode="single"
-                      selected={field.value ? parseISO(field.value) : undefined}
-                      onSelect={(date) => {
-                        if (date) {
-                          field.onChange(format(date, 'yyyy-MM-dd'))
-                          setOpen(false)
-                        }
-                      }}
-                      disabled={{ before: today }}
-                      initialFocus
-                    />
-                  </PopoverContent>
-                </Popover>
-              )
-            }}
+            render={({ field }) => <DatePickerField field={field} />}
           />
           {errors.event_date && (
             <p className="text-sm text-[#D32F2F]">{errors.event_date.message}</p>
