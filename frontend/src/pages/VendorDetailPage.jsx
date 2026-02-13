@@ -152,7 +152,7 @@ export default function VendorDetailPage() {
                 <h2 className="text-xl font-semibold text-[#1A1A1A] mb-4">Service Areas</h2>
                 <div className="flex flex-wrap gap-2">
                   {vendor.service_areas.map((area, idx) => (
-                    <Badge key={idx} variant="secondary" className="bg-[#F9F8F4]">
+                    <Badge key={idx} variant="secondary" className="bg-[#0F4C5C]/10 text-[#0F4C5C] border border-[#0F4C5C]/20">
                       {area}
                     </Badge>
                   ))}
