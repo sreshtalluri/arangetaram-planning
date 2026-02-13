@@ -189,7 +189,7 @@ export default function VendorDetailPage() {
           {/* Sidebar */}
           <div className="space-y-6">
             {/* Booking Card */}
-            <div className="bg-white rounded-xl p-6 shadow-sm sticky top-24">
+            <div className="bg-white rounded-xl p-6 shadow-sm">
               <div className="mb-6">
                 <p className="text-sm text-[#888888] mb-1">Starting from</p>
                 <p className="text-2xl font-bold text-[#1A1A1A]">{vendor.price_estimate}</p>
