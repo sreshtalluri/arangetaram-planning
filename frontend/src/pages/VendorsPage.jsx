@@ -19,7 +19,7 @@ export default function VendorsPage() {
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
   const [searchInput, setSearchInput] = useState("");
 
-  const { filters, setFilter, clearFilters, hasActiveFilters } = useDiscoveryFilters();
+  const { filters, setFilter, setLocationFilter, clearLocationFilter, clearFilters, hasActiveFilters } = useDiscoveryFilters();
 
   // Sync search input with URL param on mount
   useEffect(() => {
@@ -34,8 +34,11 @@ export default function VendorsPage() {
     category: filters.category || undefined,
     search: filters.search || undefined,
     price_range: filters.priceRange || undefined,
-    location: filters.location || undefined,
     availableDate: filters.availableDate || undefined,
+    // New location-based params
+    searchLat: filters.locationLat ? parseFloat(filters.locationLat) : undefined,
+    searchLng: filters.locationLng ? parseFloat(filters.locationLng) : undefined,
+    radiusMiles: filters.radius ? parseInt(filters.radius) : 25,
   };
 
   const { data: vendors = [], isLoading: vendorsLoading } = useVendors(vendorParams);
@@ -55,7 +58,7 @@ export default function VendorsPage() {
   // Count active filters for badge
   const activeFilterCount = [
     filters.category,
-    filters.location,
+    filters.locationLat,
     filters.priceRange,
     filters.availableDate,
   ].filter(Boolean).length;
@@ -81,6 +84,8 @@ export default function VendorsPage() {
             <FilterSidebar
               filters={filters}
               setFilter={setFilter}
+              setLocationFilter={setLocationFilter}
+              clearLocationFilter={clearLocationFilter}
               clearFilters={clearFilters}
               hasActiveFilters={hasActiveFilters}
             />
@@ -112,6 +117,8 @@ export default function VendorsPage() {
                   <MobileFilters
                     filters={filters}
                     setFilter={setFilter}
+                    setLocationFilter={setLocationFilter}
+                    clearLocationFilter={clearLocationFilter}
                     clearFilters={clearFilters}
                     hasActiveFilters={hasActiveFilters}
                   />
