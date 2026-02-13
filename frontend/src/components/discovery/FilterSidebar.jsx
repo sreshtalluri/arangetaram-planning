@@ -1,8 +1,8 @@
 import { format } from 'date-fns'
-import { CalendarIcon, X } from 'lucide-react'
+import { CalendarIcon, MapPin, X } from 'lucide-react'
 import { VENDOR_CATEGORIES } from '../../lib/vendor-categories'
-import { METRO_AREAS } from '../../lib/metro-areas'
 import { Button } from '../ui/button'
+import { Slider } from '../ui/slider'
 import {
   Select,
   SelectContent,
@@ -31,7 +31,7 @@ const PRICE_RANGES = [
   { value: '$$$$', label: '$$$$ Luxury' },
 ]
 
-export function FilterSidebar({ filters, setFilter, clearFilters, hasActiveFilters }) {
+export function FilterSidebar({ filters, setFilter, setLocationFilter, clearLocationFilter, clearFilters, hasActiveFilters }) {
   const selectedDate = filters.availableDate ? new Date(filters.availableDate + 'T00:00:00') : undefined
 
   return (
