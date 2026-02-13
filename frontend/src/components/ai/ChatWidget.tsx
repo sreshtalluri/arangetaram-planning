@@ -11,6 +11,7 @@ export function ChatWidget() {
   const [isOpen, setIsOpen] = useState(false)
   const [input, setInput] = useState('')
   const messagesEndRef = useRef<HTMLDivElement>(null)
+  const textareaRef = useRef<HTMLTextAreaElement>(null)
 
   // Get user's first event for context
   const { user } = useAuth()
@@ -28,6 +29,10 @@ export function ChatWidget() {
     if (!input.trim() || isStreaming) return
     sendMessage(input)
     setInput('')
+    // Reset textarea height after sending
+    if (textareaRef.current) {
+      textareaRef.current.style.height = 'auto'
+    }
   }
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -93,15 +98,24 @@ export function ChatWidget() {
 
       {/* Input area */}
       <div className="p-3 border-t border-[#E5E5E5] shrink-0">
-        <div className="flex gap-2">
-          <input
-            type="text"
+        <div className="flex items-end gap-2">
+          <textarea
+            ref={textareaRef}
             value={input}
-            onChange={(e) => setInput(e.target.value)}
+            onChange={(e) => {
+              setInput(e.target.value)
+              // Auto-resize: reset height then set to scrollHeight
+              const ta = textareaRef.current
+              if (ta) {
+                ta.style.height = 'auto'
+                ta.style.height = Math.min(ta.scrollHeight, 120) + 'px'
+              }
+            }}
             onKeyDown={handleKeyDown}
             placeholder="Ask about planning..."
             disabled={isStreaming}
-            className="flex-1 px-4 py-2.5 bg-[#F9F8F4] border border-[#E5E5E5] rounded-full text-sm focus:outline-none focus:border-[#0F4C5C] disabled:opacity-50"
+            rows={1}
+            className="flex-1 px-4 py-2.5 bg-[#F9F8F4] border border-[#E5E5E5] rounded-2xl text-sm focus:outline-none focus:border-[#0F4C5C] disabled:opacity-50 resize-none overflow-y-auto"
           />
           <Button
             onClick={handleSend}
