@@ -4,32 +4,23 @@ import { useBlockedDates } from '@/hooks/useAvailability'
 
 interface AvailabilityBadgeProps {
   vendorId: string
-  /** Event date in yyyy-MM-dd format */
   eventDate?: string
 }
 
-/**
- * AvailabilityBadge - Shows if vendor is available on a specific date
- *
- * Only renders when eventDate is provided. Checks vendor's blocked dates
- * and displays a green (available) or red (unavailable) badge.
- */
 export function AvailabilityBadge({ vendorId, eventDate }: AvailabilityBadgeProps) {
   const { blockedDates, isLoading } = useBlockedDates(vendorId)
 
-  // Don't render if no event date to check against
   if (!eventDate) return null
 
   if (isLoading) {
     return (
-      <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-gray-100 text-gray-600 text-sm">
-        <Loader2 className="w-4 h-4 animate-spin" />
+      <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#F9F8F4] border border-[#E5E5E5] text-[#4A4A4A] text-sm">
+        <Loader2 className="w-4 h-4 animate-spin text-[#C5A059]" />
         <span>Checking availability...</span>
       </div>
     )
   }
 
-  // Check if eventDate is in blocked dates
   const eventDateObj = parseISO(eventDate)
   const isBlocked = blockedDates.some(
     (blockedDate) =>
@@ -40,7 +31,7 @@ export function AvailabilityBadge({ vendorId, eventDate }: AvailabilityBadgeProp
 
   if (isBlocked) {
     return (
-      <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-100 text-red-800 text-sm font-medium">
+      <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#D32F2F]/10 text-[#D32F2F] border border-[#D32F2F]/20 text-sm font-medium animate-fade-in-up">
         <XCircle className="w-4 h-4" />
         <span>Unavailable on {formattedDate}</span>
       </div>
@@ -48,7 +39,7 @@ export function AvailabilityBadge({ vendorId, eventDate }: AvailabilityBadgeProp
   }
 
   return (
-    <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-green-100 text-green-800 text-sm font-medium">
+    <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#2E7D32]/10 text-[#2E7D32] border border-[#2E7D32]/20 text-sm font-medium animate-fade-in-up">
       <CheckCircle className="w-4 h-4" />
       <span>Available on {formattedDate}</span>
     </div>
