@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Sparkles, RefreshCw, Loader2, AlertCircle } from 'lucide-react'
+import { Sparkles, RefreshCw, Loader2, AlertCircle, CheckCircle2 } from 'lucide-react'
 import { useRecommendations } from '../../hooks/useRecommendations'
 import { VENDOR_CATEGORIES } from '../../lib/vendor-categories'
 import { RecommendationCard } from './RecommendationCard'
@@ -20,6 +20,7 @@ export function RecommendationsSection({ event }: RecommendationsSectionProps) {
     isLoading,
     isError,
     error,
+    allCovered,
     refreshRecommendations,
     isFetching,
   } = useRecommendations({ eventId: event.id })
@@ -73,6 +74,24 @@ export function RecommendationsSection({ event }: RecommendationsSectionProps) {
           <RefreshCw className="w-4 h-4 mr-2" />
           Try Again
         </Button>
+      </div>
+    )
+  }
+
+  // All categories covered — celebratory state
+  if (allCovered) {
+    return (
+      <div className="bg-white rounded-xl p-8 shadow-sm text-center">
+        <CheckCircle2 className="w-10 h-10 text-[#C5A059] mx-auto mb-3" />
+        <h2
+          className="text-xl font-semibold text-[#1A1A1A] mb-2"
+          style={{ fontFamily: 'Playfair Display, serif' }}
+        >
+          All Vendors Booked!
+        </h2>
+        <p className="text-[#4A4A4A]">
+          You've found vendors for every category. Your Arangetram is coming together!
+        </p>
       </div>
     )
   }
