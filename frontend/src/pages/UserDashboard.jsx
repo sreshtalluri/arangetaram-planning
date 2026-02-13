@@ -8,7 +8,7 @@ import { MyInquiriesList } from "../components/dashboard/MyInquiriesList";
 import { RecommendationsSection } from "../components/ai/RecommendationsSection";
 import { Button } from "../components/ui/button";
 import {
-  Calendar, Plus, Loader2, Search, ArrowRight, Sparkles, MessageSquare
+  Calendar, Plus, Loader2, MessageSquare
 } from "lucide-react";
 
 export default function UserDashboard() {
@@ -106,7 +106,7 @@ export default function UserDashboard() {
             )}
           </div>
 
-          {/* Right Column - Saved Vendors + Quick Actions */}
+          {/* Right Column - Saved Vendors + Inquiries */}
           <div className="space-y-6">
             {/* Saved Vendors Section */}
             <section>
@@ -126,32 +126,6 @@ export default function UserDashboard() {
               <MyInquiriesList userId={user?.id} />
             </section>
 
-            {/* Quick Actions Section */}
-            <section>
-              <h2 className="text-xl font-semibold text-[#1A1A1A] mb-4">
-                Quick Actions
-              </h2>
-              <div className="space-y-3">
-                <QuickActionCard
-                  icon={Plus}
-                  title="Create Event"
-                  description="Start planning your Arangetram"
-                  onClick={() => navigate("/events/create")}
-                />
-                <QuickActionCard
-                  icon={Search}
-                  title="Browse All Vendors"
-                  description="Explore venues, caterers, and more"
-                  onClick={() => navigate("/vendors")}
-                />
-                <QuickActionCard
-                  icon={Sparkles}
-                  title="Get Recommendations"
-                  description="AI-powered vendor suggestions"
-                  onClick={() => navigate("/chat")}
-                />
-              </div>
-            </section>
           </div>
         </div>
       </div>
@@ -186,25 +160,3 @@ function EmptyEventsState({ onCreateEvent }) {
   );
 }
 
-/**
- * Quick action card component for sidebar actions
- */
-function QuickActionCard({ icon: Icon, title, description, onClick }) {
-  return (
-    <button
-      onClick={onClick}
-      className="w-full flex items-center gap-3 bg-white rounded-lg p-4 border border-[#E5E5E5] hover:border-[#0F4C5C] hover:shadow-sm transition-all text-left group"
-    >
-      <div className="w-10 h-10 rounded-lg bg-[#F9F8F4] flex items-center justify-center shrink-0 group-hover:bg-[#0F4C5C] transition-colors">
-        <Icon className="w-5 h-5 text-[#0F4C5C] group-hover:text-white transition-colors" />
-      </div>
-      <div className="flex-1 min-w-0">
-        <h4 className="font-medium text-[#1A1A1A] group-hover:text-[#0F4C5C] transition-colors">
-          {title}
-        </h4>
-        <p className="text-sm text-[#888888] line-clamp-1">{description}</p>
-      </div>
-      <ArrowRight className="w-4 h-4 text-[#888888] group-hover:text-[#0F4C5C] transition-colors shrink-0" />
-    </button>
-  );
-}
