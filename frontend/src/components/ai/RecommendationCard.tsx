@@ -1,6 +1,25 @@
-import { X, MapPin, Sparkles } from 'lucide-react'
+import React from 'react'
+import {
+  X, MapPin, Sparkles,
+  Building2, UtensilsCrossed, Camera, Video, Palette,
+  Music, Mic2, Mail, Crown, Gift,
+} from 'lucide-react'
 import { Button } from '../ui/button'
 import type { RecommendedVendor } from '../../hooks/useRecommendations'
+
+const CATEGORY_PLACEHOLDERS: Record<string, { icon: React.ElementType; bg: string }> = {
+  venue:            { icon: Building2,        bg: 'bg-[#D4C5A9]' },
+  catering:         { icon: UtensilsCrossed,  bg: 'bg-[#C5A059]/20' },
+  photography:      { icon: Camera,           bg: 'bg-slate-200' },
+  videography:      { icon: Video,            bg: 'bg-sky-100' },
+  stage_decoration: { icon: Palette,          bg: 'bg-rose-100' },
+  musicians:        { icon: Music,            bg: 'bg-purple-100' },
+  nattuvanar:       { icon: Mic2,             bg: 'bg-[#800020]/10' },
+  makeup_artist:    { icon: Sparkles,         bg: 'bg-pink-100' },
+  invitations:      { icon: Mail,             bg: 'bg-amber-100' },
+  costumes:         { icon: Crown,            bg: 'bg-[#0F4C5C]/10' },
+  return_gifts:     { icon: Gift,             bg: 'bg-emerald-100' },
+}
 
 interface RecommendationCardProps {
   vendor: RecommendedVendor
@@ -32,12 +51,26 @@ export function RecommendationCard({
             alt={vendor.business_name}
             className="w-full h-full object-cover"
           />
+        ) : vendor.portfolio_images && vendor.portfolio_images.length > 0 ? (
+          <img
+            src={vendor.portfolio_images[0]}
+            alt={vendor.business_name}
+            className="w-full h-full object-cover"
+          />
         ) : (
-          <div className="w-full h-full flex items-center justify-center text-[#888888]">
-            <span className="text-4xl font-light">
-              {vendor.business_name.charAt(0)}
-            </span>
-          </div>
+          (() => {
+            const placeholder = CATEGORY_PLACEHOLDERS[vendor.category]
+            const Icon = placeholder?.icon || Sparkles
+            const bgClass = placeholder?.bg || 'bg-[#F9F8F4]'
+            return (
+              <div className={`w-full h-full flex flex-col items-center justify-center gap-2 ${bgClass}`}>
+                <Icon className="w-10 h-10 text-[#888888]/60" />
+                <span className="text-sm font-medium text-[#888888]/80">
+                  {vendor.business_name.charAt(0)}{vendor.business_name.split(' ')[1]?.charAt(0) || ''}
+                </span>
+              </div>
+            )
+          })()
         )}
       </div>
 
