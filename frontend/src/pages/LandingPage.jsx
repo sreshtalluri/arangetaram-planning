@@ -60,7 +60,7 @@ export default function LandingPage() {
               </p>
               <div className="flex flex-col sm:flex-row gap-4 pt-4">
                 <Button
-                  onClick={() => navigate("/plan")}
+                  onClick={() => navigate("/events/create")}
                   className="btn-primary text-base"
                   data-testid="start-planning-btn"
                 >
@@ -194,7 +194,7 @@ export default function LandingPage() {
                 ))}
               </div>
 
-              <Button onClick={() => navigate("/plan")} className="btn-primary">
+              <Button onClick={() => navigate("/events/create")} className="btn-primary">
                 Get Started Free
                 <ArrowRight className="w-4 h-4 ml-2" />
               </Button>
@@ -237,7 +237,7 @@ export default function LandingPage() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button
-              onClick={() => navigate("/plan")}
+              onClick={() => navigate("/events/create")}
               className="bg-white text-[#800020] hover:bg-[#F9F8F4] rounded-full px-8 py-3 font-medium shadow-lg"
             >
               Start Planning Now
@@ -273,7 +273,7 @@ export default function LandingPage() {
             <div>
               <h4 className="font-semibold mb-4">For Families</h4>
               <ul className="space-y-2 text-white/60 text-sm">
-                <li><Link to="/plan" className="hover:text-white">Plan Event</Link></li>
+                <li><Link to="/events/create" className="hover:text-white">Plan Event</Link></li>
                 <li><Link to="/vendors" className="hover:text-white">Browse Vendors</Link></li>
                 <li><Link to="/dashboard" className="hover:text-white">My Events</Link></li>
               </ul>

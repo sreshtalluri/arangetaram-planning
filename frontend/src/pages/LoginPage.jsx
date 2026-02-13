@@ -147,7 +147,7 @@ export default function LoginPage() {
             </p>
             <Button
               variant="outline"
-              onClick={() => navigate("/plan")}
+              onClick={() => navigate("/events/create")}
               className="w-full btn-secondary"
             >
               Continue as Guest

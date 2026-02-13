@@ -13,7 +13,6 @@ import PasswordResetPage from "./pages/PasswordResetPage";
 import AuthCallbackPage from "./pages/AuthCallbackPage";
 import VendorsPage from "./pages/VendorsPage";
 import VendorDetailPage from "./pages/VendorDetailPage";
-import PlanEventPage from "./pages/PlanEventPage";
 import UserDashboard from "./pages/UserDashboard";
 import VendorDashboard from "./pages/VendorDashboard";
 import ProfileWizardPage from "./pages/vendor/ProfileWizardPage";
@@ -33,7 +32,6 @@ function App() {
           <Route path="/auth/callback" element={<AuthCallbackPage />} />
           <Route path="/vendors" element={<VendorsPage />} />
           <Route path="/vendors/:id" element={<VendorDetailPage />} />
-          <Route path="/plan" element={<PlanEventPage />} />
           <Route
             path="/events/create"
             element={

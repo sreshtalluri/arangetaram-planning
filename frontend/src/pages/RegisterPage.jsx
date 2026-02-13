@@ -51,7 +51,7 @@ export default function RegisterPage() {
       if (user.user_type === "vendor") {
         navigate("/vendor-dashboard");
       } else {
-        navigate("/plan");
+        navigate("/events/create");
       }
     } catch (error) {
       toast.error(error.response?.data?.detail || "Registration failed");
