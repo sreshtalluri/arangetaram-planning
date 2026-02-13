@@ -41,8 +41,8 @@ export const Navbar = () => {
             >
               Browse Vendors
             </Link>
-            <Link 
-              to="/plan" 
+            <Link
+              to="/events/create"
               className="text-[#4A4A4A] hover:text-[#800020] font-medium transition-colors"
             >
               Plan Event
@@ -92,7 +92,7 @@ export const Navbar = () => {
                     Login
                   </Button>
                 </Link>
-                <Link to="/plan">
+                <Link to="/events/create">
                   <Button className="bg-[#0F4C5C] hover:bg-[#093642] text-white rounded-full px-6">
                     Start Planning
                   </Button>
