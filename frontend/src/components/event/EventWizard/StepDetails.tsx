@@ -1,11 +1,12 @@
-import { useState, useRef, useEffect } from 'react'
+import React from 'react'
 import { useFormContext, Controller } from 'react-hook-form'
 import { format, parseISO, startOfToday } from 'date-fns'
-import { DayPicker } from 'react-day-picker'
 import { CalendarIcon } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button'
+import { Calendar } from '@/components/ui/calendar'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { METRO_AREAS } from '@/lib/metro-areas'
 import { cn } from '@/lib/utils'
 import type { EventFormData } from './index'
@@ -16,8 +17,6 @@ interface StepDetailsProps {
 
 export function StepDetails({ onNext }: StepDetailsProps) {
   const { register, formState: { errors }, trigger, control, watch, setValue } = useFormContext<EventFormData>()
-  const [dateOpen, setDateOpen] = useState(false)
-  const popoverRef = useRef<HTMLDivElement>(null)
   const today = startOfToday()
 
   const handleNext = async () => {
@@ -25,7 +24,6 @@ export function StepDetails({ onNext }: StepDetailsProps) {
     if (valid) onNext()
   }
 
-  // Handle budget input with $ prefix
   const handleBudgetChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value.replace(/[^0-9]/g, '')
     setValue('budget', value ? parseInt(value, 10) : null)
@@ -33,24 +31,11 @@ export function StepDetails({ onNext }: StepDetailsProps) {
 
   const budgetValue = watch('budget')
 
-  // Close date picker when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (popoverRef.current && !popoverRef.current.contains(event.target as Node)) {
-        setDateOpen(false)
-      }
-    }
-    if (dateOpen) {
-      document.addEventListener('mousedown', handleClickOutside)
-    }
-    return () => document.removeEventListener('mousedown', handleClickOutside)
-  }, [dateOpen])
-
   return (
     <div className="space-y-6">
       <div>
         <h2 className="text-xl font-semibold mb-1">Event Details</h2>
-        <p className="text-gray-500">Tell us about your Arangetram</p>
+        <p className="text-[#4A4A4A]">Tell us about your Arangetram</p>
       </div>
 
       <div className="space-y-4">
@@ -63,7 +48,7 @@ export function StepDetails({ onNext }: StepDetailsProps) {
             placeholder="e.g., Priya's Arangetram"
           />
           {errors.event_name && (
-            <p className="text-sm text-red-500">{errors.event_name.message}</p>
+            <p className="text-sm text-[#D32F2F]">{errors.event_name.message}</p>
           )}
         </div>
 
@@ -73,40 +58,43 @@ export function StepDetails({ onNext }: StepDetailsProps) {
           <Controller
             name="event_date"
             control={control}
-            render={({ field }) => (
-              <div className="relative" ref={popoverRef}>
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => setDateOpen(!dateOpen)}
-                  className={cn(
-                    "w-full justify-start text-left font-normal",
-                    !field.value && "text-muted-foreground"
-                  )}
-                >
-                  <CalendarIcon className="mr-2 h-4 w-4" />
-                  {field.value ? format(parseISO(field.value), 'PPP') : 'Select a date'}
-                </Button>
-                {dateOpen && (
-                  <div className="absolute top-full left-0 z-50 mt-1 bg-white border rounded-md shadow-lg p-3">
-                    <DayPicker
+            render={({ field }) => {
+              const [open, setOpen] = React.useState(false)
+              return (
+                <Popover open={open} onOpenChange={setOpen}>
+                  <PopoverTrigger asChild>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className={cn(
+                        "w-full justify-start text-left font-normal border-[#E5E5E5] hover:border-[#C5A059] transition-colors duration-200",
+                        !field.value && "text-[#888888]"
+                      )}
+                    >
+                      <CalendarIcon className="mr-2 h-4 w-4 text-[#C5A059]" />
+                      {field.value ? format(parseISO(field.value), 'PPP') : 'Select a date'}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
                       mode="single"
                       selected={field.value ? parseISO(field.value) : undefined}
                       onSelect={(date) => {
                         if (date) {
                           field.onChange(format(date, 'yyyy-MM-dd'))
-                          setDateOpen(false)
+                          setOpen(false)
                         }
                       }}
                       disabled={{ before: today }}
+                      initialFocus
                     />
-                  </div>
-                )}
-              </div>
-            )}
+                  </PopoverContent>
+                </Popover>
+              )
+            }}
           />
           {errors.event_date && (
-            <p className="text-sm text-red-500">{errors.event_date.message}</p>
+            <p className="text-sm text-[#D32F2F]">{errors.event_date.message}</p>
           )}
         </div>
 
@@ -116,7 +104,7 @@ export function StepDetails({ onNext }: StepDetailsProps) {
           <select
             id="location"
             {...register('location')}
-            className="w-full h-10 px-3 py-2 border border-gray-200 rounded-md bg-white text-sm focus:outline-none focus:ring-2 focus:ring-[#0F4C5C] focus:ring-offset-2"
+            className="w-full h-10 px-3 py-2 border border-[#E5E5E5] rounded-md bg-white text-sm focus:outline-none focus:ring-2 focus:ring-[#0F4C5C] focus:ring-offset-2"
           >
             <option value="">Select a metro area</option>
             {METRO_AREAS.map((area) => (
@@ -143,7 +131,7 @@ export function StepDetails({ onNext }: StepDetailsProps) {
         <div className="space-y-2">
           <Label htmlFor="budget">Total Budget (optional)</Label>
           <div className="relative">
-            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">$</span>
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[#888888]">$</span>
             <Input
               id="budget"
               type="text"
