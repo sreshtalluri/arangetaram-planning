@@ -5,6 +5,7 @@ import { useVendorProfile } from "../hooks/useVendorProfile";
 import { usePortfolio } from "../hooks/usePortfolio";
 import { useBlockedDates } from "../hooks/useAvailability";
 import { useUnreadCount } from "../hooks/useInquiries";
+import { useVendorLocations } from "../hooks/useVendorLocations";
 import { PortfolioUploader } from "../components/vendor/PortfolioUploader";
 import { PortfolioGallery } from "../components/vendor/PortfolioGallery";
 import { AvailabilityCalendar } from "../components/vendor/AvailabilityCalendar";
@@ -28,6 +29,7 @@ export default function VendorDashboard() {
   const { data: portfolioImages = [] } = usePortfolio(user?.id);
   const { blockedDates = [], availability = [] } = useBlockedDates(user?.id);
   const { data: unreadCount = 0 } = useUnreadCount(user?.id, 'vendor');
+  const { locations } = useVendorLocations(user?.id);
 
   const [activeSection, setActiveSection] = useState('overview');
 
@@ -196,6 +198,22 @@ export default function VendorDashboard() {
         {/* Main content */}
         <main className="flex-1 p-6">
           <div className="max-w-5xl mx-auto">
+            {locations.length === 0 && (
+              <div className="bg-[#C5A059]/10 border border-[#C5A059]/30 rounded-xl p-4 flex items-center justify-between mb-6">
+                <div>
+                  <p className="font-medium text-[#1A1A1A]">Add your business address</p>
+                  <p className="text-sm text-[#888888]">
+                    Update your profile with a physical address so clients can find you by location.
+                  </p>
+                </div>
+                <Button
+                  onClick={() => navigate('/vendor/profile/create')}
+                  className="bg-[#800020] text-white hover:bg-[#600018] shrink-0"
+                >
+                  Update Profile
+                </Button>
+              </div>
+            )}
             {renderSection()}
           </div>
         </main>
