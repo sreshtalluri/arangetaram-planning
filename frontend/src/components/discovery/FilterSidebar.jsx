@@ -73,22 +73,66 @@ export function FilterSidebar({ filters, setFilter, setLocationFilter, clearLoca
 
       {/* Location Filter */}
       <FilterSection title="Location">
-        <Select
-          value={filters.location || 'all'}
-          onValueChange={(value) => setFilter('location', value === 'all' ? '' : value)}
-        >
-          <SelectTrigger className="w-full input-styled">
-            <SelectValue placeholder="All Locations" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Locations</SelectItem>
-            {METRO_AREAS.map((area) => (
-              <SelectItem key={area.value} value={area.value}>
-                {area.label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <div className="space-y-3">
+          {filters.locationLat ? (
+            <div className="flex items-center gap-2 bg-[#F9F8F4] rounded-lg px-3 py-2">
+              <MapPin className="w-3.5 h-3.5 text-[#0F4C5C] shrink-0" />
+              <span className="text-sm text-[#1A1A1A] truncate flex-1">
+                {filters.location}
+              </span>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={clearLocationFilter}
+                className="h-6 w-6 p-0 shrink-0"
+              >
+                <X className="w-3 h-3" />
+              </Button>
+            </div>
+          ) : (
+            <form onSubmit={async (e) => {
+              e.preventDefault()
+              const input = e.target.elements.locationSearch.value.trim()
+              if (!input) return
+              try {
+                const res = await fetch(
+                  `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(input)}.json?access_token=${process.env.REACT_APP_MAPBOX_TOKEN}&types=place,postcode,address&country=US&limit=1`
+                )
+                const data = await res.json()
+                if (data.features?.length > 0) {
+                  const feature = data.features[0]
+                  const [lng, lat] = feature.center
+                  setLocationFilter(feature.place_name || input, lat, lng)
+                }
+              } catch (err) {
+                console.error('Geocoding error:', err)
+              }
+            }}>
+              <input
+                name="locationSearch"
+                type="text"
+                placeholder="Search city or zip code..."
+                className="w-full input-styled px-3 py-2 text-sm rounded-md border"
+              />
+            </form>
+          )}
+          {filters.locationLat && (
+            <div className="space-y-1">
+              <div className="flex justify-between text-xs text-[#888888]">
+                <span>Radius</span>
+                <span>{filters.radius} miles</span>
+              </div>
+              <Slider
+                value={[parseInt(filters.radius) || 25]}
+                onValueChange={([value]) => setFilter('radius', value.toString())}
+                min={5}
+                max={100}
+                step={5}
+                className="w-full"
+              />
+            </div>
+          )}
+        </div>
       </FilterSection>
 
       {/* Price Range Filter */}
@@ -155,7 +199,7 @@ export function FilterSidebar({ filters, setFilter, setLocationFilter, clearLoca
 }
 
 // Mobile version of filters displayed in a Sheet
-export function MobileFilters({ filters, setFilter, clearFilters, hasActiveFilters }) {
+export function MobileFilters({ filters, setFilter, setLocationFilter, clearLocationFilter, clearFilters, hasActiveFilters }) {
   const selectedDate = filters.availableDate ? new Date(filters.availableDate + 'T00:00:00') : undefined
 
   return (
@@ -197,22 +241,66 @@ export function MobileFilters({ filters, setFilter, clearFilters, hasActiveFilte
 
       {/* Location Filter */}
       <FilterSection title="Location">
-        <Select
-          value={filters.location || 'all'}
-          onValueChange={(value) => setFilter('location', value === 'all' ? '' : value)}
-        >
-          <SelectTrigger className="w-full input-styled">
-            <SelectValue placeholder="All Locations" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Locations</SelectItem>
-            {METRO_AREAS.map((area) => (
-              <SelectItem key={area.value} value={area.value}>
-                {area.label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <div className="space-y-3">
+          {filters.locationLat ? (
+            <div className="flex items-center gap-2 bg-[#F9F8F4] rounded-lg px-3 py-2">
+              <MapPin className="w-3.5 h-3.5 text-[#0F4C5C] shrink-0" />
+              <span className="text-sm text-[#1A1A1A] truncate flex-1">
+                {filters.location}
+              </span>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={clearLocationFilter}
+                className="h-6 w-6 p-0 shrink-0"
+              >
+                <X className="w-3 h-3" />
+              </Button>
+            </div>
+          ) : (
+            <form onSubmit={async (e) => {
+              e.preventDefault()
+              const input = e.target.elements.locationSearch.value.trim()
+              if (!input) return
+              try {
+                const res = await fetch(
+                  `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(input)}.json?access_token=${process.env.REACT_APP_MAPBOX_TOKEN}&types=place,postcode,address&country=US&limit=1`
+                )
+                const data = await res.json()
+                if (data.features?.length > 0) {
+                  const feature = data.features[0]
+                  const [lng, lat] = feature.center
+                  setLocationFilter(feature.place_name || input, lat, lng)
+                }
+              } catch (err) {
+                console.error('Geocoding error:', err)
+              }
+            }}>
+              <input
+                name="locationSearch"
+                type="text"
+                placeholder="Search city or zip code..."
+                className="w-full input-styled px-3 py-2 text-sm rounded-md border"
+              />
+            </form>
+          )}
+          {filters.locationLat && (
+            <div className="space-y-1">
+              <div className="flex justify-between text-xs text-[#888888]">
+                <span>Radius</span>
+                <span>{filters.radius} miles</span>
+              </div>
+              <Slider
+                value={[parseInt(filters.radius) || 25]}
+                onValueChange={([value]) => setFilter('radius', value.toString())}
+                min={5}
+                max={100}
+                step={5}
+                className="w-full"
+              />
+            </div>
+          )}
+        </div>
       </FilterSection>
 
       {/* Price Range Filter */}
