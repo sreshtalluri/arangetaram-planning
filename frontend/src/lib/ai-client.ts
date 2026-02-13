@@ -27,6 +27,7 @@ export async function fetchSSE(
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
+      'apikey': anonKey,
       'Authorization': `Bearer ${session?.access_token || anonKey}`,
     },
     body: JSON.stringify(body),
@@ -73,6 +74,7 @@ export async function fetchRecommendations(eventId: string) {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
+      'apikey': anonKey,
       'Authorization': `Bearer ${session?.access_token || anonKey}`,
     },
     body: JSON.stringify({ eventId }),
