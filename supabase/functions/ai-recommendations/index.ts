@@ -20,6 +20,7 @@ interface VendorProfile {
   price_min?: number;
   price_max?: number;
   profile_photo_url?: string;
+  portfolio_images?: string[];
 }
 
 interface RecommendationRequest {
@@ -185,6 +186,38 @@ Deno.serve(async (req) => {
         );
       } else {
         candidatesByCategory[category] = vendorProfiles;
+      }
+    }
+
+    // Fetch portfolio images for all candidates
+    const allCandidateIds = Object.values(candidatesByCategory)
+      .flat()
+      .map(v => v.id);
+
+    if (allCandidateIds.length > 0) {
+      const { data: portfolioRows } = await supabase
+        .from('portfolio_images')
+        .select('vendor_id, storage_path')
+        .in('vendor_id', allCandidateIds)
+        .order('order_index', { ascending: true });
+
+      // Group portfolio images by vendor and resolve public URLs
+      const portfolioByVendor: { [vendorId: string]: string[] } = {};
+      for (const row of portfolioRows || []) {
+        if (!portfolioByVendor[row.vendor_id]) {
+          portfolioByVendor[row.vendor_id] = [];
+        }
+        const { data } = supabase.storage
+          .from('portfolio-images')
+          .getPublicUrl(row.storage_path);
+        portfolioByVendor[row.vendor_id].push(data.publicUrl);
+      }
+
+      // Attach portfolio images to candidates
+      for (const vendors of Object.values(candidatesByCategory)) {
+        for (const vendor of vendors) {
+          vendor.portfolio_images = portfolioByVendor[vendor.id] || [];
+        }
       }
     }
 
