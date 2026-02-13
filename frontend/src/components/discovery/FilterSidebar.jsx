@@ -166,7 +166,7 @@ export function FilterSidebar({ filters, setFilter, setLocationFilter, clearLoca
                   !selectedDate && 'text-muted-foreground'
                 )}
               >
-                <CalendarIcon className="mr-2 h-4 w-4" />
+                <CalendarIcon className="mr-2 h-4 w-4 text-[#C5A059]" />
                 {selectedDate ? format(selectedDate, 'MMM d, yyyy') : 'Select date'}
               </Button>
             </PopoverTrigger>
@@ -187,7 +187,7 @@ export function FilterSidebar({ filters, setFilter, setLocationFilter, clearLoca
               variant="ghost"
               size="icon"
               onClick={() => setFilter('availableDate', '')}
-              className="shrink-0"
+              className="shrink-0 hover:text-[#800020] transition-colors duration-200"
             >
               <X className="h-4 w-4" />
             </Button>
@@ -334,7 +334,7 @@ export function MobileFilters({ filters, setFilter, setLocationFilter, clearLoca
                   !selectedDate && 'text-muted-foreground'
                 )}
               >
-                <CalendarIcon className="mr-2 h-4 w-4" />
+                <CalendarIcon className="mr-2 h-4 w-4 text-[#C5A059]" />
                 {selectedDate ? format(selectedDate, 'MMM d, yyyy') : 'Select date'}
               </Button>
             </PopoverTrigger>
@@ -355,7 +355,7 @@ export function MobileFilters({ filters, setFilter, setLocationFilter, clearLoca
               variant="ghost"
               size="icon"
               onClick={() => setFilter('availableDate', '')}
-              className="shrink-0"
+              className="shrink-0 hover:text-[#800020] transition-colors duration-200"
             >
               <X className="h-4 w-4" />
             </Button>
