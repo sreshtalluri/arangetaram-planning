@@ -23,14 +23,18 @@ export interface PublicVendor {
   review_count: number
   portfolio_images: string[]
   services: string[]
+  distance_miles: number | null
 }
 
 interface UseVendorsParams {
   category?: string
   search?: string
   price_range?: string
-  location?: string      // Metro area code from service_areas
   availableDate?: string // yyyy-MM-dd format - exclude blocked vendors
+  // New location-based params
+  searchLat?: number
+  searchLng?: number
+  radiusMiles?: number     // default 25
 }
 
 // Map price_min to price range symbol
@@ -54,6 +58,39 @@ export function useVendors(params: UseVendorsParams = {}) {
   return useQuery({
     queryKey: ['vendors', params],
     queryFn: async (): Promise<PublicVendor[]> => {
+      // If coordinate-based search, use RPC function
+      if (params.searchLat && params.searchLng) {
+        const { data, error } = await supabase.rpc('search_vendors_by_location', {
+          search_lat: params.searchLat,
+          search_lng: params.searchLng,
+          radius_miles: params.radiusMiles || 25,
+          category_filter: params.category || null,
+          search_query: params.search || null,
+          price_range_filter: params.price_range || null,
+          available_date_filter: params.availableDate || null,
+        })
+        if (error) throw error
+        // RPC already returns sorted by distance, filtered, etc.
+        return (data || []).map((vendor: any) => ({
+          ...vendor,
+          service_areas: vendor.service_areas || [],
+          is_published: vendor.is_published ?? false,
+          price_range: getPriceRange(vendor.price_min),
+          price_estimate: getPriceEstimate(vendor.price_min, vendor.price_max),
+          location: vendor.nearest_city && vendor.nearest_state
+            ? `${vendor.nearest_city}, ${vendor.nearest_state}`
+            : 'Location not set',
+          distance_miles: vendor.distance_miles
+            ? Math.round(vendor.distance_miles * 10) / 10
+            : null,
+          rating: 0,
+          review_count: 0,
+          portfolio_images: [],
+          services: [],
+        }))
+      }
+
+      // Fallback: non-coordinate query
       let query = supabase
         .from('vendor_profiles')
         .select('*')
@@ -69,11 +106,6 @@ export function useVendors(params: UseVendorsParams = {}) {
         query = query.or(`business_name.ilike.%${params.search}%,description.ilike.%${params.search}%`)
       }
 
-      // Filter by location (service area)
-      if (params.location) {
-        query = query.contains('service_areas', [params.location])
-      }
-
       const { data, error } = await query.order('created_at', { ascending: false })
 
       if (error) throw error
@@ -85,7 +117,8 @@ export function useVendors(params: UseVendorsParams = {}) {
         is_published: vendor.is_published ?? false,
         price_range: getPriceRange(vendor.price_min),
         price_estimate: getPriceEstimate(vendor.price_min, vendor.price_max),
-        location: vendor.service_areas?.[0] || 'Bay Area',
+        location: vendor.service_areas?.[0] || 'Location not set',
+        distance_miles: null,
         rating: 0, // TODO: Implement reviews
         review_count: 0,
         portfolio_images: [], // TODO: Fetch from portfolio_images table
@@ -153,7 +186,8 @@ export function useVendorById(vendorId: string | undefined) {
         is_published: vendor.is_published ?? false,
         price_range: getPriceRange(vendor.price_min),
         price_estimate: getPriceEstimate(vendor.price_min, vendor.price_max),
-        location: vendor.service_areas?.[0] || 'Bay Area',
+        location: vendor.service_areas?.[0] || 'Location not set',
+        distance_miles: null,
         rating: 0,
         review_count: 0,
         portfolio_images: imageUrls,
