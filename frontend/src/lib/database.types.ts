@@ -164,6 +164,64 @@ export type Database = {
           },
         ]
       }
+      vendor_locations: {
+        Row: {
+          id: string
+          vendor_id: string
+          label: string | null
+          address_line1: string
+          address_line2: string | null
+          city: string
+          state: string
+          zip_code: string
+          formatted_address: string
+          latitude: number
+          longitude: number
+          is_primary: boolean | null
+          created_at: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          id?: string
+          vendor_id: string
+          label?: string | null
+          address_line1: string
+          address_line2?: string | null
+          city: string
+          state: string
+          zip_code: string
+          formatted_address: string
+          latitude: number
+          longitude: number
+          is_primary?: boolean | null
+          created_at?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          id?: string
+          vendor_id?: string
+          label?: string | null
+          address_line1?: string
+          address_line2?: string | null
+          city?: string
+          state?: string
+          zip_code?: string
+          formatted_address?: string
+          latitude?: number
+          longitude?: number
+          is_primary?: boolean | null
+          created_at?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vendor_locations_vendor_id_fkey"
+            columns: ["vendor_id"]
+            referencedRelation: "vendor_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       inquiries: {
         Row: {
           id: string
