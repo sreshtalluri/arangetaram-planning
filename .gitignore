@@ -89,6 +89,9 @@ TODO.md
 # Claude Code local files
 .claude/
 
+# Git worktrees
+.worktrees/
+
 # Environment files
 .env
 .env.local
