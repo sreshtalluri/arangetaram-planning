@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import { useEvents } from "../hooks/useEvents";
@@ -8,7 +9,7 @@ import { MyInquiriesList } from "../components/dashboard/MyInquiriesList";
 import { RecommendationsSection } from "../components/ai/RecommendationsSection";
 import { Button } from "../components/ui/button";
 import {
-  Calendar, Plus, Loader2, MessageSquare
+  Calendar, Plus, Loader2, MessageSquare, ChevronDown, Sparkles
 } from "lucide-react";
 
 export default function UserDashboard() {
@@ -20,6 +21,15 @@ export default function UserDashboard() {
 
   // Combined loading state
   const isLoading = authLoading || eventsLoading;
+
+  const [expandedRecs, setExpandedRecs] = useState({});
+
+  const toggleRecs = (eventId) => {
+    setExpandedRecs((prev) => ({
+      ...prev,
+      [eventId]: !prev[eventId],
+    }));
+  };
 
   if (isLoading) {
     return (
@@ -81,29 +91,43 @@ export default function UserDashboard() {
               {events.length > 0 ? (
                 <div className="space-y-4">
                   {events.map((event) => (
-                    <EventCard
-                      key={event.id}
-                      event={event}
-                      onEdit={() =>
-                        navigate(`/events/create?edit=${event.id}`)
-                      }
-                      onBrowseVendors={() =>
-                        navigate(`/vendors?date=${event.event_date}`)
-                      }
-                    />
+                    <div key={event.id}>
+                      <EventCard
+                        event={event}
+                        onEdit={() =>
+                          navigate(`/events/create?edit=${event.id}`)
+                        }
+                        onBrowseVendors={() =>
+                          navigate(`/vendors?date=${event.event_date}`)
+                        }
+                      />
+                      {/* Collapsible recommendations */}
+                      <button
+                        onClick={() => toggleRecs(event.id)}
+                        className="mt-2 w-full flex items-center justify-center gap-2 py-2 text-sm text-[#0F4C5C] hover:bg-[#0F4C5C]/5 rounded-lg transition-colors"
+                      >
+                        <Sparkles className="w-4 h-4 text-[#C5A059]" />
+                        {expandedRecs[event.id]
+                          ? "Hide Recommendations"
+                          : "View Recommendations"}
+                        <ChevronDown
+                          className={`w-4 h-4 transition-transform ${
+                            expandedRecs[event.id] ? "rotate-180" : ""
+                          }`}
+                        />
+                      </button>
+                      {expandedRecs[event.id] && (
+                        <div className="mt-2">
+                          <RecommendationsSection event={event} />
+                        </div>
+                      )}
+                    </div>
                   ))}
                 </div>
               ) : (
                 <EmptyEventsState onCreateEvent={() => navigate("/events/create")} />
               )}
             </section>
-
-            {/* AI Recommendations Section */}
-            {events.length > 0 && (
-              <section className="mt-8">
-                <RecommendationsSection event={events[0]} />
-              </section>
-            )}
           </div>
 
           {/* Right Column - Saved Vendors + Inquiries */}
