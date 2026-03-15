@@ -104,6 +104,8 @@ export default function UserDashboard() {
                       {/* Collapsible recommendations */}
                       <button
                         onClick={() => toggleRecs(event.id)}
+                        aria-expanded={!!expandedRecs[event.id]}
+                        aria-controls={`recs-${event.id}`}
                         className="mt-2 w-full flex items-center justify-center gap-2 py-2 text-sm text-[#0F4C5C] hover:bg-[#0F4C5C]/5 rounded-lg transition-colors"
                       >
                         <Sparkles className="w-4 h-4 text-[#C5A059]" />
@@ -116,11 +118,9 @@ export default function UserDashboard() {
                           }`}
                         />
                       </button>
-                      {expandedRecs[event.id] && (
-                        <div className="mt-2">
-                          <RecommendationsSection event={event} />
-                        </div>
-                      )}
+                      <div className={`mt-2 ${expandedRecs[event.id] ? '' : 'hidden'}`} id={`recs-${event.id}`}>
+                        <RecommendationsSection event={event} />
+                      </div>
                     </div>
                   ))}
                 </div>
