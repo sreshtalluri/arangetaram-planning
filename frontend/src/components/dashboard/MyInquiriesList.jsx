@@ -1,6 +1,6 @@
 import { useUserInquiries, useMarkInquiryRead } from '../../hooks/useInquiries'
 import { InquiryCard } from '../inquiry/InquiryCard'
-import { Loader2, Send } from 'lucide-react'
+import { Calendar, Loader2, Send } from 'lucide-react'
 import { useEffect } from 'react'
 
 /**
@@ -44,14 +44,41 @@ export function MyInquiriesList({ userId }) {
     )
   }
 
+  // Group inquiries by event
+  const grouped = {}
+  for (const inquiry of inquiries) {
+    const eventName = inquiry.event?.event_name || 'Unknown Event'
+    const eventId = inquiry.event?.id || 'unknown'
+    if (!grouped[eventId]) {
+      grouped[eventId] = { name: eventName, items: [] }
+    }
+    grouped[eventId].items.push(inquiry)
+  }
+
+  const groups = Object.entries(grouped)
+
   return (
-    <div className="space-y-4">
-      {inquiries.map((inquiry) => (
-        <InquiryCard
-          key={inquiry.id}
-          inquiry={inquiry}
-          view="user"
-        />
+    <div className="space-y-5">
+      {groups.map(([eventId, group]) => (
+        <div key={eventId}>
+          {groups.length > 1 && (
+            <div className="flex items-center gap-2 mb-2">
+              <Calendar className="w-3.5 h-3.5 text-[#888888]" />
+              <span className="text-xs font-medium text-[#888888] uppercase tracking-wide">
+                {group.name} ({group.items.length})
+              </span>
+            </div>
+          )}
+          <div className="space-y-3">
+            {group.items.map((inquiry) => (
+              <InquiryCard
+                key={inquiry.id}
+                inquiry={inquiry}
+                view="user"
+              />
+            ))}
+          </div>
+        </div>
       ))}
     </div>
   )
