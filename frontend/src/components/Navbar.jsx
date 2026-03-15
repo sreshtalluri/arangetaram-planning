@@ -1,5 +1,6 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
+import { useEvents } from "../hooks/useEvents";
 import { Button } from "./ui/button";
 import {
   DropdownMenu,
@@ -12,6 +13,7 @@ import { User, LogOut, LayoutDashboard, Store } from "lucide-react";
 
 export const Navbar = () => {
   const { user, profile, isVendor, isAuthenticated, signOut, loading } = useAuth();
+  const { data: events = [] } = useEvents(user?.id);
   const navigate = useNavigate();
 
   const handleLogout = async () => {
@@ -41,12 +43,21 @@ export const Navbar = () => {
             >
               Browse Vendors
             </Link>
-            <Link
-              to="/events/create"
-              className="text-[#4A4A4A] hover:text-[#800020] font-medium transition-colors"
-            >
-              Plan Event
-            </Link>
+            {isAuthenticated && events.length > 0 ? (
+              <Link
+                to="/dashboard"
+                className="text-[#4A4A4A] hover:text-[#800020] font-medium transition-colors"
+              >
+                My Events
+              </Link>
+            ) : (
+              <Link
+                to="/events/create"
+                className="text-[#4A4A4A] hover:text-[#800020] font-medium transition-colors"
+              >
+                Plan Event
+              </Link>
+            )}
           </div>
 
           {/* Auth Section */}
