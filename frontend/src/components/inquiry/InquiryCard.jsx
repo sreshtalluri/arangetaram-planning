@@ -184,8 +184,8 @@ export function InquiryCard({ inquiry, view, onRespond }) {
         </div>
       )}
 
-      {/* Vendor Budget Item (accepted inquiries only) */}
-      {inquiry.status === 'accepted' && (
+      {/* Vendor Budget Item (accepted inquiries, vendor view only) */}
+      {view === 'vendor' && inquiry.status === 'accepted' && (
         <VendorBudgetSection inquiry={inquiry} />
       )}
 

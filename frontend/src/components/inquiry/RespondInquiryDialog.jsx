@@ -34,7 +34,7 @@ export function RespondInquiryDialog({ inquiry, open, onOpenChange }) {
         inquiryId: inquiry.id,
         status: action,
         responseMessage: responseMessage || undefined,
-        quotedPrice: action === 'accepted' && quotedPrice ? parseFloat(quotedPrice) : undefined,
+        quotedPrice: action === 'accepted' && quotedPrice ? parseInt(quotedPrice, 10) : undefined,
         quotedPriceNotes: action === 'accepted' && quotedPriceNotes.trim() ? quotedPriceNotes.trim() : undefined,
       })
       toast.success(`Inquiry ${action}!`)
@@ -91,8 +91,8 @@ export function RespondInquiryDialog({ inquiry, open, onOpenChange }) {
                 <Input
                   type="number"
                   min="0"
-                  step="0.01"
-                  placeholder="0.00"
+                  step="1"
+                  placeholder="0"
                   value={quotedPrice}
                   onChange={(e) => setQuotedPrice(e.target.value)}
                   className="pl-7"

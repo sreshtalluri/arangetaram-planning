@@ -71,7 +71,7 @@ export function AddBudgetItemDialog({
     e.preventDefault();
     if (!form.category || !form.label.trim()) return;
 
-    const parsedPrice = parseFloat(form.price);
+    const parsedPrice = parseInt(form.price, 10);
 
     onSubmit({
       category: form.category,
@@ -139,8 +139,8 @@ export function AddBudgetItemDialog({
                 id="add-item-price"
                 type="number"
                 min="0"
-                step="0.01"
-                placeholder="0.00"
+                step="1"
+                placeholder="0"
                 value={form.price}
                 onChange={(e) => setForm((f) => ({ ...f, price: e.target.value }))}
                 className="pl-7"

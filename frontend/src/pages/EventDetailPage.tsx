@@ -83,7 +83,7 @@ export default function EventDetailPage() {
       label: item.label,
       agreed_price: item.agreed_price,
       price_notes: item.price_notes,
-      status: 'estimated',
+      status: item.agreed_price ? 'agreed' : 'estimated',
     })
   }
 

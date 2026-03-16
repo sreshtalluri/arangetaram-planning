@@ -156,17 +156,17 @@ export function BudgetBreakdownTable({
   onDeleteItem,
   onAddItem,
 }: BudgetBreakdownTableProps) {
-  // Active (non-cancelled) budget items by category
-  const activeByCategory = new Map<string, BudgetItem>();
+  // Active (non-cancelled) budget item categories
+  const bookedCategories = new Set<string>();
   for (const item of budgetItems) {
     if (item.status !== 'cancelled') {
-      activeByCategory.set(item.category, item);
+      bookedCategories.add(item.category);
     }
   }
 
   // Unbooked: categories needed but without an active budget item
   const unbookedCategories = categoriesNeeded.filter(
-    (cat) => !activeByCategory.has(cat)
+    (cat) => !bookedCategories.has(cat)
   );
 
   // All booked items (including cancelled) to display
@@ -174,9 +174,13 @@ export function BudgetBreakdownTable({
 
   const handlePriceSave = (item: BudgetItem, val: string) => {
     const parsed = parseFloat(val);
-    onUpdateItem(item.id, {
+    const updates: BudgetItemUpdate = {
       agreed_price: isNaN(parsed) ? null : parsed,
-    });
+    };
+    if (item.status === 'estimated' && !isNaN(parsed)) {
+      updates.status = 'agreed';
+    }
+    onUpdateItem(item.id, updates);
   };
 
   const handleNotesSave = (item: BudgetItem, val: string) => {
