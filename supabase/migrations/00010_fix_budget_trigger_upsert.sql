@@ -1,4 +1,6 @@
--- Replace the inquiry acceptance trigger to also create budget items
+-- Fix: update trigger to upsert budget items on re-accept (prevents duplicates)
+-- and guard categories_covered update behind vendor profile existence check.
+-- Uses CREATE OR REPLACE to update the function defined in 00009.
 CREATE OR REPLACE FUNCTION public.handle_inquiry_accepted()
 RETURNS TRIGGER AS $$
 BEGIN
