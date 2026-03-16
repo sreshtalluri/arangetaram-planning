@@ -67,9 +67,13 @@ export async function fetchSSE(
 
 /**
  * Fetch recommendations (non-streaming)
- * Uses supabase.functions.invoke() which handles JWT auth automatically.
+ * Forces a session refresh before calling the edge function to ensure a valid JWT.
  */
 export async function fetchRecommendations(eventId: string) {
+  // Force session refresh — supabase.functions.invoke() doesn't always
+  // pick up the refreshed token from auto-refresh on database queries
+  await supabase.auth.refreshSession()
+
   const { data, error } = await supabase.functions.invoke('ai-recommendations', {
     body: { eventId },
   })

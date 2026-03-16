@@ -35,7 +35,7 @@ export function useRecommendations({ eventId, enabled = true }: UseRecommendatio
     },
     enabled: !!eventId && enabled,
     staleTime: 5 * 60 * 1000, // Cache for 5 minutes
-    retry: 1, // Auto-retry once on failure (per CONTEXT.md)
+    retry: false, // Don't retry — 401s won't fix with retries, and Groq errors should show error UI immediately
   })
 
   // Refresh recommendations (invalidate cache)
