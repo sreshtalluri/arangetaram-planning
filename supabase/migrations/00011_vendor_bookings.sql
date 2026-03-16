@@ -1,4 +1,4 @@
--- Migration: 00009_vendor_bookings
+-- Migration: 00011_vendor_bookings
 -- Create vendor_bookings table for tracking vendor booking dates
 -- Part of Vendor Availability feature
 

@@ -1,4 +1,4 @@
--- Migration: 00010_booking_cancellation_cascade
+-- Migration: 00012_booking_cancellation_cascade
 -- Cancel vendor bookings when linked inquiry status changes from 'accepted'
 -- Part of Vendor Availability feature
 

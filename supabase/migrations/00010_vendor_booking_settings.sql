@@ -1,4 +1,4 @@
--- Migration: 00008_vendor_booking_settings
+-- Migration: 00010_vendor_booking_settings
 -- Create vendor_booking_settings table for per-vendor booking configuration
 -- Part of Vendor Availability feature
 
