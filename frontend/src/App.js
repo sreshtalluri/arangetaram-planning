@@ -1,5 +1,5 @@
 import "@/App.css";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { Toaster } from "./components/ui/sonner";
 import { ChatWidget } from "./components/ai/ChatWidget";
@@ -17,7 +17,7 @@ import UserDashboard from "./pages/UserDashboard";
 import VendorDashboard from "./pages/VendorDashboard";
 import ProfileWizardPage from "./pages/vendor/ProfileWizardPage";
 import CreateEventPage from "./pages/CreateEventPage";
-import EventDetailPage from "./pages/EventDetailPage";
+import BudgetPage from "./pages/BudgetPage";
 
 function App() {
   return (
@@ -41,14 +41,8 @@ function App() {
               </ProtectedRoute>
             }
           />
-          <Route
-            path="/events/:id"
-            element={
-              <ProtectedRoute>
-                <EventDetailPage />
-              </ProtectedRoute>
-            }
-          />
+          <Route path="/events/:id" element={<Navigate to="/budget" replace />} />
+          <Route path="/budget" element={<BudgetPage />} />
           <Route
             path="/dashboard"
             element={
