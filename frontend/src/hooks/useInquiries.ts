@@ -175,10 +175,14 @@ export function useRespondToInquiry() {
       inquiryId,
       status,
       responseMessage,
+      quotedPrice,
+      quotedPriceNotes,
     }: {
       inquiryId: string
       status: 'accepted' | 'declined'
       responseMessage?: string | null
+      quotedPrice?: number
+      quotedPriceNotes?: string
     }) => {
       const { data, error } = await (supabase
         .from('inquiries' as any) as any)
@@ -186,6 +190,8 @@ export function useRespondToInquiry() {
           status,
           response_message: responseMessage || null,
           responded_at: new Date().toISOString(),
+          quoted_price: quotedPrice ?? null,
+          quoted_price_notes: quotedPriceNotes ?? null,
         })
         .eq('id', inquiryId)
         .select()
@@ -199,6 +205,7 @@ export function useRespondToInquiry() {
       queryClient.invalidateQueries({ queryKey: ['inquiries', 'vendor', data.vendor_id] })
       queryClient.invalidateQueries({ queryKey: ['inquiry-stats', data.vendor_id] })
       queryClient.invalidateQueries({ queryKey: ['unread-count'] })
+      queryClient.invalidateQueries({ queryKey: ['budget-items'] })
       // When accepted, the event's categories_covered is updated by DB trigger
       // Invalidate events so user's dashboard reflects the change
       if (data.status === 'accepted') {
