@@ -121,7 +121,7 @@ export function useVendors(params: UseVendorsParams = {}) {
           .from('vendor_booking_settings' as any) as any)
           .select('vendor_id, booking_type, max_per_day, buffer_days_before, buffer_days_after')
 
-        const settingsMap = new Map(
+        const settingsMap = new Map<string, any>(
           (allSettings || []).map((s: any) => [s.vendor_id, s])
         )
 
