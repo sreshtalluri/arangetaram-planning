@@ -26,6 +26,9 @@ export function MyInquiriesList({ userId }) {
   const groups = useMemo(() => {
     const grouped = {}
     for (const inquiry of inquiries) {
+      if (!inquiry.event) {
+        console.warn('Inquiry missing event data:', inquiry.id);
+      }
       const eventName = inquiry.event?.event_name || 'Unknown Event'
       const eventId = inquiry.event?.id || 'unknown'
       if (!grouped[eventId]) {

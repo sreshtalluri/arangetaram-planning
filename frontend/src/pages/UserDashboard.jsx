@@ -42,7 +42,8 @@ export default function UserDashboard() {
       await deleteEvent.mutateAsync({ eventId: event.id, userId: user.id });
       toast.success("Event deleted");
     } catch (error) {
-      toast.error("Failed to delete event");
+      console.error('Failed to delete event:', event.id, error);
+      toast.error(error?.message || "Failed to delete event");
     }
   };
 
@@ -134,9 +135,11 @@ export default function UserDashboard() {
                           }`}
                         />
                       </button>
-                      <div className={`mt-2 ${expandedRecs[event.id] ? '' : 'hidden'}`} id={`recs-${event.id}`}>
-                        <RecommendationsSection event={event} />
-                      </div>
+                      {expandedRecs[event.id] && (
+                        <div className="mt-2" id={`recs-${event.id}`}>
+                          <RecommendationsSection event={event} />
+                        </div>
+                      )}
                     </div>
                   ))}
                 </div>

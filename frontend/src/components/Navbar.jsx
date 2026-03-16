@@ -13,7 +13,7 @@ import { User, LogOut, LayoutDashboard, Store } from "lucide-react";
 
 export const Navbar = () => {
   const { user, profile, isVendor, isAuthenticated, signOut, loading } = useAuth();
-  const { data: events = [], isLoading: eventsLoading } = useEvents(user?.id);
+  const { data: events = [], isLoading: eventsLoading, isError } = useEvents(user?.id);
   const navigate = useNavigate();
 
   const handleLogout = async () => {
@@ -44,7 +44,7 @@ export const Navbar = () => {
               Browse Vendors
             </Link>
             {(!isAuthenticated || !eventsLoading) && (
-              isAuthenticated && events.length > 0 ? (
+              isAuthenticated && (events.length > 0 || isError) ? (
                 <Link
                   to="/dashboard"
                   className="text-[#4A4A4A] hover:text-[#800020] font-medium transition-colors"

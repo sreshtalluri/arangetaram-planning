@@ -45,7 +45,11 @@ export function EventWizard() {
   // Clear stale drafts when starting a fresh create (no edit param)
   useEffect(() => {
     if (!editEventId) {
-      localStorage.removeItem(STORAGE_KEY)
+      try {
+        localStorage.removeItem(STORAGE_KEY)
+      } catch (e) {
+        // localStorage can throw in restricted browser contexts (e.g. Safari private browsing)
+      }
     }
   }, [editEventId])
 
