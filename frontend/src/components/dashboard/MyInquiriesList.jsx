@@ -1,7 +1,7 @@
 import { useUserInquiries, useMarkInquiryRead } from '../../hooks/useInquiries'
 import { InquiryCard } from '../inquiry/InquiryCard'
 import { Calendar, Loader2, Send } from 'lucide-react'
-import { useEffect } from 'react'
+import { useEffect, useMemo } from 'react'
 
 /**
  * MyInquiriesList displays all inquiries sent by a user
@@ -45,17 +45,20 @@ export function MyInquiriesList({ userId }) {
   }
 
   // Group inquiries by event
-  const grouped = {}
-  for (const inquiry of inquiries) {
-    const eventName = inquiry.event?.event_name || 'Unknown Event'
-    const eventId = inquiry.event?.id || 'unknown'
-    if (!grouped[eventId]) {
-      grouped[eventId] = { name: eventName, items: [] }
+  const groups = useMemo(() => {
+    const grouped = {}
+    for (const inquiry of inquiries) {
+      const eventName = inquiry.event?.event_name || 'Unknown Event'
+      const eventId = inquiry.event?.id || 'unknown'
+      if (!grouped[eventId]) {
+        grouped[eventId] = { name: eventName, items: [] }
+      }
+      grouped[eventId].items.push(inquiry)
     }
-    grouped[eventId].items.push(inquiry)
-  }
-
-  const groups = Object.entries(grouped)
+    return Object.entries(grouped).sort(
+      ([, a], [, b]) => a.name.localeCompare(b.name)
+    )
+  }, [inquiries])
 
   return (
     <div className="space-y-5">
