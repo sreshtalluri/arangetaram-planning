@@ -12,6 +12,7 @@ import { Textarea } from '../ui/textarea'
 import { useRespondToInquiry } from '../../hooks/useInquiries'
 import { toast } from 'sonner'
 import { Loader2, Check, X } from 'lucide-react'
+import { BookingConfirmationDialog } from './BookingConfirmationDialog'
 
 /**
  * RespondInquiryDialog allows vendors to accept or decline inquiries
@@ -23,6 +24,7 @@ import { Loader2, Check, X } from 'lucide-react'
  */
 export function RespondInquiryDialog({ inquiry, open, onOpenChange }) {
   const [responseMessage, setResponseMessage] = useState('')
+  const [showBookingDialog, setShowBookingDialog] = useState(false)
   const respondToInquiry = useRespondToInquiry()
 
   const handleRespond = async (status) => {
@@ -32,16 +34,51 @@ export function RespondInquiryDialog({ inquiry, open, onOpenChange }) {
         status,
         responseMessage: responseMessage || undefined,
       })
-      toast.success(`Inquiry ${status}!`)
-      onOpenChange(false)
-      setResponseMessage('')
+      if (status === 'accepted') {
+        toast.success('Inquiry accepted!')
+        setShowBookingDialog(true)
+      } else {
+        toast.success(`Inquiry ${status}!`)
+        onOpenChange(false)
+        setResponseMessage('')
+      }
     } catch (error) {
       toast.error(error.message || 'Failed to respond')
     }
   }
 
+  const handleBookingClose = () => {
+    setShowBookingDialog(false)
+    setResponseMessage('')
+    onOpenChange(false)
+  }
+
+  const handleBookingConfirm = () => {
+    setShowBookingDialog(false)
+    setResponseMessage('')
+    onOpenChange(false)
+  }
+
   const userName =
     inquiry?.user_profile?.full_name || inquiry?.user_profile?.email || 'User'
+
+  if (showBookingDialog) {
+    return (
+      <BookingConfirmationDialog
+        open={true}
+        onOpenChange={(isOpen) => {
+          if (!isOpen) handleBookingClose()
+        }}
+        vendorId={inquiry?.vendor_id || inquiry?.vendor_profile?.id}
+        vendorCategory={inquiry?.vendor_profile?.category}
+        inquiryId={inquiry?.id}
+        eventId={inquiry?.event?.id || inquiry?.event_id}
+        eventName={inquiry?.event?.event_name}
+        eventDate={inquiry?.event?.event_date}
+        onConfirm={handleBookingConfirm}
+      />
+    )
+  }
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
