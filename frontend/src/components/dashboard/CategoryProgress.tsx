@@ -25,14 +25,26 @@ export function CategoryProgress({
   budgetItems,
   onAssignCategory,
 }: CategoryProgressProps) {
+  // A category is "effectively covered" if it's in categories_covered OR has a non-cancelled budget item
+  const budgetCoveredCategories = new Set(
+    (budgetItems ?? [])
+      .filter((item) => item.status !== 'cancelled')
+      .map((item) => item.category)
+  )
+  const effectivelyCovered = needed.filter(
+    (cat) => covered.includes(cat) || budgetCoveredCategories.has(cat)
+  )
+
   const total = needed.length
-  const coveredCount = covered.length
+  const coveredCount = effectivelyCovered.length
   const percentage = total > 0 ? Math.round((coveredCount / total) * 100) : 0
   const circumference = 2 * Math.PI * 45 // radius = 45
   const offset = circumference - (percentage / 100) * circumference
 
-  // Derive pending categories (needed but not covered)
-  const pending = needed.filter((cat) => !covered.includes(cat))
+  // Derive pending categories (needed but not effectively covered)
+  const pending = needed.filter(
+    (cat) => !covered.includes(cat) && !budgetCoveredCategories.has(cat)
+  )
 
   if (compact) {
     return (
@@ -82,19 +94,16 @@ export function CategoryProgress({
       {/* Category Breakdown */}
       <div className="flex-1 space-y-1.5">
         {needed.map((categoryValue) => {
-          const isCovered = covered.includes(categoryValue)
+          const isCovered = effectivelyCovered.includes(categoryValue)
           const category = getCategoryByValue(categoryValue)
           const label = category?.label || categoryValue
 
-          if (isCovered) {
-            // Find non-cancelled budget items for this category
-            const categoryItems = budgetItems
-              ? budgetItems.filter(
-                  (item) =>
-                    item.category === categoryValue && item.status !== 'cancelled'
-                )
-              : []
+          // Find non-cancelled budget items for this category
+          const categoryItems = (budgetItems ?? []).filter(
+            (item) => item.category === categoryValue && item.status !== 'cancelled'
+          )
 
+          if (isCovered) {
             if (categoryItems.length > 0) {
               // Covered with budget item(s): show vendor names
               const vendorNames = categoryItems
@@ -116,7 +125,7 @@ export function CategoryProgress({
               )
             }
 
-            // Covered without budget item: show assign prompt
+            // Covered (via categories_covered) but no budget item: show assign prompt
             return (
               <div
                 key={categoryValue}
