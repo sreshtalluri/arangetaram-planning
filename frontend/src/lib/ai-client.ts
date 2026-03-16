@@ -21,7 +21,9 @@ export async function fetchSSE(
   signal?: AbortSignal
 ): Promise<void> {
   const anonKey = process.env.REACT_APP_SUPABASE_ANON_KEY || ''
-  const token = await getFreshToken()
+  // Get fresh session — Supabase client auto-refreshes expired tokens
+  const { data: { session } } = await supabase.auth.getSession()
+  const token = session?.access_token || anonKey
 
   const response = await fetch(url, {
     method: 'POST',
@@ -64,51 +66,17 @@ export async function fetchSSE(
 }
 
 /**
- * Get a fresh access token, refreshing if needed.
- * Throws if user is not authenticated — edge functions require a valid JWT.
- */
-async function getFreshToken(): Promise<string> {
-  // Try getting current session first
-  const { data: { session } } = await supabase.auth.getSession()
-
-  if (session?.access_token) {
-    // Check if token expires within 60 seconds
-    const expiresAt = session.expires_at ? session.expires_at * 1000 : 0
-    if (expiresAt > Date.now() + 60_000) {
-      return session.access_token
-    }
-
-    // Token is stale — refresh it
-    const { data: refreshed } = await supabase.auth.refreshSession()
-    if (refreshed.session?.access_token) {
-      return refreshed.session.access_token
-    }
-  }
-
-  throw new Error('Not authenticated — please log in to use this feature')
-}
-
-/**
  * Fetch recommendations (non-streaming)
+ * Uses supabase.functions.invoke() which handles JWT auth automatically.
  */
 export async function fetchRecommendations(eventId: string) {
-  const anonKey = process.env.REACT_APP_SUPABASE_ANON_KEY || ''
-  const token = await getFreshToken()
-
-  const response = await fetch(AI_ENDPOINTS.recommendations, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'apikey': anonKey,
-      'Authorization': `Bearer ${token}`,
-    },
-    body: JSON.stringify({ eventId }),
+  const { data, error } = await supabase.functions.invoke('ai-recommendations', {
+    body: { eventId },
   })
 
-  if (!response.ok) {
-    const error = await response.json().catch(() => ({ error: 'Request failed' }))
-    throw new Error(error.error || `HTTP ${response.status}`)
+  if (error) {
+    throw new Error(error.message || 'Failed to fetch recommendations')
   }
 
-  return response.json()
+  return data
 }
