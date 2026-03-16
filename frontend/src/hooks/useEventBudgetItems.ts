@@ -20,6 +20,7 @@ export interface BudgetItem {
 export interface BudgetItemInsert {
   event_id: string;
   category: string;
+  vendor_id?: string;
   label?: string;
   agreed_price?: number;
   price_notes?: string;
