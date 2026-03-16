@@ -22,6 +22,22 @@ export function MyInquiriesList({ userId }) {
     })
   }, [inquiries])
 
+  // Group inquiries by event (must be before early returns for hooks rules)
+  const groups = useMemo(() => {
+    const grouped = {}
+    for (const inquiry of inquiries) {
+      const eventName = inquiry.event?.event_name || 'Unknown Event'
+      const eventId = inquiry.event?.id || 'unknown'
+      if (!grouped[eventId]) {
+        grouped[eventId] = { name: eventName, items: [] }
+      }
+      grouped[eventId].items.push(inquiry)
+    }
+    return Object.entries(grouped).sort(
+      ([, a], [, b]) => a.name.localeCompare(b.name)
+    )
+  }, [inquiries])
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-8">
@@ -43,22 +59,6 @@ export function MyInquiriesList({ userId }) {
       </div>
     )
   }
-
-  // Group inquiries by event
-  const groups = useMemo(() => {
-    const grouped = {}
-    for (const inquiry of inquiries) {
-      const eventName = inquiry.event?.event_name || 'Unknown Event'
-      const eventId = inquiry.event?.id || 'unknown'
-      if (!grouped[eventId]) {
-        grouped[eventId] = { name: eventName, items: [] }
-      }
-      grouped[eventId].items.push(inquiry)
-    }
-    return Object.entries(grouped).sort(
-      ([, a], [, b]) => a.name.localeCompare(b.name)
-    )
-  }, [inquiries])
 
   return (
     <div className="space-y-5">
