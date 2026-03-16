@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { format, parseISO } from 'date-fns'
-import { Calendar, MapPin, Users, DollarSign, Pencil, Search } from 'lucide-react'
+import { Calendar, MapPin, Users, DollarSign, Pencil, Search, Trash2 } from 'lucide-react'
 import { Button } from '../ui/button'
 import { CategoryProgress } from './CategoryProgress'
 import { AddBudgetItemDialog } from '../budget/AddBudgetItemDialog'
@@ -12,19 +12,19 @@ interface EventCardProps {
   event: Event
   onEdit?: () => void
   onBrowseVendors?: () => void
+  onDelete?: () => void
 }
 
 /**
  * Event summary card displaying event details and category progress
  * Used in UserDashboard to show user's events
  */
-export function EventCard({ event, onEdit, onBrowseVendors }: EventCardProps) {
+export function EventCard({ event, onEdit, onBrowseVendors, onDelete }: EventCardProps) {
   const { data: budgetItems = [] } = useEventBudgetItems(event.id)
   const addBudgetItem = useAddBudgetItem()
 
   const [assignDialogOpen, setAssignDialogOpen] = useState(false)
   const [assignCategory, setAssignCategory] = useState<string | undefined>()
-
   // Format date nicely (e.g., "March 15, 2026")
   const formattedDate = event.event_date
     ? format(parseISO(event.event_date), 'MMMM d, yyyy')
@@ -97,6 +97,17 @@ export function EventCard({ event, onEdit, onBrowseVendors }: EventCardProps) {
             <Search className="w-4 h-4 mr-1" />
             Browse Vendors
           </Button>
+          {onDelete && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={onDelete}
+              aria-label="Delete event"
+              className="text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200"
+            >
+              <Trash2 className="w-4 h-4" />
+            </Button>
+          )}
         </div>
       </div>
 
