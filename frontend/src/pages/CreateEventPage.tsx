@@ -1,4 +1,4 @@
-import { Navigate } from 'react-router-dom'
+import { Navigate, useSearchParams } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 import Navbar from '../components/Navbar'
 import { EventWizard } from '../components/event/EventWizard'
@@ -6,6 +6,8 @@ import { Loader2, Info } from 'lucide-react'
 
 export default function CreateEventPage() {
   const { user, isVendor, loading } = useAuth()
+  const [searchParams] = useSearchParams()
+  const isEditing = !!searchParams.get('edit')
 
   if (loading) {
     return (
@@ -42,10 +44,12 @@ export default function CreateEventPage() {
 
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-[#1A1A1A]" style={{ fontFamily: 'Playfair Display, serif' }}>
-            Plan Your Arangetram
+            {isEditing ? 'Update Your Arangetram' : 'Plan Your Arangetram'}
           </h1>
           <p className="text-[#4A4A4A]">
-            Tell us about your event and we'll help you find the perfect vendors
+            {isEditing
+              ? 'Update your event details'
+              : "Tell us about your event and we'll help you find the perfect vendors"}
           </p>
         </div>
 
