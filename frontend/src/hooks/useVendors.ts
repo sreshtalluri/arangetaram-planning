@@ -23,6 +23,8 @@ export interface PublicVendor {
   review_count: number
   portfolio_images: string[]
   services: string[]
+  availabilityStatus?: 'available' | 'buffer_conflict' | 'unavailable'
+  availabilityNote?: string
 }
 
 interface UseVendorsParams {
@@ -97,15 +99,68 @@ export function useVendors(params: UseVendorsParams = {}) {
         vendors = vendors.filter(v => v.price_range === params.price_range)
       }
 
-      // Filter by availability date - exclude vendors blocked on that date
+      // Check availability date - tag vendors with availability status
       if (params.availableDate) {
-        const { data: blockedVendors } = await supabase
+        // Fetch manual blocks
+        const { data: manualBlocks } = await supabase
           .from('vendor_availability')
           .select('vendor_id')
           .eq('blocked_date', params.availableDate)
 
-        const blockedIds = new Set(blockedVendors?.map(b => b.vendor_id) || [])
-        vendors = vendors.filter(v => !blockedIds.has(v.id))
+        const manualBlockedIds = new Set(manualBlocks?.map(b => b.vendor_id) || [])
+
+        // Fetch booking blocks - bookings where this date appears in blocked_dates
+        const { data: bookingBlocks } = await (supabase
+          .from('vendor_bookings' as any) as any)
+          .select('vendor_id, booked_date, blocked_dates')
+          .eq('status', 'confirmed')
+          .contains('blocked_dates', [params.availableDate])
+
+        // Fetch all booking settings for capacity check
+        const { data: allSettings } = await (supabase
+          .from('vendor_booking_settings' as any) as any)
+          .select('vendor_id, booking_type, max_per_day, buffer_days_before, buffer_days_after')
+
+        const settingsMap = new Map(
+          (allSettings || []).map((s: any) => [s.vendor_id, s])
+        )
+
+        // Group bookings by vendor
+        const bookingsByVendor = new Map<string, any[]>()
+        for (const block of bookingBlocks || []) {
+          const existing = bookingsByVendor.get(block.vendor_id) || []
+          existing.push(block)
+          bookingsByVendor.set(block.vendor_id, existing)
+        }
+
+        // Compute per-vendor availability status
+        vendors = vendors.map(v => {
+          if (manualBlockedIds.has(v.id)) {
+            return { ...v, availabilityStatus: 'unavailable' as const, availabilityNote: 'Unavailable on this date' }
+          }
+
+          const vendorBookings = bookingsByVendor.get(v.id) || []
+          if (vendorBookings.length === 0) {
+            return { ...v, availabilityStatus: 'available' as const, availabilityNote: undefined }
+          }
+
+          const settings = settingsMap.get(v.id)
+          const maxPerDay = settings?.max_per_day ?? 1
+
+          // Check if the date is a booked_date (event day) vs just a buffer day
+          const eventDayBookings = vendorBookings.filter((b: any) => b.booked_date === params.availableDate)
+          const bufferOnlyBookings = vendorBookings.filter((b: any) => b.booked_date !== params.availableDate)
+
+          if (eventDayBookings.length >= maxPerDay) {
+            return { ...v, availabilityStatus: 'unavailable' as const, availabilityNote: 'Booked on this date' }
+          }
+
+          if (bufferOnlyBookings.length > 0) {
+            return { ...v, availabilityStatus: 'buffer_conflict' as const, availabilityNote: 'Buffer day conflict' }
+          }
+
+          return { ...v, availabilityStatus: 'available' as const, availabilityNote: undefined }
+        })
       }
 
       return vendors
