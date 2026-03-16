@@ -314,9 +314,11 @@ Please rank and return the top 3 vendors per category with explanations.`;
     } = {};
 
     for (const [category, recommendations] of Object.entries(
-      aiRecommendations.categories
+      aiRecommendations.categories || {}
     )) {
-      const vendors = recommendations.vendors.map(rec => {
+      const recVendors = recommendations?.vendors
+      if (!Array.isArray(recVendors)) continue
+      const vendors = recVendors.map(rec => {
         const vendorData = candidatesByCategory[category]?.find(
           v => v.id === rec.id
         );
