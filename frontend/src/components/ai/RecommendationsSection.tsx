@@ -27,9 +27,12 @@ export function RecommendationsSection({ event }: RecommendationsSectionProps) {
 
   // Filter out dismissed vendors
   const filteredRecommendations = useMemo(() => {
+    if (!recommendations || typeof recommendations !== 'object') return {}
     const result: typeof recommendations = {}
     for (const [category, data] of Object.entries(recommendations)) {
-      const filteredVendors = data.vendors.filter(
+      const vendors = data?.vendors
+      if (!Array.isArray(vendors)) continue
+      const filteredVendors = vendors.filter(
         (v) => !dismissedIds.has(v.id)
       )
       if (filteredVendors.length > 0) {
