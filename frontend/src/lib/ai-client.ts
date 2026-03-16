@@ -64,11 +64,10 @@ export async function fetchSSE(
 }
 
 /**
- * Get a fresh access token, refreshing if needed
+ * Get a fresh access token, refreshing if needed.
+ * Throws if user is not authenticated — edge functions require a valid JWT.
  */
 async function getFreshToken(): Promise<string> {
-  const anonKey = process.env.REACT_APP_SUPABASE_ANON_KEY || ''
-
   // Try getting current session first
   const { data: { session } } = await supabase.auth.getSession()
 
@@ -86,7 +85,7 @@ async function getFreshToken(): Promise<string> {
     }
   }
 
-  return anonKey
+  throw new Error('Not authenticated — please log in to use this feature')
 }
 
 /**
