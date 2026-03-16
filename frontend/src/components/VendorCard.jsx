@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { Star, MapPin } from "lucide-react";
 import { Badge } from "./ui/badge";
+import { AvailabilityBadge } from "./vendor/AvailabilityBadge";
 
 const priceLabels = {
   "$": "Budget-Friendly",
@@ -53,6 +54,14 @@ export const VendorCard = ({ vendor }) => {
               </div>
             )}
           </div>
+
+          {vendor.availabilityStatus && (
+            <AvailabilityBadge
+              status={vendor.availabilityStatus}
+              note={vendor.availabilityNote}
+              className="mb-1"
+            />
+          )}
 
           <div className="flex items-center gap-1 text-[#888888] text-sm mb-2">
             <MapPin className="w-3 h-3" />
