@@ -1,10 +1,12 @@
-import { Link, useNavigate } from 'react-router-dom'
+import { useState } from 'react'
+import { Link } from 'react-router-dom'
 import { format, parseISO } from 'date-fns'
 import { Calendar, MapPin, Users, DollarSign, Pencil, Search } from 'lucide-react'
 import { Button } from '../ui/button'
 import { CategoryProgress } from './CategoryProgress'
+import { AddBudgetItemDialog } from '../budget/AddBudgetItemDialog'
 import type { Event } from '../../hooks/useEvents'
-import { useEventBudgetItems } from '../../hooks/useEventBudgetItems'
+import { useEventBudgetItems, useAddBudgetItem } from '../../hooks/useEventBudgetItems'
 
 interface EventCardProps {
   event: Event
@@ -15,11 +17,13 @@ interface EventCardProps {
 /**
  * Event summary card displaying event details and category progress
  * Used in UserDashboard to show user's events
- * Clicking the card navigates to the event detail page.
  */
 export function EventCard({ event, onEdit, onBrowseVendors }: EventCardProps) {
-  const navigate = useNavigate()
   const { data: budgetItems = [] } = useEventBudgetItems(event.id)
+  const addBudgetItem = useAddBudgetItem()
+
+  const [assignDialogOpen, setAssignDialogOpen] = useState(false)
+  const [assignCategory, setAssignCategory] = useState<string | undefined>()
 
   // Format date nicely (e.g., "March 15, 2026")
   const formattedDate = event.event_date
@@ -54,10 +58,7 @@ export function EventCard({ event, onEdit, onBrowseVendors }: EventCardProps) {
       : `/vendors?date=${event.event_date}`
 
   return (
-    <div
-      className="bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow p-6 cursor-pointer"
-      onClick={() => navigate(`/events/${event.id}`)}
-    >
+    <div className="bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow p-6">
       {/* Header: Event Name + Actions */}
       <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-4">
         <div>
@@ -74,7 +75,7 @@ export function EventCard({ event, onEdit, onBrowseVendors }: EventCardProps) {
         </div>
 
         {/* Quick Actions */}
-        <div className="flex gap-2" onClick={(e) => e.stopPropagation()}>
+        <div className="flex gap-2">
           <Button
             variant="outline"
             size="sm"
@@ -145,6 +146,11 @@ export function EventCard({ event, onEdit, onBrowseVendors }: EventCardProps) {
             needed={event.categories_needed}
             covered={event.categories_covered}
             eventDate={event.event_date}
+            budgetItems={budgetItems}
+            onAssignCategory={(cat) => {
+              setAssignCategory(cat)
+              setAssignDialogOpen(true)
+            }}
           />
         </div>
       ) : (
@@ -153,12 +159,24 @@ export function EventCard({ event, onEdit, onBrowseVendors }: EventCardProps) {
           <Link
             to={`/events/create?edit=${event.id}`}
             className="text-[#0F4C5C] hover:underline"
-            onClick={(e) => e.stopPropagation()}
           >
             Add categories
           </Link>
         </div>
       )}
+
+      <AddBudgetItemDialog
+        open={assignDialogOpen}
+        onOpenChange={setAssignDialogOpen}
+        categoriesNeeded={event.categories_needed}
+        defaultCategory={assignCategory}
+        onSubmit={(item) => {
+          addBudgetItem.mutate({
+            event_id: event.id,
+            ...item,
+          })
+        }}
+      />
     </div>
   )
 }
