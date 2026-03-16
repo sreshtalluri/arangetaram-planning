@@ -89,6 +89,9 @@ TODO.md
 # Claude Code local files
 .claude/
 
+# Brainstorming visual companion
+.superpowers/
+
 # Git worktrees
 .worktrees/
 

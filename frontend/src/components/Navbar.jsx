@@ -37,12 +37,20 @@ export const Navbar = () => {
 
           {/* Navigation Links */}
           <div className="hidden md:flex items-center gap-8">
-            <Link 
-              to="/vendors" 
+            <Link
+              to="/vendors"
               className="text-[#4A4A4A] hover:text-[#800020] font-medium transition-colors"
             >
               Browse Vendors
             </Link>
+            {isAuthenticated && (
+              <Link
+                to="/budget"
+                className="text-[#4A4A4A] hover:text-[#800020] font-medium transition-colors"
+              >
+                Budget
+              </Link>
+            )}
             {(!isAuthenticated || !eventsLoading) && (
               isAuthenticated && (events.length > 0 || isError) ? (
                 <Link

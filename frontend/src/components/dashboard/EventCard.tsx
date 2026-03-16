@@ -1,9 +1,12 @@
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { format, parseISO } from 'date-fns'
 import { Calendar, MapPin, Users, DollarSign, Pencil, Search, Trash2 } from 'lucide-react'
 import { Button } from '../ui/button'
 import { CategoryProgress } from './CategoryProgress'
+import { AddBudgetItemDialog } from '../budget/AddBudgetItemDialog'
 import type { Event } from '../../hooks/useEvents'
+import { useEventBudgetItems, useAddBudgetItem } from '../../hooks/useEventBudgetItems'
 
 interface EventCardProps {
   event: Event
@@ -17,6 +20,11 @@ interface EventCardProps {
  * Used in UserDashboard to show user's events
  */
 export function EventCard({ event, onEdit, onBrowseVendors, onDelete }: EventCardProps) {
+  const { data: budgetItems = [], isError: budgetError } = useEventBudgetItems(event.id)
+  const addBudgetItem = useAddBudgetItem()
+
+  const [assignDialogOpen, setAssignDialogOpen] = useState(false)
+  const [assignCategory, setAssignCategory] = useState<string | undefined>()
   // Format date nicely (e.g., "March 15, 2026")
   const formattedDate = event.event_date
     ? format(parseISO(event.event_date), 'MMMM d, yyyy')
@@ -27,9 +35,24 @@ export function EventCard({ event, onEdit, onBrowseVendors, onDelete }: EventCar
     ? `$${event.budget.toLocaleString()}`
     : null
 
+  // Committed = sum of agreed/paid items (consistent with BudgetPage)
+  const committedAmount = budgetItems
+    .filter((item) => item.status === 'agreed' || item.status === 'paid')
+    .reduce((sum, item) => sum + (item.agreed_price ?? 0), 0)
+
+  // Budget progress: show committed vs total when there are committed amounts
+  const budgetPercentage =
+    event.budget && committedAmount > 0
+      ? Math.min(100, (committedAmount / event.budget) * 100)
+      : 0
+
+  // Safely access categories arrays (may be null from DB)
+  const categoriesNeeded = event.categories_needed || []
+  const categoriesCovered = event.categories_covered || []
+
   // Calculate pending categories for browse link
-  const pendingCategories = event.categories_needed.filter(
-    (cat) => !event.categories_covered.includes(cat)
+  const pendingCategories = categoriesNeeded.filter(
+    (cat) => !categoriesCovered.includes(cat)
   )
 
   // Build browse URL with first pending category pre-selected
@@ -102,24 +125,47 @@ export function EventCard({ event, onEdit, onBrowseVendors, onDelete }: EventCar
             <span>{event.guest_count} guests</span>
           </div>
         )}
-        {formattedBudget && (
+        {formattedBudget && !budgetError && (
           <div className="flex items-center gap-1">
             <DollarSign className="w-4 h-4 text-[#888888]" />
-            <span>{formattedBudget}</span>
+            {committedAmount > 0 ? (
+              <div className="flex flex-col gap-0.5">
+                <span>
+                  <span className="font-medium text-blue-700">
+                    ${committedAmount.toLocaleString()}
+                  </span>
+                  {' / '}
+                  {formattedBudget}
+                </span>
+                <div className="w-24 h-1.5 bg-[#E5E5E5] rounded-full overflow-hidden">
+                  <div
+                    className="h-full rounded-full bg-blue-500 transition-all"
+                    style={{ width: `${budgetPercentage}%` }}
+                  />
+                </div>
+              </div>
+            ) : (
+              <span>{formattedBudget}</span>
+            )}
           </div>
         )}
       </div>
 
       {/* Category Progress Section */}
-      {event.categories_needed.length > 0 ? (
+      {categoriesNeeded.length > 0 ? (
         <div className="pt-4 border-t border-[#E5E5E5]">
           <h4 className="text-sm font-medium text-[#1A1A1A] mb-3">
             Category Coverage
           </h4>
           <CategoryProgress
-            needed={event.categories_needed}
-            covered={event.categories_covered}
+            needed={categoriesNeeded}
+            covered={categoriesCovered}
             eventDate={event.event_date}
+            budgetItems={budgetItems}
+            onAssignCategory={(cat) => {
+              setAssignCategory(cat)
+              setAssignDialogOpen(true)
+            }}
           />
         </div>
       ) : (
@@ -133,6 +179,20 @@ export function EventCard({ event, onEdit, onBrowseVendors, onDelete }: EventCar
           </Link>
         </div>
       )}
+
+      <AddBudgetItemDialog
+        open={assignDialogOpen}
+        onOpenChange={setAssignDialogOpen}
+        categoriesNeeded={categoriesNeeded}
+        defaultCategory={assignCategory}
+        onSubmit={(item) => {
+          addBudgetItem.mutate({
+            event_id: event.id,
+            ...item,
+            status: item.agreed_price !== undefined ? 'agreed' : 'estimated',
+          })
+        }}
+      />
     </div>
   )
 }

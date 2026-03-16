@@ -1,8 +1,106 @@
+import { useState, useRef } from 'react'
 import { format, formatDistanceToNow, parseISO } from 'date-fns'
 import { Calendar, MapPin, Users, DollarSign, MessageSquare } from 'lucide-react'
 import { InquiryBadge } from './InquiryBadge'
 import { ContactReveal } from './ContactReveal'
 import { Button } from '../ui/button'
+import { useEventBudgetItems, useUpdateBudgetItem } from '../../hooks/useEventBudgetItems'
+
+const STATUS_BADGE_STYLES = {
+  agreed: { backgroundColor: '#d1fae5', color: '#065f46' },
+  estimated: { backgroundColor: '#fef3c7', color: '#92400e' },
+  paid: { backgroundColor: '#dbeafe', color: '#1e40af' },
+}
+
+function VendorBudgetSection({ inquiry }) {
+  const eventId = inquiry.event_id ?? inquiry.event?.id
+  const { data: budgetItems } = useEventBudgetItems(eventId)
+  const updateBudgetItem = useUpdateBudgetItem()
+
+  const [editing, setEditing] = useState(false)
+  const [priceInput, setPriceInput] = useState('')
+  const savingRef = useRef(false)
+
+  const item = budgetItems?.find((b) => b.vendor_id === inquiry.vendor_id)
+
+  if (!item) return null
+
+  const displayPrice =
+    item.agreed_price != null ? `$${item.agreed_price.toLocaleString()}` : 'Not set'
+
+  const badgeStyle = STATUS_BADGE_STYLES[item.status] ?? STATUS_BADGE_STYLES.estimated
+
+  function startEdit() {
+    savingRef.current = false
+    setPriceInput(item.agreed_price != null ? String(item.agreed_price) : '')
+    setEditing(true)
+  }
+
+  function saveEdit() {
+    if (savingRef.current) return
+    savingRef.current = true
+    const parsed = priceInput === '' ? null : parseInt(priceInput, 10)
+    if (priceInput !== '' && isNaN(parsed)) {
+      setEditing(false)
+      return
+    }
+    updateBudgetItem.mutate(
+      { id: item.id, eventId, updates: { agreed_price: parsed } },
+      { onSettled: () => setEditing(false) }
+    )
+  }
+
+  function handleKeyDown(e) {
+    if (e.key === 'Enter') saveEdit()
+    if (e.key === 'Escape') { savingRef.current = true; setEditing(false) }
+  }
+
+  return (
+    <div className="border-t pt-4 mt-4">
+      <p className="text-sm font-medium text-[#1A1A1A] mb-2">Budget Item</p>
+      <div className="flex flex-wrap items-center gap-3">
+        {/* Price */}
+        <div className="flex items-center gap-1 text-sm text-[#4A4A4A]">
+          <DollarSign className="w-4 h-4" />
+          {editing ? (
+            <input
+              autoFocus
+              type="number"
+              min="0"
+              value={priceInput}
+              onChange={(e) => setPriceInput(e.target.value)}
+              onBlur={saveEdit}
+              onKeyDown={handleKeyDown}
+              className="border rounded px-1 py-0.5 w-28 text-sm"
+              placeholder="Enter amount"
+            />
+          ) : (
+            <button
+              onClick={startEdit}
+              className="underline decoration-dotted cursor-pointer hover:text-[#1A1A1A]"
+              title="Click to edit price"
+            >
+              Your quoted price: {displayPrice}
+            </button>
+          )}
+        </div>
+
+        {/* Status badge */}
+        <span
+          className="text-xs font-medium px-2 py-0.5 rounded-full capitalize"
+          style={badgeStyle}
+        >
+          {item.status}
+        </span>
+      </div>
+
+      {/* Price notes */}
+      {item.price_notes && (
+        <p className="text-xs text-[#888888] mt-1">{item.price_notes}</p>
+      )}
+    </div>
+  )
+}
 
 /**
  * InquiryCard displays an inquiry with event details, status, and actions
@@ -88,6 +186,11 @@ export function InquiryCard({ inquiry, view, onRespond }) {
         <div className="border-t pt-4 mt-4">
           <ContactReveal vendorProfile={inquiry.vendor_profile} />
         </div>
+      )}
+
+      {/* Vendor Budget Item (accepted inquiries, vendor view only) */}
+      {view === 'vendor' && inquiry.status === 'accepted' && (
+        <VendorBudgetSection inquiry={inquiry} />
       )}
 
       {/* Respond Button (vendor view, pending) */}

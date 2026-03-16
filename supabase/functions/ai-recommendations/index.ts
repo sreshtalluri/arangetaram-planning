@@ -52,8 +52,43 @@ Deno.serve(async (req) => {
   }
 
   try {
+    // Verify the caller is authenticated by extracting user from JWT
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader) {
+      return new Response(
+        JSON.stringify({ error: 'Missing authorization header' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Create a user-scoped client to verify the JWT and get user identity
+    const userClient = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
+      {
+        global: { headers: { Authorization: authHeader } },
+        auth: { autoRefreshToken: false, persistSession: false },
+      }
+    );
+    const { data: { user }, error: userError } = await userClient.auth.getUser();
+    if (userError || !user) {
+      return new Response(
+        JSON.stringify({ error: 'Not authenticated' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
     // Parse request body
-    const { eventId }: RecommendationRequest = await req.json();
+    let eventId: string;
+    try {
+      const body: RecommendationRequest = await req.json();
+      eventId = body.eventId;
+    } catch {
+      return new Response(
+        JSON.stringify({ error: 'Invalid request body — expected JSON with eventId' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
 
     if (!eventId) {
       return new Response(
@@ -77,20 +112,25 @@ Deno.serve(async (req) => {
       }
     );
 
-    // Step 1: Fetch event details
+    // Step 1: Fetch event details and verify the user owns this event
     const { data: event, error: eventError } = await supabase
       .from('events')
-      .select('id, event_date, location, budget, categories_needed, categories_covered')
+      .select('id, user_id, event_date, location, budget, categories_needed, categories_covered')
       .eq('id', eventId)
       .single();
 
     if (eventError || !event) {
       return new Response(
         JSON.stringify({ error: 'Event not found' }),
-        {
-          status: 404,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        }
+        { status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Verify the authenticated user owns this event
+    if (event.user_id !== user.id) {
+      return new Response(
+        JSON.stringify({ error: 'Not authorized to access this event' }),
+        { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
@@ -115,21 +155,9 @@ Deno.serve(async (req) => {
       );
     }
 
-    if (!eventData.categories_needed || eventData.categories_needed.length === 0) {
-      return new Response(
-        JSON.stringify({
-          categories: {},
-          message: 'No categories needed for this event',
-        }),
-        {
-          status: 200,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        }
-      );
-    }
-
     // Step 2: Database filter - get candidate vendors per category
     const candidatesByCategory: { [category: string]: VendorProfile[] } = {};
+    const failedCategories: string[] = [];
 
     for (const category of pendingCategories) {
       // Build query with filters
@@ -155,7 +183,7 @@ Deno.serve(async (req) => {
       const { data: vendors, error: vendorsError } = await query;
 
       if (vendorsError) {
-        console.error(`Error fetching vendors for category ${category}:`, vendorsError);
+        failedCategories.push(category);
         continue;
       }
 
@@ -170,11 +198,17 @@ Deno.serve(async (req) => {
       if (eventData.event_date) {
         const vendorIds = vendorProfiles.map(v => v.id);
 
-        const { data: blockedVendors } = await supabase
+        const { data: blockedVendors, error: availabilityError } = await supabase
           .from('vendor_availability')
           .select('vendor_id')
           .in('vendor_id', vendorIds)
           .eq('blocked_date', eventData.event_date);
+
+        if (availabilityError) {
+          // Proceed without availability filtering rather than failing entirely
+          candidatesByCategory[category] = vendorProfiles;
+          continue;
+        }
 
         const blockedVendorIds = new Set(
           (blockedVendors || []).map(b => b.vendor_id)
@@ -195,28 +229,30 @@ Deno.serve(async (req) => {
       .map(v => v.id);
 
     if (allCandidateIds.length > 0) {
-      const { data: portfolioRows } = await supabase
+      const { data: portfolioRows, error: portfolioError } = await supabase
         .from('portfolio_images')
         .select('vendor_id, storage_path')
         .in('vendor_id', allCandidateIds)
         .order('order_index', { ascending: true });
 
-      // Group portfolio images by vendor and resolve public URLs
-      const portfolioByVendor: { [vendorId: string]: string[] } = {};
-      for (const row of portfolioRows || []) {
-        if (!portfolioByVendor[row.vendor_id]) {
-          portfolioByVendor[row.vendor_id] = [];
+      // Group portfolio images by vendor and resolve public URLs (skip if query failed)
+      if (!portfolioError) {
+        const portfolioByVendor: { [vendorId: string]: string[] } = {};
+        for (const row of portfolioRows || []) {
+          if (!portfolioByVendor[row.vendor_id]) {
+            portfolioByVendor[row.vendor_id] = [];
+          }
+          const { data } = supabase.storage
+            .from('portfolio-images')
+            .getPublicUrl(row.storage_path);
+          portfolioByVendor[row.vendor_id].push(data.publicUrl);
         }
-        const { data } = supabase.storage
-          .from('portfolio-images')
-          .getPublicUrl(row.storage_path);
-        portfolioByVendor[row.vendor_id].push(data.publicUrl);
-      }
 
-      // Attach portfolio images to candidates
-      for (const vendors of Object.values(candidatesByCategory)) {
-        for (const vendor of vendors) {
-          vendor.portfolio_images = portfolioByVendor[vendor.id] || [];
+        // Attach portfolio images to candidates
+        for (const vendors of Object.values(candidatesByCategory)) {
+          for (const vendor of vendors) {
+            vendor.portfolio_images = portfolioByVendor[vendor.id] || [];
+          }
         }
       }
     }
@@ -301,8 +337,7 @@ Please rank and return the top 3 vendors per category with explanations.`;
     let aiRecommendations: AIResponse;
     try {
       aiRecommendations = JSON.parse(textContent);
-    } catch (parseError) {
-      console.error('Failed to parse AI response:', textContent);
+    } catch {
       throw new Error('Invalid AI response format');
     }
 
@@ -314,9 +349,11 @@ Please rank and return the top 3 vendors per category with explanations.`;
     } = {};
 
     for (const [category, recommendations] of Object.entries(
-      aiRecommendations.categories
+      aiRecommendations.categories || {}
     )) {
-      const vendors = recommendations.vendors.map(rec => {
+      const recVendors = recommendations?.vendors
+      if (!Array.isArray(recVendors)) continue
+      const vendors = recVendors.map(rec => {
         const vendorData = candidatesByCategory[category]?.find(
           v => v.id === rec.id
         );
@@ -337,7 +374,10 @@ Please rank and return the top 3 vendors per category with explanations.`;
     }
 
     return new Response(
-      JSON.stringify({ categories: enrichedCategories }),
+      JSON.stringify({
+        categories: enrichedCategories,
+        ...(failedCategories.length > 0 && { failedCategories }),
+      }),
       {
         status: 200,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },

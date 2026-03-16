@@ -9,6 +9,7 @@ import {
 } from '../ui/dialog'
 import { Button } from '../ui/button'
 import { Textarea } from '../ui/textarea'
+import { Input } from '../ui/input'
 import { useRespondToInquiry } from '../../hooks/useInquiries'
 import { toast } from 'sonner'
 import { Loader2, Check, X } from 'lucide-react'
@@ -23,18 +24,24 @@ import { Loader2, Check, X } from 'lucide-react'
  */
 export function RespondInquiryDialog({ inquiry, open, onOpenChange }) {
   const [responseMessage, setResponseMessage] = useState('')
+  const [quotedPrice, setQuotedPrice] = useState('')
+  const [quotedPriceNotes, setQuotedPriceNotes] = useState('')
   const respondToInquiry = useRespondToInquiry()
 
-  const handleRespond = async (status) => {
+  const handleRespond = async (action) => {
     try {
       await respondToInquiry.mutateAsync({
         inquiryId: inquiry.id,
-        status,
+        status: action,
         responseMessage: responseMessage || undefined,
+        quotedPrice: action === 'accepted' && quotedPrice ? parseInt(quotedPrice, 10) : undefined,
+        quotedPriceNotes: action === 'accepted' && quotedPriceNotes.trim() ? quotedPriceNotes.trim() : undefined,
       })
-      toast.success(`Inquiry ${status}!`)
+      toast.success(`Inquiry ${action}!`)
       onOpenChange(false)
       setResponseMessage('')
+      setQuotedPrice('')
+      setQuotedPriceNotes('')
     } catch (error) {
       toast.error(error.message || 'Failed to respond')
     }
@@ -65,6 +72,45 @@ export function RespondInquiryDialog({ inquiry, open, onOpenChange }) {
               className="input-styled resize-none"
               rows={3}
             />
+          </div>
+
+          {/* Price fields — shown only when vendor is accepting */}
+          <div className="space-y-4 rounded-lg border border-dashed border-green-300 bg-green-50/50 p-4">
+            <p className="text-xs font-semibold uppercase tracking-wide text-green-700">
+              If accepting — your quote
+            </p>
+
+            <div className="space-y-2">
+              <label className="text-sm font-medium">
+                Your Price <span className="text-[#888888] font-normal">(optional)</span>
+              </label>
+              <div className="relative">
+                <span className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-muted-foreground text-sm">
+                  $
+                </span>
+                <Input
+                  type="number"
+                  min="0"
+                  step="1"
+                  placeholder="0"
+                  value={quotedPrice}
+                  onChange={(e) => setQuotedPrice(e.target.value)}
+                  className="pl-7"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-sm font-medium">
+                Price Notes <span className="text-[#888888] font-normal">(optional)</span>
+              </label>
+              <Input
+                type="text"
+                placeholder="e.g. includes 8 hours coverage"
+                value={quotedPriceNotes}
+                onChange={(e) => setQuotedPriceNotes(e.target.value)}
+              />
+            </div>
           </div>
         </div>
 

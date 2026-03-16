@@ -20,15 +20,19 @@ export async function fetchSSE(
   onChunk: (text: string) => void,
   signal?: AbortSignal
 ): Promise<void> {
-  const { data: { session } } = await supabase.auth.getSession()
   const anonKey = process.env.REACT_APP_SUPABASE_ANON_KEY || ''
+  const { data: { session } } = await supabase.auth.getSession()
+  if (!session?.access_token) {
+    throw new Error('Your session has expired. Please log in again.')
+  }
+  const token = session.access_token
 
   const response = await fetch(url, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
       'apikey': anonKey,
-      'Authorization': `Bearer ${session?.access_token || anonKey}`,
+      'Authorization': `Bearer ${token}`,
     },
     body: JSON.stringify(body),
     signal,
@@ -48,10 +52,10 @@ export async function fetchSSE(
     onEvent: (event) => {
       if (event.data === '[DONE]') return
       try {
-        const { text } = JSON.parse(event.data)
-        if (text) onChunk(text)
-      } catch {
-        // Ignore parse errors for malformed chunks
+        const parsed = JSON.parse(event.data)
+        if (parsed.text) onChunk(parsed.text)
+      } catch (parseError) {
+        console.warn('Failed to parse SSE chunk:', event.data, parseError)
       }
     },
   })
@@ -65,25 +69,16 @@ export async function fetchSSE(
 
 /**
  * Fetch recommendations (non-streaming)
+ * Uses supabase.functions.invoke() which passes the user's JWT automatically.
  */
 export async function fetchRecommendations(eventId: string) {
-  const { data: { session } } = await supabase.auth.getSession()
-  const anonKey = process.env.REACT_APP_SUPABASE_ANON_KEY || ''
-
-  const response = await fetch(AI_ENDPOINTS.recommendations, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'apikey': anonKey,
-      'Authorization': `Bearer ${session?.access_token || anonKey}`,
-    },
-    body: JSON.stringify({ eventId }),
+  const { data, error } = await supabase.functions.invoke('ai-recommendations', {
+    body: { eventId },
   })
 
-  if (!response.ok) {
-    const error = await response.json().catch(() => ({ error: 'Request failed' }))
-    throw new Error(error.error || `HTTP ${response.status}`)
+  if (error) {
+    throw new Error(error.message || 'Failed to fetch recommendations')
   }
 
-  return response.json()
+  return data
 }

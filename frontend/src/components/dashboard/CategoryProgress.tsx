@@ -1,12 +1,15 @@
 import { Link } from 'react-router-dom'
 import { Check, Circle } from 'lucide-react'
 import { getCategoryByValue } from '../../lib/vendor-categories'
+import type { BudgetItem } from '../../hooks/useEventBudgetItems'
 
 interface CategoryProgressProps {
   needed: string[]       // categories_needed array
   covered: string[]      // categories_covered array
   compact?: boolean      // true for inline text, false for detailed view
   eventDate?: string     // optional event date for filtering vendors
+  budgetItems?: BudgetItem[]                     // budget items for vendor name display
+  onAssignCategory?: (category: string) => void  // called when user clicks Assign
 }
 
 /**
@@ -19,15 +22,29 @@ export function CategoryProgress({
   covered,
   compact = false,
   eventDate,
+  budgetItems,
+  onAssignCategory,
 }: CategoryProgressProps) {
+  // A category is "effectively covered" if it's in categories_covered OR has a non-cancelled budget item
+  const budgetCoveredCategories = new Set(
+    (budgetItems ?? [])
+      .filter((item) => item.status !== 'cancelled')
+      .map((item) => item.category)
+  )
+  const effectivelyCovered = needed.filter(
+    (cat) => covered.includes(cat) || budgetCoveredCategories.has(cat)
+  )
+
   const total = needed.length
-  const coveredCount = covered.length
+  const coveredCount = effectivelyCovered.length
   const percentage = total > 0 ? Math.round((coveredCount / total) * 100) : 0
   const circumference = 2 * Math.PI * 45 // radius = 45
   const offset = circumference - (percentage / 100) * circumference
 
-  // Derive pending categories (needed but not covered)
-  const pending = needed.filter((cat) => !covered.includes(cat))
+  // Derive pending categories (needed but not effectively covered)
+  const pending = needed.filter(
+    (cat) => !covered.includes(cat) && !budgetCoveredCategories.has(cat)
+  )
 
   if (compact) {
     return (
@@ -77,18 +94,55 @@ export function CategoryProgress({
       {/* Category Breakdown */}
       <div className="flex-1 space-y-1.5">
         {needed.map((categoryValue) => {
-          const isCovered = covered.includes(categoryValue)
+          const isCovered = effectivelyCovered.includes(categoryValue)
           const category = getCategoryByValue(categoryValue)
           const label = category?.label || categoryValue
 
+          // Find non-cancelled budget items for this category
+          const categoryItems = (budgetItems ?? []).filter(
+            (item) => item.category === categoryValue && item.status !== 'cancelled'
+          )
+
           if (isCovered) {
+            if (categoryItems.length > 0) {
+              // Covered with budget item(s): show vendor names
+              const vendorNames = categoryItems
+                .map((item) => item.label)
+                .filter(Boolean)
+                .join(', ')
+
+              return (
+                <div
+                  key={categoryValue}
+                  className="flex items-center gap-2 text-sm"
+                >
+                  <Check className="w-4 h-4 text-green-600 shrink-0" />
+                  <span className="text-[#4A4A4A]">{label}</span>
+                  {vendorNames && (
+                    <span className="text-xs text-[#888888]">— {vendorNames}</span>
+                  )}
+                </div>
+              )
+            }
+
+            // Covered (via categories_covered) but no budget item: show assign prompt
             return (
               <div
                 key={categoryValue}
                 className="flex items-center gap-2 text-sm"
               >
-                <Check className="w-4 h-4 text-green-600" />
+                <Check className="w-4 h-4 text-green-600 shrink-0" />
                 <span className="text-[#4A4A4A]">{label}</span>
+                <span className="text-xs text-[#888888]">— No vendor assigned</span>
+                {onAssignCategory && (
+                  <button
+                    type="button"
+                    onClick={() => onAssignCategory(categoryValue)}
+                    className="text-xs text-[#0F4C5C] hover:underline ml-0.5"
+                  >
+                    + Assign
+                  </button>
+                )}
               </div>
             )
           }
