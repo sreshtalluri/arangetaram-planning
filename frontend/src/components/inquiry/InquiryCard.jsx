@@ -35,7 +35,7 @@ function VendorBudgetSection({ inquiry }) {
   }
 
   function saveEdit() {
-    const parsed = priceInput === '' ? null : parseFloat(priceInput)
+    const parsed = priceInput === '' ? null : parseInt(priceInput, 10)
     if (priceInput !== '' && isNaN(parsed)) {
       setEditing(false)
       return

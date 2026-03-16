@@ -79,7 +79,16 @@ Deno.serve(async (req) => {
     }
 
     // Parse request body
-    const { eventId }: RecommendationRequest = await req.json();
+    let eventId: string;
+    try {
+      const body: RecommendationRequest = await req.json();
+      eventId = body.eventId;
+    } catch {
+      return new Response(
+        JSON.stringify({ error: 'Invalid request body — expected JSON with eventId' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
 
     if (!eventId) {
       return new Response(
@@ -375,6 +384,7 @@ Please rank and return the top 3 vendors per category with explanations.`;
       }
     );
   } catch (error) {
+    console.error('Recommendation error:', error);
     return new Response(
       JSON.stringify({
         error: error instanceof Error ? error.message : 'Internal server error',

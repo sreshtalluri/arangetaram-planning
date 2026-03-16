@@ -20,7 +20,7 @@ interface EventCardProps {
  * Used in UserDashboard to show user's events
  */
 export function EventCard({ event, onEdit, onBrowseVendors, onDelete }: EventCardProps) {
-  const { data: budgetItems = [] } = useEventBudgetItems(event.id)
+  const { data: budgetItems = [], isError: budgetError } = useEventBudgetItems(event.id)
   const addBudgetItem = useAddBudgetItem()
 
   const [assignDialogOpen, setAssignDialogOpen] = useState(false)
@@ -125,7 +125,7 @@ export function EventCard({ event, onEdit, onBrowseVendors, onDelete }: EventCar
             <span>{event.guest_count} guests</span>
           </div>
         )}
-        {formattedBudget && (
+        {formattedBudget && !budgetError && (
           <div className="flex items-center gap-1">
             <DollarSign className="w-4 h-4 text-[#888888]" />
             {committedAmount > 0 ? (

@@ -1,5 +1,5 @@
 import "@/App.css";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, useParams } from "react-router-dom";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { Toaster } from "./components/ui/sonner";
 import { ChatWidget } from "./components/ai/ChatWidget";
@@ -18,6 +18,11 @@ import VendorDashboard from "./pages/VendorDashboard";
 import ProfileWizardPage from "./pages/vendor/ProfileWizardPage";
 import CreateEventPage from "./pages/CreateEventPage";
 import BudgetPage from "./pages/BudgetPage";
+
+function EventRedirect() {
+  const { id } = useParams();
+  return <Navigate to={`/budget?event=${id}`} replace />;
+}
 
 function App() {
   return (
@@ -41,8 +46,15 @@ function App() {
               </ProtectedRoute>
             }
           />
-          <Route path="/events/:id" element={<Navigate to="/budget" replace />} />
-          <Route path="/budget" element={<BudgetPage />} />
+          <Route path="/events/:id" element={<EventRedirect />} />
+          <Route
+            path="/budget"
+            element={
+              <ProtectedRoute>
+                <BudgetPage />
+              </ProtectedRoute>
+            }
+          />
           <Route
             path="/dashboard"
             element={

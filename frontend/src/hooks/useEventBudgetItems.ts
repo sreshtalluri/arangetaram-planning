@@ -1,4 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { toast } from 'sonner';
 import { supabase } from '../lib/supabase';
 
 // TODO: Remove 'as any' casts once database.types.ts is regenerated to include event_budget_items table (run supabase gen types after migration 00008)
@@ -72,8 +73,8 @@ export function useAddBudgetItem() {
     onSuccess: (data: any) => {
       queryClient.invalidateQueries({ queryKey: ['budget-items', data.event_id] });
     },
-    onError: (error: Error) => {
-      console.error('Failed to add budget item:', error);
+    onError: () => {
+      toast.error('Failed to add budget item. Please try again.');
     },
   });
 }
@@ -105,8 +106,8 @@ export function useUpdateBudgetItem() {
     onSuccess: (data: any) => {
       queryClient.invalidateQueries({ queryKey: ['budget-items', data.eventId] });
     },
-    onError: (error: Error) => {
-      console.error('Failed to update budget item:', error);
+    onError: () => {
+      toast.error('Failed to save changes. Please try again.');
     },
   });
 }
@@ -128,8 +129,8 @@ export function useDeleteBudgetItem() {
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['budget-items', data.eventId] });
     },
-    onError: (error: Error) => {
-      console.error('Failed to delete budget item:', error);
+    onError: () => {
+      toast.error('Failed to delete budget item. Please try again.');
     },
   });
 }

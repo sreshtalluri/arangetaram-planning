@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { format, parseISO } from 'date-fns';
 import { ChevronDown, ChevronRight } from 'lucide-react';
 import Navbar from '../components/Navbar';
@@ -111,9 +111,8 @@ interface CollapsibleEventRowProps {
 }
 
 function CollapsibleEventRow({ event, isExpanded, onToggle }: CollapsibleEventRowProps) {
-  // Quick summary numbers for the header (read from items inside EventBudgetSection,
-  // but we keep a lightweight duplicate query here for the header display only)
-  const { data: budgetItems = [] } = useEventBudgetItems(event.id);
+  // React Query deduplicates this with EventBudgetSection's identical query key, so no extra network request
+  const { data: budgetItems = [], isError } = useEventBudgetItems(event.id);
 
   const committedAmount = budgetItems
     .filter((item) => item.status === 'agreed' || item.status === 'paid')
@@ -147,7 +146,9 @@ function CollapsibleEventRow({ event, isExpanded, onToggle }: CollapsibleEventRo
           </div>
         </div>
         <div className="flex-shrink-0 ml-4 text-sm font-medium text-[#4A4A4A]">
-          {totalBudget !== null ? (
+          {isError ? (
+            <span className="text-red-500">Error loading</span>
+          ) : totalBudget !== null ? (
             <span>
               <span className="text-[#0F4C5C] font-semibold">
                 ${committedAmount.toLocaleString()}
@@ -181,17 +182,23 @@ function CollapsibleEventRow({ event, isExpanded, onToggle }: CollapsibleEventRo
 export default function BudgetPage() {
   const { user, isAuthenticated, loading } = useAuth();
   const { data: events = [], isLoading: eventsLoading } = useEvents(user?.id);
+  const [searchParams] = useSearchParams();
 
   // Track which events are expanded (Set of event IDs)
   const [expandedEvents, setExpandedEvents] = useState<Set<string>>(new Set());
   const initialized = useRef(false);
 
-  // Expand first event once when events first load
+  // Expand targeted event (from /events/:id redirect) or first event on initial load
   useEffect(() => {
     if (initialized.current || events.length === 0) return;
     initialized.current = true;
-    setExpandedEvents(new Set([events[0].id]));
-  }, [events]);
+    const targetEvent = searchParams.get('event');
+    if (targetEvent && events.some((e) => e.id === targetEvent)) {
+      setExpandedEvents(new Set([targetEvent]));
+    } else {
+      setExpandedEvents(new Set([events[0].id]));
+    }
+  }, [events, searchParams]);
 
   const toggleEvent = (eventId: string) => {
     setExpandedEvents((prev) => {
@@ -214,31 +221,6 @@ export default function BudgetPage() {
           <div className="text-center space-y-3">
             <div className="w-8 h-8 border-4 border-[#0F4C5C] border-t-transparent rounded-full animate-spin mx-auto" />
             <p className="text-[#4A4A4A]">Loading budgets…</p>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  // ── Not logged in ──
-  if (!isAuthenticated) {
-    return (
-      <div className="min-h-screen bg-[#F9F8F4]">
-        <Navbar />
-        <div className="flex items-center justify-center min-h-[60vh]">
-          <div className="text-center space-y-4">
-            <h2 className="text-2xl font-semibold text-[#1A1A1A]">
-              Log in to manage your event budgets
-            </h2>
-            <p className="text-[#4A4A4A]">
-              Track spending and keep your Arangetram planning on budget.
-            </p>
-            <Link
-              to="/login"
-              className="inline-block mt-2 rounded-full bg-[#0F4C5C] px-8 py-3 text-sm font-semibold text-white hover:bg-[#093642] transition-colors"
-            >
-              Log In
-            </Link>
           </div>
         </div>
       </div>
