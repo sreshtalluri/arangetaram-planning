@@ -8,6 +8,7 @@ import { useUnreadCount } from "../hooks/useInquiries";
 import { PortfolioUploader } from "../components/vendor/PortfolioUploader";
 import { PortfolioGallery } from "../components/vendor/PortfolioGallery";
 import { AvailabilityCalendar } from "../components/vendor/AvailabilityCalendar";
+import { BookingSettingsPanel } from "../components/vendor/BookingSettingsPanel";
 import { VendorInquiriesList } from "../components/dashboard/VendorInquiriesList";
 import { InquiryStatsCards } from "../components/inquiry/InquiryStatsCards";
 import { getCategoryByValue } from "../lib/vendor-categories";
@@ -121,6 +122,7 @@ export default function VendorDashboard() {
         return (
           <AvailabilitySection
             vendorId={user?.id}
+            vendorCategory={vendorProfile.category}
             upcomingBlockedCount={availability.length}
           />
         );
@@ -465,7 +467,7 @@ function PortfolioSection({ vendorId, portfolioCount }) {
 }
 
 // Availability Section Component
-function AvailabilitySection({ vendorId, upcomingBlockedCount }) {
+function AvailabilitySection({ vendorId, vendorCategory, upcomingBlockedCount }) {
   return (
     <div className="space-y-6">
       <div>
@@ -487,6 +489,10 @@ function AvailabilitySection({ vendorId, upcomingBlockedCount }) {
           )}
         </div>
         <AvailabilityCalendar vendorId={vendorId} />
+      </div>
+
+      <div className="bg-white rounded-xl p-6 shadow-sm border">
+        <BookingSettingsPanel vendorId={vendorId} vendorCategory={vendorCategory} />
       </div>
     </div>
   );
