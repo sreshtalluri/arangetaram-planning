@@ -52,6 +52,32 @@ Deno.serve(async (req) => {
   }
 
   try {
+    // Verify the caller is authenticated by extracting user from JWT
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader) {
+      return new Response(
+        JSON.stringify({ error: 'Missing authorization header' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Create a user-scoped client to verify the JWT and get user identity
+    const userClient = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
+      {
+        global: { headers: { Authorization: authHeader } },
+        auth: { autoRefreshToken: false, persistSession: false },
+      }
+    );
+    const { data: { user }, error: userError } = await userClient.auth.getUser();
+    if (userError || !user) {
+      return new Response(
+        JSON.stringify({ error: 'Not authenticated' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
     // Parse request body
     const { eventId }: RecommendationRequest = await req.json();
 
@@ -77,12 +103,27 @@ Deno.serve(async (req) => {
       }
     );
 
-    // Step 1: Fetch event details
+    // Step 1: Fetch event details and verify the user owns this event
     const { data: event, error: eventError } = await supabase
       .from('events')
-      .select('id, event_date, location, budget, categories_needed, categories_covered')
+      .select('id, user_id, event_date, location, budget, categories_needed, categories_covered')
       .eq('id', eventId)
       .single();
+
+    if (eventError || !event) {
+      return new Response(
+        JSON.stringify({ error: 'Event not found' }),
+        { status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Verify the authenticated user owns this event
+    if (event.user_id !== user.id) {
+      return new Response(
+        JSON.stringify({ error: 'Not authorized to access this event' }),
+        { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
 
     if (eventError || !event) {
       return new Response(
