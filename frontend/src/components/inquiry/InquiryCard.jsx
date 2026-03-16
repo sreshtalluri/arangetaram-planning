@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { format, formatDistanceToNow, parseISO } from 'date-fns'
 import { Calendar, MapPin, Users, DollarSign, MessageSquare } from 'lucide-react'
 import { InquiryBadge } from './InquiryBadge'
@@ -19,6 +19,7 @@ function VendorBudgetSection({ inquiry }) {
 
   const [editing, setEditing] = useState(false)
   const [priceInput, setPriceInput] = useState('')
+  const savingRef = useRef(false)
 
   const item = budgetItems?.find((b) => b.vendor_id === inquiry.vendor_id)
 
@@ -30,11 +31,14 @@ function VendorBudgetSection({ inquiry }) {
   const badgeStyle = STATUS_BADGE_STYLES[item.status] ?? STATUS_BADGE_STYLES.estimated
 
   function startEdit() {
+    savingRef.current = false
     setPriceInput(item.agreed_price != null ? String(item.agreed_price) : '')
     setEditing(true)
   }
 
   function saveEdit() {
+    if (savingRef.current) return
+    savingRef.current = true
     const parsed = priceInput === '' ? null : parseInt(priceInput, 10)
     if (priceInput !== '' && isNaN(parsed)) {
       setEditing(false)
@@ -48,7 +52,7 @@ function VendorBudgetSection({ inquiry }) {
 
   function handleKeyDown(e) {
     if (e.key === 'Enter') saveEdit()
-    if (e.key === 'Escape') setEditing(false)
+    if (e.key === 'Escape') { savingRef.current = true; setEditing(false) }
   }
 
   return (

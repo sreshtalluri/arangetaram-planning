@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import {
   Building2,
   UtensilsCrossed,
@@ -85,18 +85,23 @@ function EditableCell({
 }) {
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState(value);
+  const savingRef = useRef(false);
 
   const startEdit = () => {
+    savingRef.current = false;
     setDraft(value);
     setEditing(true);
   };
 
   const save = () => {
+    if (savingRef.current) return;
+    savingRef.current = true;
     setEditing(false);
     onSave(draft);
   };
 
   const cancel = () => {
+    savingRef.current = true;
     setEditing(false);
     setDraft(value);
   };

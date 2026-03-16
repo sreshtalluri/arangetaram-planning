@@ -189,6 +189,7 @@ export function EventCard({ event, onEdit, onBrowseVendors, onDelete }: EventCar
           addBudgetItem.mutate({
             event_id: event.id,
             ...item,
+            status: item.agreed_price !== undefined ? 'agreed' : 'estimated',
           })
         }}
       />
