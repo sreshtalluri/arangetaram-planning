@@ -79,7 +79,7 @@ export function AddBudgetItemDialog({
       : {}
   );
 
-  // Reset everything when dialog opens or closes
+  // Reset form state when dialog closes
   useEffect(() => {
     if (!open) {
       setMode('platform');

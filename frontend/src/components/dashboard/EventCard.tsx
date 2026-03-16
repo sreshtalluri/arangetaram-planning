@@ -35,9 +35,9 @@ export function EventCard({ event, onEdit, onBrowseVendors, onDelete }: EventCar
     ? `$${event.budget.toLocaleString()}`
     : null
 
-  // Compute committed amount from non-cancelled budget items
+  // Committed = sum of agreed/paid items (consistent with BudgetPage)
   const committedAmount = budgetItems
-    .filter((item) => item.status !== 'cancelled')
+    .filter((item) => item.status === 'agreed' || item.status === 'paid')
     .reduce((sum, item) => sum + (item.agreed_price ?? 0), 0)
 
   // Budget progress: show committed vs total when there are committed amounts

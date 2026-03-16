@@ -17,7 +17,7 @@ import {
 } from 'lucide-react';
 import { Card, CardContent } from '../ui/card';
 import { getCategoryByValue } from '../../lib/vendor-categories';
-import type { BudgetItem, BudgetItemUpdate } from '../../hooks/useEventBudgetItems';
+import type { BudgetItem, BudgetItemUpdate, BudgetStatus } from '../../hooks/useEventBudgetItems';
 
 // Icon map for category icon names from vendor-categories
 const ICON_MAP: Record<string, React.ComponentType<LucideProps>> = {
@@ -42,8 +42,7 @@ interface BudgetBreakdownTableProps {
   onAddItem: () => void;
 }
 
-// Status badge styling
-function StatusBadge({ status }: { status: string }) {
+function StatusBadge({ status }: { status: BudgetStatus | 'open' }) {
   const styles: Record<string, string> = {
     estimated: 'bg-amber-100 text-amber-800 border border-amber-300',
     agreed: 'bg-green-100 text-green-800 border border-green-300',
@@ -134,7 +133,7 @@ function EditableCell({
   );
 }
 
-// Category label with icon — high contrast dark text on colored pill
+// Category label with icon
 function CategoryCell({ category }: { category: string }) {
   const cat = getCategoryByValue(category);
   if (!cat) {
@@ -173,7 +172,7 @@ export function BudgetBreakdownTable({
   const bookedItems = budgetItems;
 
   const handlePriceSave = (item: BudgetItem, val: string) => {
-    const parsed = parseFloat(val);
+    const parsed = parseInt(val, 10);
     const updates: BudgetItemUpdate = {
       agreed_price: isNaN(parsed) ? null : parsed,
     };
@@ -274,7 +273,11 @@ export function BudgetBreakdownTable({
               {/* Delete */}
               <div className="w-8 flex justify-center">
                 <button
-                  onClick={() => onDeleteItem(item.id)}
+                  onClick={() => {
+                    if (window.confirm('Delete this budget item? This cannot be undone.')) {
+                      onDeleteItem(item.id);
+                    }
+                  }}
                   className="rounded p-1 text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
                   title="Delete item"
                 >

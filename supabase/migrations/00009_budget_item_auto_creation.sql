@@ -16,20 +16,22 @@ BEGIN
       ARRAY[(SELECT category FROM public.vendor_profiles WHERE id = NEW.vendor_id)]
     );
 
-    -- New logic: create budget item
-    INSERT INTO public.event_budget_items (
-      event_id, category, vendor_id, inquiry_id, label, agreed_price, price_notes, status
-    )
-    VALUES (
-      NEW.event_id,
-      (SELECT category FROM public.vendor_profiles WHERE id = NEW.vendor_id),
-      NEW.vendor_id,
-      NEW.id,
-      (SELECT business_name FROM public.vendor_profiles WHERE id = NEW.vendor_id),
-      NEW.quoted_price,
-      NEW.quoted_price_notes,
-      CASE WHEN NEW.quoted_price IS NOT NULL THEN 'agreed' ELSE 'estimated' END
-    );
+    -- New logic: create budget item (only if vendor profile exists)
+    IF EXISTS (SELECT 1 FROM public.vendor_profiles WHERE id = NEW.vendor_id) THEN
+      INSERT INTO public.event_budget_items (
+        event_id, category, vendor_id, inquiry_id, label, agreed_price, price_notes, status
+      )
+      VALUES (
+        NEW.event_id,
+        (SELECT category FROM public.vendor_profiles WHERE id = NEW.vendor_id),
+        NEW.vendor_id,
+        NEW.id,
+        (SELECT business_name FROM public.vendor_profiles WHERE id = NEW.vendor_id),
+        NEW.quoted_price,
+        NEW.quoted_price_notes,
+        CASE WHEN NEW.quoted_price IS NOT NULL THEN 'agreed' ELSE 'estimated' END
+      );
+    END IF;
   END IF;
 
   -- Handle declined: cancel linked budget item

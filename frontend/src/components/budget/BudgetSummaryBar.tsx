@@ -14,7 +14,7 @@ export function BudgetSummaryBar({
   totalCategories,
 }: BudgetSummaryBarProps) {
   const remaining = totalBudget !== null ? Math.max(0, totalBudget - committedAmount) : null;
-  const percentage = totalBudget !== null ? Math.min(100, (committedAmount / totalBudget) * 100) : 0;
+  const percentage = totalBudget ? Math.min(100, (committedAmount / totalBudget) * 100) : 0;
   const isOverBudget = totalBudget !== null && committedAmount > totalBudget;
 
   return (

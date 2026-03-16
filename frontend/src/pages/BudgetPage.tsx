@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { format, parseISO } from 'date-fns';
 import { ChevronDown, ChevronRight } from 'lucide-react';
@@ -25,7 +25,7 @@ interface EventBudgetSectionProps {
 function EventBudgetSection({ event }: EventBudgetSectionProps) {
   const [addDialogOpen, setAddDialogOpen] = useState(false);
 
-  const { data: budgetItems = [] } = useEventBudgetItems(event.id);
+  const { data: budgetItems = [], isError, error } = useEventBudgetItems(event.id);
   const addBudgetItem = useAddBudgetItem();
   const updateBudgetItem = useUpdateBudgetItem();
   const deleteBudgetItem = useDeleteBudgetItem();
@@ -68,6 +68,14 @@ function EventBudgetSection({ event }: EventBudgetSectionProps) {
       status: item.agreed_price !== undefined ? 'agreed' : 'estimated',
     });
   };
+
+  if (isError) {
+    return (
+      <div className="pt-4 text-center text-red-600 py-8">
+        Failed to load budget items{error instanceof Error ? `: ${error.message}` : ''}. Please refresh the page.
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-4 pt-4">
@@ -176,18 +184,14 @@ export default function BudgetPage() {
 
   // Track which events are expanded (Set of event IDs)
   const [expandedEvents, setExpandedEvents] = useState<Set<string>>(new Set());
+  const initialized = useRef(false);
 
-  // Initialize expanded state after events load
+  // Expand first event once when events first load
   useEffect(() => {
-    if (events.length === 0) return;
-    if (events.length === 1) {
-      setExpandedEvents(new Set([events[0].id]));
-    } else {
-      setExpandedEvents(new Set([events[0].id]));
-    }
-  // Only run once when events first load (go from 0 → N)
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [events.length > 0]);
+    if (initialized.current || events.length === 0) return;
+    initialized.current = true;
+    setExpandedEvents(new Set([events[0].id]));
+  }, [events]);
 
   const toggleEvent = (eventId: string) => {
     setExpandedEvents((prev) => {

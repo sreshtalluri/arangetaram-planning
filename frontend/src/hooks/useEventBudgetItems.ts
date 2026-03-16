@@ -1,7 +1,9 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '../lib/supabase';
 
-// Note: Using 'as any' for .from() calls because event_budget_items table is not yet in database.types.ts
+// TODO: Remove 'as any' casts once database.types.ts is regenerated to include event_budget_items table (run supabase gen types after migration 00008)
+
+export type BudgetStatus = 'estimated' | 'agreed' | 'paid' | 'cancelled';
 
 export interface BudgetItem {
   id: string;
@@ -12,7 +14,7 @@ export interface BudgetItem {
   label: string | null;
   agreed_price: number | null;
   price_notes: string | null;
-  status: 'estimated' | 'agreed' | 'paid' | 'cancelled';
+  status: BudgetStatus;
   created_at: string | null;
   updated_at: string | null;
 }
@@ -24,13 +26,13 @@ export interface BudgetItemInsert {
   label?: string;
   agreed_price?: number;
   price_notes?: string;
-  status?: string;
+  status?: BudgetStatus;
 }
 
 export interface BudgetItemUpdate {
   agreed_price?: number | null;
   price_notes?: string | null;
-  status?: string;
+  status?: BudgetStatus;
 }
 
 // Fetch all budget items for an event
@@ -70,6 +72,9 @@ export function useAddBudgetItem() {
     onSuccess: (data: any) => {
       queryClient.invalidateQueries({ queryKey: ['budget-items', data.event_id] });
     },
+    onError: (error: Error) => {
+      console.error('Failed to add budget item:', error);
+    },
   });
 }
 
@@ -100,6 +105,9 @@ export function useUpdateBudgetItem() {
     onSuccess: (data: any) => {
       queryClient.invalidateQueries({ queryKey: ['budget-items', data.eventId] });
     },
+    onError: (error: Error) => {
+      console.error('Failed to update budget item:', error);
+    },
   });
 }
 
@@ -119,6 +127,9 @@ export function useDeleteBudgetItem() {
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['budget-items', data.eventId] });
+    },
+    onError: (error: Error) => {
+      console.error('Failed to delete budget item:', error);
     },
   });
 }

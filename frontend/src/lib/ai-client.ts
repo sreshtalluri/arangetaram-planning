@@ -21,9 +21,11 @@ export async function fetchSSE(
   signal?: AbortSignal
 ): Promise<void> {
   const anonKey = process.env.REACT_APP_SUPABASE_ANON_KEY || ''
-  // Get fresh session — Supabase client auto-refreshes expired tokens
   const { data: { session } } = await supabase.auth.getSession()
-  const token = session?.access_token || anonKey
+  if (!session?.access_token) {
+    throw new Error('Your session has expired. Please log in again.')
+  }
+  const token = session.access_token
 
   const response = await fetch(url, {
     method: 'POST',
@@ -50,10 +52,10 @@ export async function fetchSSE(
     onEvent: (event) => {
       if (event.data === '[DONE]') return
       try {
-        const { text } = JSON.parse(event.data)
-        if (text) onChunk(text)
-      } catch {
-        // Ignore parse errors for malformed chunks
+        const parsed = JSON.parse(event.data)
+        if (parsed.text) onChunk(parsed.text)
+      } catch (parseError) {
+        console.warn('Failed to parse SSE chunk:', event.data, parseError)
       }
     },
   })
