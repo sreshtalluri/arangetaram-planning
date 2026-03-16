@@ -46,9 +46,13 @@ export function EventCard({ event, onEdit, onBrowseVendors }: EventCardProps) {
       ? Math.min(100, (committedAmount / event.budget) * 100)
       : 0
 
+  // Safely access categories arrays (may be null from DB)
+  const categoriesNeeded = event.categories_needed || []
+  const categoriesCovered = event.categories_covered || []
+
   // Calculate pending categories for browse link
-  const pendingCategories = event.categories_needed.filter(
-    (cat) => !event.categories_covered.includes(cat)
+  const pendingCategories = categoriesNeeded.filter(
+    (cat) => !categoriesCovered.includes(cat)
   )
 
   // Build browse URL with first pending category pre-selected
@@ -137,14 +141,14 @@ export function EventCard({ event, onEdit, onBrowseVendors }: EventCardProps) {
       </div>
 
       {/* Category Progress Section */}
-      {event.categories_needed.length > 0 ? (
+      {categoriesNeeded.length > 0 ? (
         <div className="pt-4 border-t border-[#E5E5E5]">
           <h4 className="text-sm font-medium text-[#1A1A1A] mb-3">
             Category Coverage
           </h4>
           <CategoryProgress
-            needed={event.categories_needed}
-            covered={event.categories_covered}
+            needed={categoriesNeeded}
+            covered={categoriesCovered}
             eventDate={event.event_date}
             budgetItems={budgetItems}
             onAssignCategory={(cat) => {
@@ -168,7 +172,7 @@ export function EventCard({ event, onEdit, onBrowseVendors }: EventCardProps) {
       <AddBudgetItemDialog
         open={assignDialogOpen}
         onOpenChange={setAssignDialogOpen}
-        categoriesNeeded={event.categories_needed}
+        categoriesNeeded={categoriesNeeded}
         defaultCategory={assignCategory}
         onSubmit={(item) => {
           addBudgetItem.mutate({
