@@ -1,12 +1,15 @@
 import { Link } from 'react-router-dom'
 import { Check, Circle } from 'lucide-react'
 import { getCategoryByValue } from '../../lib/vendor-categories'
+import type { BudgetItem } from '../../hooks/useEventBudgetItems'
 
 interface CategoryProgressProps {
   needed: string[]       // categories_needed array
   covered: string[]      // categories_covered array
   compact?: boolean      // true for inline text, false for detailed view
   eventDate?: string     // optional event date for filtering vendors
+  budgetItems?: BudgetItem[]                     // budget items for vendor name display
+  onAssignCategory?: (category: string) => void  // called when user clicks Assign
 }
 
 /**
@@ -19,6 +22,8 @@ export function CategoryProgress({
   covered,
   compact = false,
   eventDate,
+  budgetItems,
+  onAssignCategory,
 }: CategoryProgressProps) {
   const total = needed.length
   const coveredCount = covered.length
@@ -82,13 +87,53 @@ export function CategoryProgress({
           const label = category?.label || categoryValue
 
           if (isCovered) {
+            // Find non-cancelled budget items for this category
+            const categoryItems = budgetItems
+              ? budgetItems.filter(
+                  (item) =>
+                    item.category === categoryValue && item.status !== 'cancelled'
+                )
+              : []
+
+            if (categoryItems.length > 0) {
+              // Covered with budget item(s): show vendor names
+              const vendorNames = categoryItems
+                .map((item) => item.label)
+                .filter(Boolean)
+                .join(', ')
+
+              return (
+                <div
+                  key={categoryValue}
+                  className="flex items-center gap-2 text-sm"
+                >
+                  <Check className="w-4 h-4 text-green-600 shrink-0" />
+                  <span className="text-[#4A4A4A]">{label}</span>
+                  {vendorNames && (
+                    <span className="text-xs text-[#888888]">— {vendorNames}</span>
+                  )}
+                </div>
+              )
+            }
+
+            // Covered without budget item: show assign prompt
             return (
               <div
                 key={categoryValue}
                 className="flex items-center gap-2 text-sm"
               >
-                <Check className="w-4 h-4 text-green-600" />
+                <Check className="w-4 h-4 text-green-600 shrink-0" />
                 <span className="text-[#4A4A4A]">{label}</span>
+                <span className="text-xs text-[#888888]">— No vendor assigned</span>
+                {onAssignCategory && (
+                  <button
+                    type="button"
+                    onClick={() => onAssignCategory(categoryValue)}
+                    className="text-xs text-[#0F4C5C] hover:underline ml-0.5"
+                  >
+                    + Assign
+                  </button>
+                )}
               </div>
             )
           }
