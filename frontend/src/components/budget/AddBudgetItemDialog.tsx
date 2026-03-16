@@ -18,6 +18,21 @@ import {
 } from '../ui/select';
 import { getCategoryByValue } from '../../lib/vendor-categories';
 
+// The .jsx UI components don't carry full TypeScript prop types.
+// Cast them here so TSX can use them as standard React components.
+// Double-cast (as unknown as T) is needed because the .jsx source types don't overlap cleanly.
+type AnyComponent<P = Record<string, unknown>> = React.ComponentType<P>;
+const DDialog = Dialog as unknown as AnyComponent<{ open: boolean; onOpenChange: (open: boolean) => void; children: React.ReactNode }>;
+const DDialogContent = DialogContent as unknown as AnyComponent<{ className?: string; children: React.ReactNode }>;
+const DDialogHeader = DialogHeader as unknown as AnyComponent<{ children: React.ReactNode }>;
+const DDialogTitle = DialogTitle as unknown as AnyComponent<{ children: React.ReactNode }>;
+const DDialogFooter = DialogFooter as unknown as AnyComponent<{ children: React.ReactNode }>;
+const DSelect = Select as unknown as AnyComponent<{ value: string; onValueChange: (val: string) => void; children: React.ReactNode }>;
+const DSelectTrigger = SelectTrigger as unknown as AnyComponent<{ id?: string; children: React.ReactNode }>;
+const DSelectValue = SelectValue as unknown as AnyComponent<{ placeholder?: string }>;
+const DSelectContent = SelectContent as unknown as AnyComponent<{ children: React.ReactNode }>;
+const DSelectItem = SelectItem as unknown as AnyComponent<{ value: string; children: React.ReactNode }>;
+
 interface AddBudgetItemDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -71,34 +86,34 @@ export function AddBudgetItemDialog({
   const isValid = form.category !== '' && form.label.trim() !== '';
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md">
-        <DialogHeader>
-          <DialogTitle>Add Budget Item</DialogTitle>
-        </DialogHeader>
+    <DDialog open={open} onOpenChange={onOpenChange}>
+      <DDialogContent className="sm:max-w-md">
+        <DDialogHeader>
+          <DDialogTitle>Add Budget Item</DDialogTitle>
+        </DDialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Category */}
           <div className="space-y-1.5">
             <Label htmlFor="add-item-category">Category</Label>
-            <Select
+            <DSelect
               value={form.category}
-              onValueChange={(val) => setForm((f) => ({ ...f, category: val }))}
+              onValueChange={(val: string) => setForm((f) => ({ ...f, category: val }))}
             >
-              <SelectTrigger id="add-item-category">
-                <SelectValue placeholder="Select a category" />
-              </SelectTrigger>
-              <SelectContent>
+              <DSelectTrigger id="add-item-category">
+                <DSelectValue placeholder="Select a category" />
+              </DSelectTrigger>
+              <DSelectContent>
                 {categoriesNeeded.map((cat) => {
                   const info = getCategoryByValue(cat);
                   return (
-                    <SelectItem key={cat} value={cat}>
+                    <DSelectItem key={cat} value={cat}>
                       {info ? info.label : cat}
-                    </SelectItem>
+                    </DSelectItem>
                   );
                 })}
-              </SelectContent>
-            </Select>
+              </DSelectContent>
+            </DSelect>
           </div>
 
           {/* Label */}
@@ -145,7 +160,7 @@ export function AddBudgetItemDialog({
             />
           </div>
 
-          <DialogFooter>
+          <DDialogFooter>
             <button
               type="button"
               onClick={() => onOpenChange(false)}
@@ -160,9 +175,9 @@ export function AddBudgetItemDialog({
             >
               Add Item
             </button>
-          </DialogFooter>
+          </DDialogFooter>
         </form>
-      </DialogContent>
-    </Dialog>
+      </DDialogContent>
+    </DDialog>
   );
 }
