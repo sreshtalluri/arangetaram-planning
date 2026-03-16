@@ -20,15 +20,15 @@ export async function fetchSSE(
   onChunk: (text: string) => void,
   signal?: AbortSignal
 ): Promise<void> {
-  const { data: { session } } = await supabase.auth.getSession()
   const anonKey = process.env.REACT_APP_SUPABASE_ANON_KEY || ''
+  const token = await getFreshToken()
 
   const response = await fetch(url, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
       'apikey': anonKey,
-      'Authorization': `Bearer ${session?.access_token || anonKey}`,
+      'Authorization': `Bearer ${token}`,
     },
     body: JSON.stringify(body),
     signal,
@@ -64,18 +64,44 @@ export async function fetchSSE(
 }
 
 /**
+ * Get a fresh access token, refreshing if needed
+ */
+async function getFreshToken(): Promise<string> {
+  const anonKey = process.env.REACT_APP_SUPABASE_ANON_KEY || ''
+
+  // Try getting current session first
+  const { data: { session } } = await supabase.auth.getSession()
+
+  if (session?.access_token) {
+    // Check if token expires within 60 seconds
+    const expiresAt = session.expires_at ? session.expires_at * 1000 : 0
+    if (expiresAt > Date.now() + 60_000) {
+      return session.access_token
+    }
+
+    // Token is stale — refresh it
+    const { data: refreshed } = await supabase.auth.refreshSession()
+    if (refreshed.session?.access_token) {
+      return refreshed.session.access_token
+    }
+  }
+
+  return anonKey
+}
+
+/**
  * Fetch recommendations (non-streaming)
  */
 export async function fetchRecommendations(eventId: string) {
-  const { data: { session } } = await supabase.auth.getSession()
   const anonKey = process.env.REACT_APP_SUPABASE_ANON_KEY || ''
+  const token = await getFreshToken()
 
   const response = await fetch(AI_ENDPOINTS.recommendations, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
       'apikey': anonKey,
-      'Authorization': `Bearer ${session?.access_token || anonKey}`,
+      'Authorization': `Bearer ${token}`,
     },
     body: JSON.stringify({ eventId }),
   })

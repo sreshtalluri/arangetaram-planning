@@ -95,13 +95,18 @@
                     }),
                     (e.__SV = 1));
             })(document, window.posthog || []);
-            posthog.init("phc_xAvL2Iq4tFmANRE7kzbKwaSqp1HJjN7x48s3vr0CMjs", {
-                api_host: "https://us.i.posthog.com",
-                person_profiles: "identified_only", // or 'always' to create profiles for anonymous users as well,
-                session_recording: {
-                    recordCrossOriginIframes: true,
-                },
-            });
+            // Only init PostHog in production to avoid ad-blocker noise in dev.
+            // For production ad-blocker resistance, proxy PostHog through your own domain:
+            // https://posthog.com/docs/advanced/proxy
+            if (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+                posthog.init("phc_xAvL2Iq4tFmANRE7kzbKwaSqp1HJjN7x48s3vr0CMjs", {
+                    api_host: "https://us.i.posthog.com",
+                    person_profiles: "identified_only",
+                    session_recording: {
+                        recordCrossOriginIframes: true,
+                    },
+                });
+            }
         </script>
     </body>
 </html>
