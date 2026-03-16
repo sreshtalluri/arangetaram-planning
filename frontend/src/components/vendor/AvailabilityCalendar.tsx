@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useBlockedDates, useBlockDates, useUnblockDate } from '@/hooks/useAvailability'
+import { useAllBlockedDates } from '@/hooks/useVendorBookings'
 import { Loader2, X, ChevronLeft, ChevronRight, ChevronDown } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { buttonVariants } from '@/components/ui/button'
@@ -18,6 +19,7 @@ export function AvailabilityCalendar({ vendorId }: AvailabilityCalendarProps) {
   const { blockedDates, availability, isLoading } = useBlockedDates(vendorId)
   const blockMutation = useBlockDates()
   const unblockMutation = useUnblockDate()
+  const { data: allBlocked } = useAllBlockedDates(vendorId)
 
   const [selectedDates, setSelectedDates] = useState<Date[]>([])
   const [lastClickedDate, setLastClickedDate] = useState<Date | null>(null)
@@ -25,11 +27,34 @@ export function AvailabilityCalendar({ vendorId }: AvailabilityCalendarProps) {
   const [showAllBlocked, setShowAllBlocked] = useState(false)
   const today = useMemo(() => startOfToday(), [])
 
+  const bookingEventDates = useMemo(() =>
+    (allBlocked?.bookingBlocks || [])
+      .filter(b => !b.isBufferDay)
+      .map(b => parseISO(b.date)),
+    [allBlocked]
+  )
+
+  const bookingBufferDates = useMemo(() =>
+    (allBlocked?.bookingBlocks || [])
+      .filter(b => b.isBufferDay)
+      .map(b => parseISO(b.date)),
+    [allBlocked]
+  )
+
   const isDateBlocked = (date: Date) =>
     blockedDates.some(blocked => isSameDay(blocked, date))
 
+  const isBookingDate = (date: Date) =>
+    bookingEventDates.some(d => isSameDay(d, date)) ||
+    bookingBufferDates.some(d => isSameDay(d, date))
+
   const handleDayClick = (day: Date, modifiers: Record<string, boolean>, e: React.MouseEvent) => {
     if (!isAfter(day, today) && !isSameDay(day, today)) return
+
+    if (isBookingDate(day)) {
+      toast.info('This date is blocked by a confirmed booking. Cancel the booking to free it.')
+      return
+    }
 
     if (isDateBlocked(day)) {
       handleUnblock(day)
@@ -135,6 +160,14 @@ export function AvailabilityCalendar({ vendorId }: AvailabilityCalendarProps) {
           Booked
         </div>
         <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#0F4C5C]/10 border border-[#0F4C5C]/20 text-xs font-medium text-[#0F4C5C]">
+          <div className="w-2.5 h-2.5 rounded-full bg-[#0F4C5C]/20 ring-1 ring-[#0F4C5C]" />
+          Confirmed Booking
+        </div>
+        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#0F4C5C]/5 border border-[#0F4C5C]/10 text-xs font-medium text-[#0F4C5C]/70">
+          <div className="w-2.5 h-2.5 rounded-full bg-[#0F4C5C]/10" />
+          Buffer Day
+        </div>
+        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#0F4C5C]/10 border border-[#0F4C5C]/20 text-xs font-medium text-[#0F4C5C]">
           <div className="w-2.5 h-2.5 rounded-full bg-[#0F4C5C]/15" />
           Selected
         </div>
@@ -150,10 +183,14 @@ export function AvailabilityCalendar({ vendorId }: AvailabilityCalendarProps) {
             disabled={{ before: today }}
             modifiers={{
               booked: blockedDates,
+              booking: bookingEventDates,
+              bufferDay: bookingBufferDates,
               selected: selectedDates,
             }}
             modifiersClassNames={{
               booked: 'bg-[#800020]/15 text-[#800020] font-medium',
+              booking: 'bg-[#0F4C5C]/20 text-[#0F4C5C] font-bold ring-2 ring-[#0F4C5C]',
+              bufferDay: 'bg-[#0F4C5C]/10 text-[#0F4C5C] font-medium',
               selected: 'bg-[#0F4C5C]/15 text-[#0F4C5C] ring-2 ring-[#0F4C5C]',
             }}
             className="border border-[#E5E5E5] rounded-xl p-5 shadow-[0_4px_20px_-2px_rgba(0,0,0,0.05)]"
@@ -195,7 +232,7 @@ export function AvailabilityCalendar({ vendorId }: AvailabilityCalendarProps) {
             }}
           />
           <p className="text-xs text-[#888888] mt-3">
-            Click to select dates. Shift-click to select a range. Click a booked date to unblock it.
+            Click to select dates. Shift-click to select a range. Click a blocked date to unblock. Booking dates cannot be unblocked directly.
           </p>
         </div>
 
