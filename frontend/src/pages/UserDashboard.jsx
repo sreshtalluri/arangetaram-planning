@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
-import { useEvents } from "../hooks/useEvents";
+import { useEvents, useDeleteEvent } from "../hooks/useEvents";
+import { toast } from "sonner";
 import Navbar from "../components/Navbar";
 import { EventCard } from "../components/dashboard/EventCard";
 import { SavedVendorsList } from "../components/dashboard/SavedVendorsList";
@@ -29,6 +30,20 @@ export default function UserDashboard() {
       ...prev,
       [eventId]: !prev[eventId],
     }));
+  };
+
+  const deleteEvent = useDeleteEvent();
+
+  const handleDelete = async (event) => {
+    if (!window.confirm(`Are you sure you want to delete "${event.event_name}"? This cannot be undone.`)) {
+      return;
+    }
+    try {
+      await deleteEvent.mutateAsync({ eventId: event.id, userId: user.id });
+      toast.success("Event deleted");
+    } catch (error) {
+      toast.error("Failed to delete event");
+    }
   };
 
   if (isLoading) {
@@ -100,6 +115,7 @@ export default function UserDashboard() {
                         onBrowseVendors={() =>
                           navigate(`/vendors?date=${event.event_date}`)
                         }
+                        onDelete={() => handleDelete(event)}
                       />
                       {/* Collapsible recommendations */}
                       <button

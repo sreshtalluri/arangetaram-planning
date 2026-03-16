@@ -42,18 +42,15 @@ export function EventWizard() {
   const createEvent = useCreateEvent()
   const updateEvent = useUpdateEvent()
 
-  // Load saved draft from localStorage
-  const getSavedDraft = (): EventFormData | null => {
-    if (typeof window === 'undefined') return null
-    const saved = localStorage.getItem(STORAGE_KEY)
-    return saved ? JSON.parse(saved) : null
-  }
+  // Clear stale drafts when starting a fresh create (no edit param)
+  useEffect(() => {
+    if (!editEventId) {
+      localStorage.removeItem(STORAGE_KEY)
+    }
+  }, [editEventId])
 
   // Get default values for form
   const getDefaultValues = (): EventFormData => {
-    const savedDraft = getSavedDraft()
-    if (savedDraft) return savedDraft
-
     if (existingEvent) {
       return {
         event_name: existingEvent.event_name,
@@ -83,9 +80,9 @@ export function EventWizard() {
     mode: 'onChange',
   })
 
-  // Reset form when existingEvent loads (if no draft)
+  // Reset form when existingEvent loads
   useEffect(() => {
-    if (existingEvent && !getSavedDraft()) {
+    if (existingEvent) {
       methods.reset({
         event_name: existingEvent.event_name,
         event_date: existingEvent.event_date,
