@@ -100,26 +100,31 @@ export function useVendors(params: UseVendorsParams = {}) {
       }
 
       // Check availability date - tag vendors with availability status
-      if (params.availableDate) {
-        // Fetch manual blocks
+      if (params.availableDate && vendors.length > 0) {
+        const vendorIds = vendors.map(v => v.id)
+
+        // Fetch manual blocks scoped to current vendor set
         const { data: manualBlocks } = await supabase
           .from('vendor_availability')
           .select('vendor_id')
           .eq('blocked_date', params.availableDate)
+          .in('vendor_id', vendorIds)
 
         const manualBlockedIds = new Set(manualBlocks?.map(b => b.vendor_id) || [])
 
-        // Fetch booking blocks - bookings where this date appears in blocked_dates
+        // Fetch booking blocks scoped to current vendor set
         const { data: bookingBlocks } = await (supabase
           .from('vendor_bookings' as any) as any)
           .select('vendor_id, booked_date, blocked_dates')
           .eq('status', 'confirmed')
+          .in('vendor_id', vendorIds)
           .contains('blocked_dates', [params.availableDate])
 
-        // Fetch all booking settings for capacity check
+        // Fetch booking settings scoped to current vendor set
         const { data: allSettings } = await (supabase
           .from('vendor_booking_settings' as any) as any)
           .select('vendor_id, booking_type, max_per_day, buffer_days_before, buffer_days_after')
+          .in('vendor_id', vendorIds)
 
         const settingsMap = new Map<string, any>(
           (allSettings || []).map((s: any) => [s.vendor_id, s])

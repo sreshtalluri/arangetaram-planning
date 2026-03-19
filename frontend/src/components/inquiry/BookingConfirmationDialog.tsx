@@ -3,7 +3,9 @@ import { DayPicker } from 'react-day-picker'
 import {
   format,
   isSameDay,
+  isBefore,
   parseISO,
+  startOfToday,
   subDays,
   addDays,
   eachDayOfInterval,
@@ -121,9 +123,13 @@ export function BookingConfirmationDialog({
     return unique.sort((a, b) => a.getTime() - b.getTime())
   }, [eventDateObj, selectedBufferDates, extraDates])
 
+  const today = useMemo(() => startOfToday(), [])
+
   const handleDayClick = (day: Date) => {
     // Event date cannot be deselected
     if (isSameDay(day, eventDateObj)) return
+    // Don't allow selecting past dates
+    if (isBefore(day, today)) return
 
     // Buffer date: toggle selection
     if (isBufferDate(day)) {
@@ -264,6 +270,7 @@ export function BookingConfirmationDialog({
             mode="multiple"
             selected={allSelectedDates}
             onDayClick={handleDayClick}
+            disabled={{ before: today }}
             defaultMonth={eventDateObj}
             modifiers={modifiers}
             modifiersClassNames={modifiersClassNames}
