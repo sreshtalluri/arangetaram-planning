@@ -1,6 +1,8 @@
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
-import { useEvents } from "../hooks/useEvents";
+import { useEvents, useDeleteEvent } from "../hooks/useEvents";
+import { toast } from "sonner";
 import Navbar from "../components/Navbar";
 import { EventCard } from "../components/dashboard/EventCard";
 import { SavedVendorsList } from "../components/dashboard/SavedVendorsList";
@@ -8,7 +10,7 @@ import { MyInquiriesList } from "../components/dashboard/MyInquiriesList";
 import { RecommendationsSection } from "../components/ai/RecommendationsSection";
 import { Button } from "../components/ui/button";
 import {
-  Calendar, Plus, Loader2, MessageSquare
+  Calendar, Plus, Loader2, MessageSquare, ChevronDown, Sparkles
 } from "lucide-react";
 
 export default function UserDashboard() {
@@ -20,6 +22,30 @@ export default function UserDashboard() {
 
   // Combined loading state
   const isLoading = authLoading || eventsLoading;
+
+  const [expandedRecs, setExpandedRecs] = useState({});
+
+  const toggleRecs = (eventId) => {
+    setExpandedRecs((prev) => ({
+      ...prev,
+      [eventId]: !prev[eventId],
+    }));
+  };
+
+  const deleteEvent = useDeleteEvent();
+
+  const handleDelete = async (event) => {
+    if (!window.confirm(`Are you sure you want to delete "${event.event_name}"? This cannot be undone.`)) {
+      return;
+    }
+    try {
+      await deleteEvent.mutateAsync({ eventId: event.id, userId: user.id });
+      toast.success("Event deleted");
+    } catch (error) {
+      console.error('Failed to delete event:', event.id, error);
+      toast.error(error?.message || "Failed to delete event");
+    }
+  };
 
   if (isLoading) {
     return (
@@ -81,29 +107,46 @@ export default function UserDashboard() {
               {events.length > 0 ? (
                 <div className="space-y-4">
                   {events.map((event) => (
-                    <EventCard
-                      key={event.id}
-                      event={event}
-                      onEdit={() =>
-                        navigate(`/events/create?edit=${event.id}`)
-                      }
-                      onBrowseVendors={() =>
-                        navigate(`/vendors?date=${event.event_date}`)
-                      }
-                    />
+                    <div key={event.id}>
+                      <EventCard
+                        event={event}
+                        onEdit={() =>
+                          navigate(`/events/create?edit=${event.id}`)
+                        }
+                        onBrowseVendors={() =>
+                          navigate(`/vendors?date=${event.event_date}`)
+                        }
+                        onDelete={() => handleDelete(event)}
+                      />
+                      {/* Collapsible recommendations */}
+                      <button
+                        onClick={() => toggleRecs(event.id)}
+                        aria-expanded={!!expandedRecs[event.id]}
+                        aria-controls={`recs-${event.id}`}
+                        className="mt-2 w-full flex items-center justify-center gap-2 py-2 text-sm text-[#0F4C5C] hover:bg-[#0F4C5C]/5 rounded-lg transition-colors"
+                      >
+                        <Sparkles className="w-4 h-4 text-[#C5A059]" />
+                        {expandedRecs[event.id]
+                          ? "Hide Recommendations"
+                          : "View Recommendations"}
+                        <ChevronDown
+                          className={`w-4 h-4 transition-transform ${
+                            expandedRecs[event.id] ? "rotate-180" : ""
+                          }`}
+                        />
+                      </button>
+                      {expandedRecs[event.id] && (
+                        <div className="mt-2" id={`recs-${event.id}`}>
+                          <RecommendationsSection event={event} />
+                        </div>
+                      )}
+                    </div>
                   ))}
                 </div>
               ) : (
                 <EmptyEventsState onCreateEvent={() => navigate("/events/create")} />
               )}
             </section>
-
-            {/* AI Recommendations Section */}
-            {events.length > 0 && (
-              <section className="mt-8">
-                <RecommendationsSection event={events[0]} />
-              </section>
-            )}
           </div>
 
           {/* Right Column - Saved Vendors + Inquiries */}
